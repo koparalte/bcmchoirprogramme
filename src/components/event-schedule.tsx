@@ -11,8 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { X, Search } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -22,37 +20,18 @@ export function EventSchedule({ events }: { events: Event[] }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const [filterCategory, setFilterCategory] = useState("all");
-  const [filterDate, setFilterDate] = useState<Date | undefined>();
-  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date-asc");
   
-  const [isPending, startTransition] = useTransition();
-
   const categories = useMemo(
     () => ["all", ...Array.from(new Set(events.map((e) => e.category)))],
     [events]
   );
   
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    startTransition(() => {
-        setSearchTerm(e.target.value);
-    });
-  }
-
   const filteredAndSortedEvents = useMemo(() => {
     let filtered = events;
 
     if (filterCategory !== "all") {
       filtered = filtered.filter((e) => e.category === filterCategory);
-    }
-    
-    if (filterDate) {
-        const selectedDate = filterDate.toISOString().split("T")[0];
-        filtered = filtered.filter((e) => e.date === selectedDate);
-    }
-
-    if (searchTerm) {
-        filtered = filtered.filter((e) => e.title.toLowerCase().includes(searchTerm.toLowerCase()) || e.description.toLowerCase().includes(searchTerm.toLowerCase()));
     }
     
     return [...filtered].sort((a, b) => {
@@ -69,12 +48,10 @@ export function EventSchedule({ events }: { events: Event[] }) {
                 return 0;
         }
     });
-  }, [events, filterCategory, filterDate, searchTerm, sortBy]);
+  }, [events, filterCategory, sortBy]);
   
   const clearFilters = () => {
     setFilterCategory("all");
-    setFilterDate(undefined);
-    setSearchTerm("");
     setSortBy("date-asc");
   }
 
@@ -83,16 +60,12 @@ export function EventSchedule({ events }: { events: Event[] }) {
     setIsDialogOpen(true);
   };
   
-  const hasActiveFilters = filterCategory !== 'all' || filterDate !== undefined || searchTerm !== '';
+  const hasActiveFilters = filterCategory !== 'all';
 
   return (
     <div className="animate-in fade-in-50 duration-500">
       <div className="bg-card p-4 rounded-lg shadow-sm mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end">
-            <div className="relative sm:col-span-2 md:col-span-3 lg:col-span-2">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search events..." value={searchTerm} onChange={handleSearchChange} className="pl-10" />
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger>
               <SelectValue placeholder="Filter by category" />
@@ -105,7 +78,6 @@ export function EventSchedule({ events }: { events: Event[] }) {
               ))}
             </SelectContent>
           </Select>
-          <DatePicker date={filterDate} setDate={setFilterDate} />
           <Select value={sortBy} onValueChange={setSortBy}>
              <SelectTrigger>
                <SelectValue placeholder="Sort by" />
@@ -149,7 +121,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
          <div className="text-center col-span-full py-16 px-4 border-2 border-dashed rounded-lg">
            <Search className="mx-auto h-12 w-12 text-muted-foreground" />
            <h3 className="mt-4 text-xl font-semibold">No Matching Events</h3>
-           <p className="mt-1 text-muted-foreground">Try adjusting your search or filter criteria.</p>
+           <p className="mt-1 text-muted-foreground">Try adjusting your filter criteria.</p>
          </div>
        )}
 
