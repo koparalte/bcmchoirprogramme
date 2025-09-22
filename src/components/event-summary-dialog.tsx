@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -65,20 +64,20 @@ export function EventSummaryDialog({
       <DialogContent className="sm:max-w-2xl max-h-[90svh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-primary pr-10">{event.title}</DialogTitle>
-          <DialogDescription className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2">
-            <div className="flex items-center gap-1.5 text-sm">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
                 <span>{format(new Date(event.date), 'PPP')}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-sm">
-                <Clock className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
                 <span>{event.startTime} - {event.endTime}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-sm">
-                <Tag className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center gap-1.5">
+                <Tag className="w-4 h-4" />
                 <Badge variant="secondary">{event.category}</Badge>
             </div>
-          </DialogDescription>
+          </div>
         </DialogHeader>
         <Separator />
         <ScrollArea className="flex-grow">
