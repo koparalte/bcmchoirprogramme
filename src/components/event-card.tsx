@@ -26,7 +26,10 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader>
         <div className="flex justify-between items-start gap-4">
-          <CardTitle className="font-headline text-xl text-primary">{event.title}</CardTitle>
+          <div className="flex-grow">
+            <CardTitle className="font-headline text-xl text-primary">{event.title}</CardTitle>
+            {event.subtitle && <p className="text-sm text-muted-foreground mt-1">{event.subtitle}</p>}
+          </div>
           <CategoryIcon category={event.category} className="w-6 h-6 text-muted-foreground shrink-0 mt-1" />
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground pt-1">
