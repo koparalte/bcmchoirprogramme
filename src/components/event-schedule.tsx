@@ -4,19 +4,24 @@ import { useState, useMemo } from "react";
 import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
-import { AnimatePresence, motion } from "framer-motion";
-import { format } from "date-fns";
+import { motion } from "framer-motion";
+import { format, getMonth, getYear } from "date-fns";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export function EventSchedule({ events }: { events: Event[] }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  const groupedEvents = useMemo(() => {
+
+  const { currentMonthKey, groupedEvents } = useMemo(() => {
     const sorted = [...events].sort((a, b) => {
         return new Date(a.startdate).getTime() - new Date(b.startdate).getTime();
     });
 
-    return sorted.reduce((acc, event) => {
+    const now = new Date();
+    const currentYear = getYear(now);
+    const currentMonth = getMonth(now);
+    
+    const groups = sorted.reduce((acc, event) => {
       const month = format(new Date(event.startdate), 'MMMM yyyy');
       if (!acc[month]) {
         acc[month] = [];
@@ -24,6 +29,14 @@ export function EventSchedule({ events }: { events: Event[] }) {
       acc[month].push(event);
       return acc;
     }, {} as Record<string, Event[]>);
+
+    // Find the key for the current month
+    const currentKey = Object.keys(groups).find(monthKey => {
+      const monthDate = new Date(monthKey);
+      return getYear(monthDate) === currentYear && getMonth(monthDate) === currentMonth;
+    });
+
+    return { currentMonthKey: currentKey, groupedEvents: groups };
   }, [events]);
 
   const handleSelectEvent = (event: Event) => {
@@ -33,39 +46,44 @@ export function EventSchedule({ events }: { events: Event[] }) {
   
   const hasEvents = Object.keys(groupedEvents).length > 0;
 
+  const monthKeys = Object.keys(groupedEvents);
+
   return (
     <div className="animate-in fade-in-50 duration-500">
       {hasEvents ? (
-        <AnimatePresence>
-          {Object.entries(groupedEvents).map(([month, monthEvents]) => (
-            <motion.div 
-              key={month}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h2 className="text-2xl font-bold text-primary my-6 pb-2 border-b-2 border-primary/20">
+        <Accordion type="single" collapsible defaultValue={currentMonthKey} className="w-full">
+          {monthKeys.map((month) => (
+            <AccordionItem value={month} key={month}>
+               <AccordionTrigger className="text-2xl font-bold text-primary my-2 hover:no-underline">
                 {month}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {monthEvents.map((event) => (
-                  <motion.div
-                    key={event.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                      <EventCard event={event} onSelectEvent={handleSelectEvent} />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <motion.div
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                    {groupedEvents[month].map((event) => (
+                      <motion.div
+                        key={event.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                          <EventCard event={event} onSelectEvent={handleSelectEvent} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </AnimatePresence>
+        </Accordion>
        ) : (
          <div className="text-center col-span-full py-16 px-4 border-2 border-dashed rounded-lg">
            <h3 className="mt-4 text-xl font-semibold">No Matching Events</h3>
