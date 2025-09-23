@@ -27,12 +27,12 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
       const endMonth = endDate.toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
 
       if (startMonth === endMonth) {
-         return `${startDate.getUTCDate()} - ${endDate.getUTCDate()} ${startMonth}, ${startDate.getUTCFullYear()}`;
+         return `${startDate.toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' })} ${startDate.getUTCDate()} - ${endDate.toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' })} ${endDate.getUTCDate()} ${startMonth}, ${startDate.getUTCFullYear()}`;
       }
-      return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' })} - ${endDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`;
+      return `${startDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} - ${endDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`;
     }
     return startDate.toLocaleDateString(undefined, {
-      year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
     });
   }
 

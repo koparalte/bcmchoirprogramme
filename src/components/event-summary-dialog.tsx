@@ -64,9 +64,9 @@ export function EventSummaryDialog({
     if (end) {
       const endDate = new Date(end);
       endDate.setMinutes(endDate.getMinutes() + endDate.getTimezoneOffset());
-      return `${format(startDate, 'PPP')} - ${format(endDate, 'PPP')}`;
+      return `${format(startDate, 'PPPP')} - ${format(endDate, 'PPPP')}`;
     }
-    return format(startDate, 'PPP');
+    return format(startDate, 'PPPP');
   }
 
   if (!event) return null;
