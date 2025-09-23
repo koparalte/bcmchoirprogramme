@@ -54,9 +54,6 @@ export default function Home() {
         <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary uppercase">
           BCM Choir Programme
         </h1>
-        <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
-          Instantly create a beautiful, filterable event schedule from your Google Sheet.
-        </p>
       </header>
 
       {isLoading && (
