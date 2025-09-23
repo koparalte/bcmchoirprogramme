@@ -5,19 +5,37 @@ export function Logo({ className, ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn("w-8 h-8", className)}
+      viewBox="0 0 200 200"
+      className={cn("w-16 h-16", className)}
       {...props}
     >
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" fill="hsl(var(--secondary))"/>
-      <path d="M14 2v6h6" stroke="hsl(var(--primary))" />
-      <path d="m10 12.5 5-3-5-3" stroke="hsl(var(--accent))" strokeWidth="2.5" />
-      <path d="m10 19.5 5-3-5-3" stroke="hsl(var(--primary))" strokeWidth="2.5" />
+      <g>
+        <circle cx="100" cy="100" r="95" fill="white" />
+        <g stroke="hsl(var(--destructive))" strokeWidth="4" fill="none">
+          {/* Cross */}
+          <path d="M100 20V50" />
+          <path d="M85 35H115" />
+          
+          {/* Globe */}
+          <circle cx="100" cy="90" r="35" />
+          <path d="M65 90H135" />
+          <path d="M100 55V125" />
+          <ellipse cx="100" cy="90" rx="17.5" ry="33" />
+          <ellipse cx="100" cy="90" rx="30" ry="15" />
+
+          {/* Book */}
+          <path d="M40 120 C 40 100, 60 80, 100 80 C 140 80, 160 100, 160 120" />
+          <path d="M40 120 L 40 140 L 160 140 L 160 120" />
+          <path d="M100 85 L 100 140" />
+
+          {/* Banner */}
+          <path d="M50 145 C 70 160, 130 160, 150 145 L 160 155 C 130 175, 70 175, 40 155 Z" fill="white"/>
+          <path d="M50 145 C 70 160, 130 160, 150 145 M 40 155 C 70 175, 130 175, 160 155" />
+        </g>
+        <text x="100" y="165" fontFamily="Arial, sans-serif" fontSize="10" fontWeight="bold" textAnchor="middle" fill="hsl(var(--destructive))">
+            BAPTIST CHURCH OF MIZORAM
+        </text>
+      </g>
     </svg>
   );
 }
