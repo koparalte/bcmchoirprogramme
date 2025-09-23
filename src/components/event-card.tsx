@@ -17,7 +17,7 @@ type EventCardProps = {
 };
 
 export function EventCard({ event, onSelectEvent }: EventCardProps) {
-  const descriptionSnippet = event.description.substring(0, 140) + (event.description.length > 140 ? "..." : "");
+  const descriptionSnippet = event.description.substring(0, 100) + (event.description.length > 100 ? "..." : "");
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -28,7 +28,7 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
       <CardContent className="px-4 pb-2 pt-0 flex-grow">
         <p className="text-sm text-muted-foreground">{descriptionSnippet}</p>
       </CardContent>
-      <CardFooter className="flex justify-between items-center bg-secondary/30 p-3">
+      <CardFooter className="flex justify-between items-center bg-secondary/30 p-3 mt-auto">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="w-3.5 h-3.5" />
             <span>{new Date(event.date).toLocaleDateString(undefined, {

@@ -51,7 +51,7 @@ export async function getEvents(
     const { cols, rows } = gvizData.table;
     const headers = cols.map((col) => col.label.toLowerCase());
 
-    const requiredHeaders = ["title", "subtitle", "description", "date", "starttime", "endtime", "category"];
+    const requiredHeaders = ["title", "subtitle", "description", "date"];
     for (const h of requiredHeaders) {
       if (!headers.includes(h)) {
         return { error: `Missing required column in Google Sheet: '${h}'. Please check your column headers.`}
@@ -84,9 +84,6 @@ export async function getEvents(
         subtitle: event.subtitle || "",
         description: event.description || "",
         date: event.date || "",
-        startTime: event.starttime || "",
-        endTime: event.endtime || "",
-        category: event.category || "General",
       };
     });
 

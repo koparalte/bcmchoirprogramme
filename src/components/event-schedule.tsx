@@ -20,27 +20,15 @@ export function EventSchedule({ events }: { events: Event[] }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const [filterCategory, setFilterCategory] = useState("all");
   const [sortBy, setSortBy] = useState("date-asc");
   
-  const categories = useMemo(
-    () => ["all", ...Array.from(new Set(events.map((e) => e.category)))],
-    [events]
-  );
-  
   const groupedEvents = useMemo(() => {
-    let filtered = events;
-
-    if (filterCategory !== "all") {
-      filtered = filtered.filter((e) => e.category === filterCategory);
-    }
-    
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...events].sort((a, b) => {
         switch(sortBy) {
             case 'date-asc':
-                return new Date(a.date).getTime() - new Date(b.date).getTime() || a.startTime.localeCompare(b.startTime);
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
             case 'date-desc':
-                return new Date(b.date).getTime() - new Date(a.date).getTime() || b.startTime.localeCompare(a.startTime);
+                return new Date(b.date).getTime() - new Date(a.date).getTime();
             case 'title-asc':
                 return a.title.localeCompare(b.title);
             case 'title-desc':
@@ -58,7 +46,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
       acc[month].push(event);
       return acc;
     }, {} as Record<string, Event[]>);
-  }, [events, filterCategory, sortBy]);
+  }, [events, sortBy]);
 
   const handleSelectEvent = (event: Event) => {
     setSelectedEvent(event);
@@ -66,29 +54,16 @@ export function EventSchedule({ events }: { events: Event[] }) {
   };
   
   const clearFilters = () => {
-    setFilterCategory("all");
     setSortBy("date-asc");
   }
 
-  const hasActiveFilters = filterCategory !== 'all' || sortBy !== 'date-asc';
+  const hasActiveFilters = sortBy !== 'date-asc';
   const hasEvents = Object.keys(groupedEvents).length > 0;
 
   return (
     <div className="animate-in fade-in-50 duration-500">
       <div className="bg-card p-4 rounded-lg shadow-sm mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Select value={sortBy} onValueChange={setSortBy}>
              <SelectTrigger>
                <SelectValue placeholder="Sort by" />
@@ -105,7 +80,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
             <div className="mt-4 flex justify-end">
                 <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground hover:text-primary">
                     <X className="w-4 h-4 mr-2" />
-                    Clear Filters
+                    Clear Sort
                 </Button>
             </div>
         )}
