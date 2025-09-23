@@ -51,7 +51,7 @@ export default function Home() {
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12">
       <header className="flex flex-col items-center text-center mb-8 md:mb-12">
         <Logo className="w-16 h-16 mb-4" />
-        <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary">
+        <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary uppercase">
           BCM Choir Programme
         </h1>
         <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
