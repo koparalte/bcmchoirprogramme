@@ -40,7 +40,7 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
     if (!event.zingzan) return null;
     const lowerZingzan = event.zingzan.toLowerCase();
     if (lowerZingzan === 'day') {
-      return <Sun className="w-3.5 h-3.5" />;
+      return <Sun className="w-3.5 h-3.5 text-accent" />;
     }
     if (lowerZingzan === 'night') {
       return <Moon className="w-3.5 h-3.5" />;
