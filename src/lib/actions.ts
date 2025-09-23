@@ -1,7 +1,6 @@
 'use server';
 
 import {z} from 'zod';
-import {summarizeEventDescription} from '@/ai/flows/summarize-event-descriptions';
 import type {Event} from './types';
 
 const sheetUrlSchema = z.string().url();
@@ -125,20 +124,5 @@ export async function getEvents(
       error:
         'An unexpected error occurred. Check the browser console for more details.',
     };
-  }
-}
-
-export async function getEventSummary(
-  description: string
-): Promise<{summary?: string; error?: string}> {
-  if (!description) {
-    return {summary: 'No description provided.'};
-  }
-  try {
-    const {summary} = await summarizeEventDescription({description});
-    return {summary};
-  } catch (error) {
-    console.error('AI summarization failed:', error);
-    return {error: 'Failed to generate summary.'};
   }
 }
