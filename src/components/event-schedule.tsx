@@ -92,7 +92,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
           <Select value={sortBy} onValueChange={setSortBy}>
              <SelectTrigger>
                <SelectValue placeholder="Sort by" />
-             </Trigger>
+             </SelectTrigger>
              <SelectContent>
                 <SelectItem value="date-asc">Date (Asc)</SelectItem>
                 <SelectItem value="date-desc">Date (Desc)</SelectItem>
