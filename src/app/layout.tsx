@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: 'BCM CHOIR PROGRAMME',
   description: 'Dynamically generate an event schedule from a Google Sheet.',
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({
