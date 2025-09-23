@@ -7,9 +7,6 @@ const logoUrl = "https://lh3.googleusercontent.com/d/1yOgPWEoQhO6nWt2AmwM4lxXgRs
 export const metadata: Metadata = {
   title: 'BCM CHOIR PROGRAMME',
   description: 'Dynamically generate an event schedule from a Google Sheet.',
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({
