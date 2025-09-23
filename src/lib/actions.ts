@@ -18,6 +18,28 @@ interface GvizResponse {
   };
 }
 
+function parseSheetDate(cellValue: string): string | null {
+    if (typeof cellValue === 'string' && cellValue.startsWith('Date(')) {
+        const dateParts = cellValue
+        .replace('Date(', '')
+        .replace(')', '')
+        .split(',');
+        const dateObj = new Date(
+        parseInt(dateParts[0]),
+        parseInt(dateParts[1]),
+        parseInt(dateParts[2])
+        );
+        return dateObj.toISOString().split('T')[0];
+    }
+    // Handle cases where date might be a simple string
+    const date = new Date(cellValue);
+    if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+    }
+    return null;
+}
+
+
 export async function getEvents(
   sheetUrl: string
 ): Promise<{data?: Event[]; error?: string}> {
@@ -54,7 +76,7 @@ export async function getEvents(
     const {cols, rows} = gvizData.table;
     const headers = cols.map(col => col.label.toLowerCase());
 
-    const requiredHeaders = ['location', 'programme', 'description', 'date'];
+    const requiredHeaders = ['location', 'programme', 'description', 'startdate'];
     for (const h of requiredHeaders) {
       if (!headers.includes(h)) {
         return {
@@ -68,24 +90,9 @@ export async function getEvents(
       row.c.forEach((cell, i) => {
         const header = headers[i];
         if (header) {
-          if (cell) {
-            // For dates, Google Sheets often sends them in a weird format.
-            // "Date(YYYY,M,D)". We parse it. M is 0-indexed.
-            if (
-              header === 'date' &&
-              typeof cell.v === 'string' &&
-              cell.v.startsWith('Date(')
-            ) {
-              const dateParts = cell.v
-                .replace('Date(', '')
-                .replace(')', '')
-                .split(',');
-              const dateObj = new Date(
-                parseInt(dateParts[0]),
-                parseInt(dateParts[1]),
-                parseInt(dateParts[2])
-              );
-              event[header] = dateObj.toISOString().split('T')[0];
+          if (cell && cell.v !== null) {
+            if ((header === 'startdate' || header === 'enddate') && typeof cell.v === 'string') {
+              event[header] = parseSheetDate(cell.v);
             } else {
               event[header] = cell.f ?? cell.v;
             }
@@ -99,7 +106,8 @@ export async function getEvents(
         title: event.location || 'Untitled Event',
         programme: event.programme || '',
         description: event.description || '',
-        date: event.date || '',
+        startdate: event.startdate || '',
+        enddate: event.enddate,
       };
     });
 

@@ -19,11 +19,28 @@ type EventCardProps = {
 export function EventCard({ event, onSelectEvent }: EventCardProps) {
   const descriptionSnippet = event.description.substring(0, 100) + (event.description.length > 100 ? "..." : "");
 
+  const formatDateRange = (start: string, end?: string) => {
+    const startDate = new Date(start);
+    if (end) {
+      const endDate = new Date(end);
+      const startMonth = startDate.toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
+      const endMonth = endDate.toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
+
+      if (startMonth === endMonth) {
+         return `${startDate.getUTCDate()} - ${endDate.getUTCDate()} ${startMonth}, ${startDate.getUTCFullYear()}`;
+      }
+      return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' })} - ${endDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`;
+    }
+    return startDate.toLocaleDateString(undefined, {
+      year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
+    });
+  }
+
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-4">
         <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
-        {event.programme && <p className="text-lg text-muted-foreground mt-1">{event.programme}</p>}
+        {event.programme && <p className="text-md text-muted-foreground mt-1">{event.programme}</p>}
       </CardHeader>
       <CardContent className="px-4 pb-2 pt-0 flex-grow">
         <p className="text-sm text-muted-foreground">{descriptionSnippet}</p>
@@ -31,9 +48,7 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
       <CardFooter className="flex justify-between items-center bg-secondary/30 p-3 mt-auto">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="w-3.5 h-3.5" />
-            <span>{new Date(event.date).toLocaleDateString(undefined, {
-                year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'
-            })}</span>
+            <span>{formatDateRange(event.startdate, event.enddate)}</span>
         </div>
         <Button
           variant="ghost"

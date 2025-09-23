@@ -56,6 +56,19 @@ export function EventSummaryDialog({
     }
   }
 
+  const formatDateRange = (start: string, end?: string) => {
+    const startDate = new Date(start);
+    // Adjust for timezone offset to show correct date
+    startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
+
+    if (end) {
+      const endDate = new Date(end);
+      endDate.setMinutes(endDate.getMinutes() + endDate.getTimezoneOffset());
+      return `${format(startDate, 'PPP')} - ${format(endDate, 'PPP')}`;
+    }
+    return format(startDate, 'PPP');
+  }
+
   if (!event) return null;
 
   return (
@@ -67,7 +80,7 @@ export function EventSummaryDialog({
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4" />
-                <span>{format(new Date(event.date), 'PPP')}</span>
+                <span>{formatDateRange(event.startdate, event.enddate)}</span>
             </div>
           </div>
         </DialogHeader>

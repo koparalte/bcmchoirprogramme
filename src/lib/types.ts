@@ -3,5 +3,6 @@ export type Event = {
   title: string;
   programme: string;
   description: string;
-  date: string; // YYYY-MM-DD
+  startdate: string; // YYYY-MM-DD
+  enddate?: string; // YYYY-MM-DD
 };

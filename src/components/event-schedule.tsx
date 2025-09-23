@@ -26,9 +26,9 @@ export function EventSchedule({ events }: { events: Event[] }) {
     const sorted = [...events].sort((a, b) => {
         switch(sortBy) {
             case 'date-asc':
-                return new Date(a.date).getTime() - new Date(b.date).getTime();
+                return new Date(a.startdate).getTime() - new Date(b.startdate).getTime();
             case 'date-desc':
-                return new Date(b.date).getTime() - new Date(a.date).getTime();
+                return new Date(b.startdate).getTime() - new Date(a.startdate).getTime();
             case 'title-asc':
                 return a.title.localeCompare(b.title);
             case 'title-desc':
@@ -39,7 +39,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
     });
 
     return sorted.reduce((acc, event) => {
-      const month = format(new Date(event.date), 'MMMM yyyy');
+      const month = format(new Date(event.startdate), 'MMMM yyyy');
       if (!acc[month]) {
         acc[month] = [];
       }
