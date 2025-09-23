@@ -54,7 +54,7 @@ export async function getEvents(
 
     const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    const response = await fetch(gvizUrl);
+    const response = await fetch(gvizUrl, { cache: 'no-store' });
 
     if (!response.ok) {
       return {
