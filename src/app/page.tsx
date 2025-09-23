@@ -1,51 +1,18 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { Loader2, PartyPopper } from "lucide-react";
+import { Loader2, PartyPopper, AlertTriangle } from "lucide-react";
 
 import type { Event } from "@/lib/types";
 import { getEvents } from "@/lib/actions";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { EventSchedule } from "@/components/event-schedule";
 import { Logo } from "@/components/logo";
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/1xeyiLqMDULNfycqE2zStdsABz_I1eXqXBvqnOqEhs3U/edit?gid=0#gid=0";
 
-export default function Home() {
-  const [events, setEvents] = useState<Event[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const { toast } = useToast();
-
-  const loadEvents = async () => {
-    setIsLoading(true);
-    setError(null);
-    setEvents(null);
-
-    const result = await getEvents(SHEET_URL);
-
-    if (result.error) {
-      setError(result.error);
-      toast({
-        variant: "destructive",
-        title: "Error fetching events",
-        description: result.error,
-      });
-    } else {
-      setEvents(result.data || []);
-    }
-    setIsLoading(false);
-  }
-
-  useEffect(() => {
-    loadEvents();
-  }, []);
+export default async function Home() {
+  const { data: events, error } = await getEvents(SHEET_URL);
 
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12">
@@ -56,24 +23,18 @@ export default function Home() {
         </h1>
       </header>
 
-      {isLoading && (
-        <div className="text-center p-8">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary"/>
-            <p className="mt-4 text-muted-foreground">Fetching your events...</p>
-        </div>
-      )}
-
-      {error && !isLoading && (
+      {error && (
          <Card className="max-w-3xl mx-auto text-center p-8 border-destructive/50 bg-destructive/10">
            <CardContent className="pt-6">
-            <h3 className="text-xl font-semibold text-destructive">An Error Occurred</h3>
+            <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+            <h3 className="mt-4 text-xl font-semibold text-destructive">An Error Occurred</h3>
             <p className="mt-2 text-destructive/80">{error}</p>
-            <Button variant="destructive" className="mt-4" onClick={loadEvents}>Try Again</Button>
+            <p className="mt-4 text-sm text-muted-foreground">Please check your Google Sheet URL and make sure it's published to the web.</p>
            </CardContent>
          </Card>
       )}
 
-      {events && !isLoading && (
+      {events && (
         events.length > 0
           ? <EventSchedule events={events} />
           : (
