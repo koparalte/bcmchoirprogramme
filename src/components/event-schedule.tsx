@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo } from "react";
 import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
@@ -12,8 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { X, Search } from "lucide-react";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { format } from "date-fns";
 
 export function EventSchedule({ events }: { events: Event[] }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -27,14 +28,14 @@ export function EventSchedule({ events }: { events: Event[] }) {
     [events]
   );
   
-  const filteredAndSortedEvents = useMemo(() => {
+  const groupedEvents = useMemo(() => {
     let filtered = events;
 
     if (filterCategory !== "all") {
       filtered = filtered.filter((e) => e.category === filterCategory);
     }
     
-    return [...filtered].sort((a, b) => {
+    const sorted = [...filtered].sort((a, b) => {
         switch(sortBy) {
             case 'date-asc':
                 return new Date(a.date).getTime() - new Date(b.date).getTime() || a.startTime.localeCompare(b.startTime);
@@ -48,19 +49,29 @@ export function EventSchedule({ events }: { events: Event[] }) {
                 return 0;
         }
     });
+
+    return sorted.reduce((acc, event) => {
+      const month = format(new Date(event.date), 'MMMM yyyy');
+      if (!acc[month]) {
+        acc[month] = [];
+      }
+      acc[month].push(event);
+      return acc;
+    }, {} as Record<string, Event[]>);
   }, [events, filterCategory, sortBy]);
-  
-  const clearFilters = () => {
-    setFilterCategory("all");
-    setSortBy("date-asc");
-  }
 
   const handleSelectEvent = (event: Event) => {
     setSelectedEvent(event);
     setIsDialogOpen(true);
   };
   
-  const hasActiveFilters = filterCategory !== 'all';
+  const clearFilters = () => {
+    setFilterCategory("all");
+    setSortBy("date-asc");
+  }
+
+  const hasActiveFilters = filterCategory !== 'all' || sortBy !== 'date-asc';
+  const hasEvents = Object.keys(groupedEvents).length > 0;
 
   return (
     <div className="animate-in fade-in-50 duration-500">
@@ -81,7 +92,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
           <Select value={sortBy} onValueChange={setSortBy}>
              <SelectTrigger>
                <SelectValue placeholder="Sort by" />
-             </SelectTrigger>
+             </Trigger>
              <SelectContent>
                 <SelectItem value="date-asc">Date (Asc)</SelectItem>
                 <SelectItem value="date-desc">Date (Desc)</SelectItem>
@@ -100,26 +111,39 @@ export function EventSchedule({ events }: { events: Event[] }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {hasEvents ? (
         <AnimatePresence>
-            {filteredAndSortedEvents.map((event) => (
-              <motion.div
-                key={event.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                  <EventCard event={event} onSelectEvent={handleSelectEvent} />
-              </motion.div>
-            ))}
+          {Object.entries(groupedEvents).map(([month, monthEvents]) => (
+            <motion.div 
+              key={month}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl font-bold text-primary my-6 pb-2 border-b-2 border-primary/20">
+                {month}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {monthEvents.map((event) => (
+                  <motion.div
+                    key={event.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                      <EventCard event={event} onSelectEvent={handleSelectEvent} />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
         </AnimatePresence>
-      </div>
-
-      {filteredAndSortedEvents.length === 0 && (
+       ) : (
          <div className="text-center col-span-full py-16 px-4 border-2 border-dashed rounded-lg">
-           <Search className="mx-auto h-12 w-12 text-muted-foreground" />
            <h3 className="mt-4 text-xl font-semibold">No Matching Events</h3>
            <p className="mt-1 text-muted-foreground">Try adjusting your filter criteria.</p>
          </div>
