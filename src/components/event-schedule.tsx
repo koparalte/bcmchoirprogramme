@@ -5,21 +5,17 @@ import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
-import { format, getMonth, getYear } from "date-fns";
+import { format, getMonth, getYear, isPast, endOfMonth } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export function EventSchedule({ events }: { events: Event[] }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { currentMonthKey, groupedEvents } = useMemo(() => {
+  const { defaultOpenMonths, groupedEvents } = useMemo(() => {
     const sorted = [...events].sort((a, b) => {
         return new Date(a.startdate).getTime() - new Date(b.startdate).getTime();
     });
-
-    const now = new Date();
-    const currentYear = getYear(now);
-    const currentMonth = getMonth(now);
     
     const groups = sorted.reduce((acc, event) => {
       const month = format(new Date(event.startdate), 'MMMM yyyy');
@@ -30,13 +26,13 @@ export function EventSchedule({ events }: { events: Event[] }) {
       return acc;
     }, {} as Record<string, Event[]>);
 
-    // Find the key for the current month
-    const currentKey = Object.keys(groups).find(monthKey => {
+    const now = new Date();
+    const openMonths = Object.keys(groups).filter(monthKey => {
       const monthDate = new Date(monthKey);
-      return getYear(monthDate) === currentYear && getMonth(monthDate) === currentMonth;
+      return !isPast(endOfMonth(monthDate));
     });
 
-    return { currentMonthKey: currentKey, groupedEvents: groups };
+    return { defaultOpenMonths: openMonths, groupedEvents: groups };
   }, [events]);
 
   const handleSelectEvent = (event: Event) => {
@@ -51,7 +47,7 @@ export function EventSchedule({ events }: { events: Event[] }) {
   return (
     <div className="animate-in fade-in-50 duration-500">
       {hasEvents ? (
-        <Accordion type="single" collapsible defaultValue={currentMonthKey} className="w-full">
+        <Accordion type="multiple" defaultValue={defaultOpenMonths} className="w-full">
           {monthKeys.map((month) => (
             <AccordionItem value={month} key={month}>
                <AccordionTrigger className="text-2xl font-bold text-primary my-2 hover:no-underline">
