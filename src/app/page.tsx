@@ -52,7 +52,7 @@ export default function Home() {
       <header className="flex flex-col items-center text-center mb-8 md:mb-12">
         <Logo className="w-16 h-16 mb-4" />
         <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary">
-          SheetSync Events
+          BCM Choir Programme
         </h1>
         <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
           Instantly create a beautiful, filterable event schedule from your Google Sheet.

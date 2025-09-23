@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'SheetSync Events',
+  title: 'BCM Choir Programme',
   description: 'Dynamically generate an event schedule from a Google Sheet.',
 };
 
