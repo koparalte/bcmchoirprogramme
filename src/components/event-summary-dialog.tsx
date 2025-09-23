@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getEventSummary } from "@/lib/actions";
 import { type Event } from "@/lib/types";
-import { Loader2, Sparkles, Clock, Calendar, Tag } from "lucide-react";
+import { Loader2, Sparkles, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
@@ -69,14 +68,6 @@ export function EventSummaryDialog({
             <div className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4" />
                 <span>{format(new Date(event.date), 'PPP')}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                <span>{event.startTime} - {event.endTime}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-                <Tag className="w-4 h-4" />
-                <Badge variant="secondary">{event.category}</Badge>
             </div>
           </div>
         </DialogHeader>
