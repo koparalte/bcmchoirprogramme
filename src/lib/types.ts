@@ -5,5 +5,5 @@ export type Event = {
   description: string;
   startdate: string; // YYYY-MM-DD
   enddate?: string; // YYYY-MM-DD
-  zingzan?: string; // Day or Night
+  zingzan?: string; // zing (day) or zan (night)
 };
