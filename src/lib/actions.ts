@@ -93,7 +93,10 @@ export async function getEvents(
           if (cell && cell.v !== null) {
             if ((header === 'startdate' || header === 'enddate') && typeof cell.v === 'string') {
               event[header] = parseSheetDate(cell.v);
-            } else {
+            } else if (header === 'zing&zan') {
+              event['zingzan'] = cell.f ?? cell.v;
+            }
+            else {
               event[header] = cell.f ?? cell.v;
             }
           } else {
@@ -108,6 +111,7 @@ export async function getEvents(
         description: event.description || '',
         startdate: event.startdate || '',
         enddate: event.enddate,
+        zingzan: event.zingzan,
       };
     });
 

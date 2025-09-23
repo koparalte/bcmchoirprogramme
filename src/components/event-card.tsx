@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { type Event } from "@/lib/types";
-import { Calendar, ArrowRight } from "lucide-react";
+import { Calendar, ArrowRight, Sun, Moon } from "lucide-react";
 
 type EventCardProps = {
   event: Event;
@@ -36,6 +36,18 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
     });
   }
 
+  const renderZingZanIcon = () => {
+    if (!event.zingzan) return null;
+    const lowerZingzan = event.zingzan.toLowerCase();
+    if (lowerZingzan === 'day') {
+      return <Sun className="w-3.5 h-3.5" />;
+    }
+    if (lowerZingzan === 'night') {
+      return <Moon className="w-3.5 h-3.5" />;
+    }
+    return null;
+  }
+
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-4">
@@ -49,6 +61,9 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="w-3.5 h-3.5" />
             <span>{formatDateRange(event.startdate, event.enddate)}</span>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-2">
+              {renderZingZanIcon()}
+            </div>
         </div>
         <Button
           variant="ghost"
