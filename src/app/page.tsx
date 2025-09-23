@@ -1,6 +1,6 @@
 import { EventSchedule } from "@/components/event-schedule";
 
-export default async function Home() {
+export default function Home() {
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12">
       <header className="flex flex-col items-center text-center mb-8 md:mb-12">
