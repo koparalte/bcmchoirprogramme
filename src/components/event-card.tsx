@@ -23,7 +23,7 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-4">
         <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
-        {event.subtitle && <p className="text-lg text-muted-foreground mt-1">{event.subtitle}</p>}
+        {event.programme && <p className="text-lg text-muted-foreground mt-1">{event.programme}</p>}
       </CardHeader>
       <CardContent className="px-4 pb-2 pt-0 flex-grow">
         <p className="text-sm text-muted-foreground">{descriptionSnippet}</p>

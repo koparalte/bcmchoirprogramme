@@ -63,7 +63,7 @@ export function EventSummaryDialog({
       <DialogContent className="sm:max-w-2xl max-h-[90svh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline text-primary pr-10">{event.title}</DialogTitle>
-          {event.subtitle && <p className="text-muted-foreground mt-1">{event.subtitle}</p>}
+          {event.programme && <p className="text-muted-foreground mt-1">{event.programme}</p>}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4" />
