@@ -14,7 +14,22 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
 
   const { defaultOpenMonths, groupedEvents } = useMemo(() => {
     const sorted = [...events].sort((a, b) => {
-        return new Date(a.startdate).getTime() - new Date(b.startdate).getTime();
+      const dateA = new Date(a.startdate).getTime();
+      const dateB = new Date(b.startdate).getTime();
+      
+      if (dateA !== dateB) {
+        return dateA - dateB;
+      }
+      
+      // If dates are the same, sort by zingzan
+      // 'zing' (day) should come before 'zan' (night)
+      if (a.zingzan?.toLowerCase() === 'zing' && b.zingzan?.toLowerCase() !== 'zing') {
+        return -1;
+      }
+      if (a.zingzan?.toLowerCase() !== 'zing' && b.zingzan?.toLowerCase() === 'zing') {
+        return 1;
+      }
+      return 0;
     });
     
     const groups = sorted.reduce((acc, event) => {
