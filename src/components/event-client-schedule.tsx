@@ -107,7 +107,7 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
       <Accordion type="multiple" defaultValue={['upcoming-events']} className="w-full space-y-8">
         <AccordionItem value="upcoming-events">
           <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
-            Upcoming Events
+            Upcoming
           </AccordionTrigger>
           <AccordionContent>
             {hasUpcomingEvents ? (
@@ -128,7 +128,7 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
         {hasPastEvents && (
           <AccordionItem value="past-events">
             <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
-              Past Events
+              Past
             </AccordionTrigger>
             <AccordionContent>
               <Accordion type="multiple" className="w-full">
