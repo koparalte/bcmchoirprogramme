@@ -111,6 +111,7 @@ export async function getEvents(
         startdate: event.startdate || '',
         enddate: event.enddate,
         zingzan: event.zingzan,
+        time: event.time,
       };
     });
 

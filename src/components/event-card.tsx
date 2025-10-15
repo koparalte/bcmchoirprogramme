@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { type Event } from "@/lib/types";
-import { Calendar, ArrowRight, Sun, Moon } from "lucide-react";
+import { Calendar, ArrowRight, Sun, Moon, Clock } from "lucide-react";
 
 type EventCardProps = {
   event: Event;
@@ -34,14 +34,23 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
     });
   }
 
-  const renderZingZanIcon = () => {
-    if (!event.zingzan) return null;
-    const lowerZingzan = event.zingzan.toLowerCase();
-    if (lowerZingzan === 'zing') {
-      return <Sun className="w-3.5 h-3.5 text-accent" />;
+  const renderZingZanOrTime = () => {
+    if (event.zingzan) {
+      const lowerZingzan = event.zingzan.toLowerCase();
+      if (lowerZingzan === 'zing') {
+        return <Sun className="w-3.5 h-3.5 text-accent" />;
+      }
+      if (lowerZingzan === 'zan') {
+        return <Moon className="w-3.5 h-3.5" />;
+      }
     }
-    if (lowerZingzan === 'zan') {
-      return <Moon className="w-3.5 h-3.5" />;
+    if (event.time) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{event.time}</span>
+        </div>
+      );
     }
     return null;
   }
@@ -53,12 +62,12 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
         {event.programme && <p className="text-md text-muted-foreground mt-1">{event.programme}</p>}
       </CardHeader>
       <CardFooter className="flex justify-between items-center bg-secondary/30 p-3 mt-auto">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{formatDateRange(event.startdate, event.enddate)}</span>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-2">
-              {renderZingZanIcon()}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{formatDateRange(event.startdate, event.enddate)}</span>
             </div>
+            {renderZingZanOrTime()}
         </div>
         <Button
           variant="ghost"
