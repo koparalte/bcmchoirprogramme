@@ -75,7 +75,7 @@ export async function getEvents(
     const {cols, rows} = gvizData.table;
     const headers = cols.map(col => col.label.toLowerCase());
 
-    const requiredHeaders = ['location', 'programme', 'description', 'startdate'];
+    const requiredHeaders = ['location', 'programme', 'startdate'];
     for (const h of requiredHeaders) {
       if (!headers.includes(h)) {
         return {
