@@ -3,11 +3,8 @@ import { EventClientSchedule } from "./event-client-schedule";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
 
-
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1xeyiLqMDULNfycqE2zStdsABz_I1eXqXBvqnOqEhs3U/edit?gid=0#gid=0";
-
-export async function EventSchedule() {
-  const { data: events, error } = await getEvents(SHEET_URL);
+export async function EventSchedule({ sheetUrl }: { sheetUrl: string }) {
+  const { data: events, error } = await getEvents(sheetUrl);
 
   if (error) {
     return (
