@@ -11,8 +11,8 @@ export default function Home() {
       <PageHeader />
       <Tabs defaultValue="bcm" className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-          <TabsTrigger value="bcm">BCM</TabsTrigger>
-          <TabsTrigger value="bcya">BCYA</TabsTrigger>
+          <TabsTrigger value="bcm">PROGRAMME</TabsTrigger>
+          <TabsTrigger value="bcya">HLA ZIR</TabsTrigger>
         </TabsList>
         <TabsContent value="bcm" className="mt-6">
           <EventSchedule sheetUrl={BCM_SHEET_URL} />
