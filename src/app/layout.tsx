@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 const logoUrl = "https://lh3.googleusercontent.com/d/1yOgPWEoQhO6nWt2AmwM4lxXgRsoZs7nM";
 
 export const metadata: Metadata = {
-  title: 'BCM CHOIR PROGRAMME',
+  title: 'BCM CHOIR PROGRAMME & HLA ZIR',
   description: '',
 };
 
@@ -29,4 +29,3 @@ export default function RootLayout({
     </html>
   );
 }
-
