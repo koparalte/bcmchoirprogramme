@@ -5,12 +5,12 @@ import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
-import { endOfDay, isPast, format } from "date-fns";
+import { endOfDay, isPast, format, parseISO } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const groupEventsByMonth = (events: Event[]) => {
   return events.reduce((acc, event) => {
-    const month = format(new Date(event.startdate), 'MMMM yyyy');
+    const month = format(parseISO(event.startdate), 'MMMM yyyy');
     if (!acc[month]) {
       acc[month] = [];
     }
@@ -63,9 +63,11 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
       if (dateA !== dateB) {
         return dateA - dateB;
       }
-
-      if (a.zingzan?.toLowerCase() === 'zing' && b.zingzan?.toLowerCase() !== 'zing') return -1;
-      if (a.zingzan?.toLowerCase() !== 'zing' && b.zingzan?.toLowerCase() === 'zing') return 1;
+      
+      if (a.zingzan && b.zingzan) {
+        if (a.zingzan.toLowerCase() === 'zing' && b.zingzan.toLowerCase() !== 'zing') return -1;
+        if (a.zingzan.toLowerCase() !== 'zing' && b.zingzan.toLowerCase() === 'zing') return 1;
+      }
       return 0;
     });
 
@@ -74,8 +76,8 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
     const today = endOfDay(new Date());
 
     sorted.forEach(event => {
-      const eventEndDate = event.enddate ? new Date(event.enddate) : new Date(event.startdate);
-      if (isPast(eventEndDate) && !isPast(today)) {
+      const eventEndDate = event.enddate ? parseISO(event.enddate) : parseISO(event.startdate);
+      if (isPast(eventEndDate)) {
         past.push(event);
       } else {
         upcoming.push(event);
@@ -104,8 +106,8 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
 
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
-      <Accordion type="multiple" defaultValue={['upcoming-events']} className="w-full space-y-8">
-        <AccordionItem value="upcoming-events">
+      <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8">
+        <AccordionItem value="upcoming">
           <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
             Upcoming
           </AccordionTrigger>
@@ -126,7 +128,7 @@ export function EventClientSchedule({ events }: { events: Event[] }) {
         </AccordionItem>
 
         {hasPastEvents && (
-          <AccordionItem value="past-events">
+          <AccordionItem value="past">
             <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
               Past
             </AccordionTrigger>
