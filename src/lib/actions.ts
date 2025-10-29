@@ -82,7 +82,8 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
 }
 
 export async function getEvents(
-  sheetUrl: string
+  sheetUrl: string,
+  showAllEvents?: boolean
 ): Promise<{data?: Event[]; error?: string}> {
   const { data: gvizData, error } = await fetchSheetData(sheetUrl);
 
@@ -98,13 +99,13 @@ export async function getEvents(
     if (!headers.includes('location') && !headers.includes('name')) {
         return { error: "Missing required column in Google Sheet: 'location' or 'name'. Please check your column headers." };
     }
-     if (!headers.includes('programme') && !headers.includes('kohhran')) {
+     if (!showAllEvents && !headers.includes('programme') && !headers.includes('kohhran')) {
         return { error: "Missing required column in Google Sheet: 'programme' or 'kohhran'. Please check your column headers." };
     }
 
 
     for (const h of requiredHeaders) {
-      if (!headers.includes(h)) {
+      if (!headers.includes(h) && !showAllEvents) {
         return {
           error: `Missing required column in Google Sheet: '${h}'. Please check your column headers.`,
         };
@@ -136,9 +137,9 @@ export async function getEvents(
         startdate: event.startdate || '',
         enddate: event.enddate,
         time: event.time,
-        designation: event.designation,
+        designation: event.designation
       };
-    });
+    }).filter(event => event.title !== 'Untitled Event' || event.programme || event.description);
 
     return {data: events};
   } catch (err) {
@@ -163,23 +164,20 @@ export async function getMembers(
     const {cols, rows} = gvizData.table;
     const headers = cols.map(col => col.label.toLowerCase());
     
-    const nameHeader = headers.find(h => h.toLowerCase() === 'name');
-    if (!nameHeader) {
+    const nameHeaderIndex = headers.findIndex(h => h.toLowerCase() === 'name');
+
+    if (nameHeaderIndex === -1) {
       return { error: "Missing required column in Google Sheet: 'name'. Please check your column headers." };
     }
 
     const members: Member[] = rows
       .map((row, index) => {
-        const member: Record<string, any> = {};
-        row.c.forEach((cell, i) => {
-          const header = headers[i];
-          if (header) {
-            member[header] = cell ? (cell.f ?? cell.v) : null;
-          }
-        });
+        const nameCell = row.c[nameHeaderIndex];
+        const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
+        
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
-          name: member.name || '',
+          name: name || '',
         };
       })
       .filter(member => member.name); // Filter out members with no name
