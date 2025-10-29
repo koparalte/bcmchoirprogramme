@@ -45,10 +45,13 @@ export function MemberDetailsDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex flex-col items-center gap-4">
-              <Avatar className="w-32 h-32 text-4xl">
-                <AvatarImage src={member.link} alt={member.name} />
-                <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-              </Avatar>
+              <div className="relative w-32 h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center">
+                {member.link ? (
+                  <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
+                ) : (
+                  <span className="text-4xl text-muted-foreground">{getInitials(member.name)}</span>
+                )}
+              </div>
             <DialogTitle className="text-2xl font-headline text-primary text-center">
               {member.name}
             </DialogTitle>
