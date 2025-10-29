@@ -24,7 +24,7 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
             <div className="flex items-center gap-2">
                 <p className="text-lg font-medium text-foreground">{member.name}</p>
                 {member.designation && (
-                    <Badge variant="secondary" className="ml-auto">{member.designation}</Badge>
+                    <Badge variant="destructive" className="ml-auto">{member.designation}</Badge>
                 )}
             </div>
             {member.kohhran && (
