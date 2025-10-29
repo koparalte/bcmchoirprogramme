@@ -185,7 +185,7 @@ export async function getMembers(
           name: name || '',
         };
       })
-      .filter(member => member.name); // Filter out members with no name
+      .filter(member => member.name && member.name.toLowerCase() !== 'name'); // Filter out members with no name and the header
 
     return {data: members};
   } catch (err) {
