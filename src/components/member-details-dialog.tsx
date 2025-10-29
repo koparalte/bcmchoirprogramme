@@ -46,24 +46,17 @@ export function MemberDetailsDialog({
                     <span>{member.kohhran}</span>
                 </div>
             )}
-            {member.part && (
-                <div className="flex items-start gap-3 text-muted-foreground">
-                    <Music className="w-5 h-5 mt-0.5" />
-                    <div className="flex flex-col">
-                        <span className="font-semibold text-foreground">Part</span>
+            <div className="flex items-start gap-3 text-muted-foreground">
+                <Music className="w-5 h-5 mt-0.5" />
+                <div className="flex flex-col">
+                    <span className="font-semibold text-foreground">Part</span>
+                    {member.part ? (
                         <span className="whitespace-pre-wrap">{member.part}</span>
-                    </div>
-                </div>
-            )}
-            {!member.part && (
-                 <div className="flex items-start gap-3 text-muted-foreground">
-                    <Music className="w-5 h-5 mt-0.5" />
-                    <div className="flex flex-col">
-                        <span className="font-semibold text-foreground">Part</span>
+                    ) : (
                         <span>No part assigned.</span>
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
       </DialogContent>
     </Dialog>
