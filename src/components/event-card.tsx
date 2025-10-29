@@ -70,7 +70,7 @@ export function EventCard({ event, onSelectEvent, isBcya }: EventCardProps) {
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDateRange(event.startdate, event.enddate)}</span>
             </div>
-            {renderZingZan()}
+            {!isBcya && renderZingZan()}
         </div>
         <Button
           variant="ghost"
