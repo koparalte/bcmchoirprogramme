@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { type Event } from "@/lib/types";
-import { Calendar, ArrowRight, Sun, Moon, Clock } from "lucide-react";
+import { Calendar, ArrowRight, Clock } from "lucide-react";
 
 type EventCardProps = {
   event: Event;
@@ -36,21 +36,10 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
     });
   }
 
-  const renderZingZan = () => {
-    if (event.zingzan) {
-      const lowerZingzan = event.zingzan.toLowerCase();
-      if (lowerZingzan === 'zing') {
-        return <Sun className="w-3.5 h-3.5 text-accent" />;
-      }
-      if (lowerZingzan === 'zan') {
-        return <Moon className="w-3.5 h-3.5" />;
-      }
-    }
-    return null;
-  }
+  const zingZanText = event.zingzan?.trim().toLowerCase();
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 min-h-[170px]">
       <CardHeader className="p-4 flex-grow">
         <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
         {isBcya ? (
@@ -66,18 +55,22 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
         )}
       </CardHeader>
       <CardFooter className="flex justify-between items-center bg-secondary/30 p-3 mt-auto">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-col items-start gap-1 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDateRange(event.startdate, event.enddate)}</span>
             </div>
-            {isProgramme && renderZingZan()}
+            {isProgramme && (zingZanText === 'zing' || zingZanText === 'zan') && (
+              <span className={`font-semibold capitalize ${zingZanText === 'zing' ? 'text-accent' : 'text-foreground'}`}>
+                {zingZanText}
+              </span>
+            )}
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onSelectEvent(event)}
-          className="text-primary hover:text-primary h-auto py-1 px-2 text-xs"
+          className="text-primary hover:text-primary h-auto py-1 px-2 text-xs self-end"
         >
           View Details <ArrowRight className="ml-1.5 w-3.h-3.5" />
         </Button>
