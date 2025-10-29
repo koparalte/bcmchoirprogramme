@@ -138,7 +138,7 @@ export async function getEvents(
         enddate: event.enddate,
         time: event.time,
         designation: event.designation,
-        zingzan: event.zingzan
+        zingzan: event['zing&zan'] || event.zingzan
       };
     }).filter(event => event.title !== 'Untitled Event' || event.programme || event.description);
 
@@ -186,7 +186,7 @@ export async function getMembers(
           name: name || '',
         };
       })
-      .filter(member => member.name && member.name.toLowerCase() !== 'name'); // Filter out members with no name and the header
+      .filter(member => member.name && member.name.trim().toLowerCase() !== 'name'); // Filter out members with no name and the header
 
     return {data: members};
   } catch (err) {

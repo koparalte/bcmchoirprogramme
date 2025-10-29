@@ -47,9 +47,9 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
         ) : (
             event.programme && !event.time && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
         )}
-        {isProgramme && (zingZanText === 'zing' || zingZanText === 'zan') && (
+        {isProgramme && zingZanText && (
             <p className={`font-semibold capitalize mt-1 ${zingZanText === 'zing' ? 'text-accent' : 'text-foreground'}`}>
-                {zingZanText}
+                {event.zingzan}
             </p>
         )}
         {event.time && (
