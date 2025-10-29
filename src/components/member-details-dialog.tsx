@@ -45,7 +45,7 @@ export function MemberDetailsDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex flex-col items-center gap-4">
-              <Avatar className="w-24 h-24 text-3xl">
+              <Avatar className="w-32 h-32 text-4xl">
                 <AvatarImage src={member.link} alt={member.name} />
                 <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
               </Avatar>
