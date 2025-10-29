@@ -55,10 +55,39 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
   };
 
   const groupedMembers = groupMembersByPart(members);
+  const conductors = groupedMembers['Conductor'] || [];
+  delete groupedMembers['Conductor'];
+
   const defaultOpen = Object.keys(groupedMembers);
 
   return (
     <>
+      {conductors.length > 0 && (
+        <div className="mb-6">
+            <motion.div
+                layout
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                {conductors.map((member) => (
+                    <motion.div
+                        key={member.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <MemberCard member={member} onSelectMember={handleSelectMember} />
+                    </motion.div>
+                ))}
+            </motion.div>
+        </div>
+      )}
+
       <Accordion type="multiple" defaultValue={defaultOpen} className="w-full space-y-4">
         {Object.entries(groupedMembers).map(([part, partMembers]) => (
           <AccordionItem value={part} key={part}>
