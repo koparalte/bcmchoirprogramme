@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { User, Church } from "lucide-react";
 import type { Member } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 type MemberCardProps = {
     member: Member;
@@ -20,8 +20,13 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
         <div className="bg-secondary p-3 rounded-full mt-1">
             <User className="w-6 h-6 text-secondary-foreground" />
         </div>
-        <div className="flex flex-col">
-            <p className="text-lg font-medium text-foreground">{member.name}</p>
+        <div className="flex flex-col flex-grow">
+            <div className="flex items-center gap-2">
+                <p className="text-lg font-medium text-foreground">{member.name}</p>
+                {member.designation && (
+                    <Badge variant="secondary" className="ml-auto">{member.designation}</Badge>
+                )}
+            </div>
             {member.kohhran && (
                 <div className="flex items-center gap-2 mt-1 text-muted-foreground">
                     <Church className="w-4 h-4" />

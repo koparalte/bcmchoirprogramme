@@ -184,12 +184,19 @@ export async function getMembers(
             const partCell = row.c[2];
             part = partCell ? (partCell.f ?? partCell.v) : null;
         }
+        
+        let designation: string | null = null;
+        if (cols.length > 3 && row.c.length > 3) {
+            const designationCell = row.c[3];
+            designation = designationCell ? (designationCell.f ?? designationCell.v) : null;
+        }
 
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
           kohhran: kohhran || undefined,
           part: part || undefined,
+          designation: designation || undefined,
         };
       })
       .filter(member => member.name && member.name.trim().toLowerCase() !== 'name' && member.name.trim().toLowerCase() !== 'member name'); // Filter out members with no name and the header
