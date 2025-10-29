@@ -47,6 +47,11 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
         ) : (
             event.programme && !event.time && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
         )}
+        {isProgramme && (zingZanText === 'zing' || zingZanText === 'zan') && (
+            <p className={`font-semibold capitalize mt-1 ${zingZanText === 'zing' ? 'text-accent' : 'text-foreground'}`}>
+                {zingZanText}
+            </p>
+        )}
         {event.time && (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
               <Clock className="w-4 h-4" />
@@ -60,11 +65,6 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDateRange(event.startdate, event.enddate)}</span>
             </div>
-            {isProgramme && (zingZanText === 'zing' || zingZanText === 'zan') && (
-              <span className={`font-semibold capitalize ${zingZanText === 'zing' ? 'text-accent' : 'text-foreground'}`}>
-                {zingZanText}
-              </span>
-            )}
         </div>
         <Button
           variant="ghost"
