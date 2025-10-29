@@ -180,19 +180,19 @@ export async function getMembers(
         }
 
         let part: string | null = null;
-        if (cols.length > 2 && row.c.length > 2) {
+        if (row.c.length > 2) {
             const partCell = row.c[2];
             part = partCell ? (partCell.f ?? partCell.v) : null;
         }
         
         let designation: string | null = null;
-        if (cols.length > 3 && row.c.length > 3) {
+        if (row.c.length > 3) {
             const designationCell = row.c[3];
             designation = designationCell ? (designationCell.f ?? designationCell.v) : null;
         }
 
         let link: string | null = null;
-        if (cols.length > 4 && row.c.length > 4) {
+        if (row.c.length > 4) {
             const linkCell = row.c[4];
             link = linkCell ? (linkCell.f ?? linkCell.v) : null;
         }
