@@ -1,7 +1,7 @@
 import { getMembers } from "@/lib/actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
-import { MemberCard } from "./member-card";
+import { MemberClientSchedule } from "./member-client-schedule";
 
 export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
   const { data: members, error } = await getMembers(sheetUrl);
@@ -29,11 +29,5 @@ export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
     )
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {members.map((member) => (
-        <MemberCard key={member.id} name={member.name} />
-      ))}
-    </div>
-  );
+  return <MemberClientSchedule members={members} />;
 }
