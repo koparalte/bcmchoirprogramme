@@ -7,6 +7,7 @@ export type Event = {
   enddate?: string; // YYYY-MM-DD
   time?: string;
   designation?: string;
+  zingzan?: string;
 };
 
 export type Member = {

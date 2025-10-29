@@ -137,7 +137,8 @@ export async function getEvents(
         startdate: event.startdate || '',
         enddate: event.enddate,
         time: event.time,
-        designation: event.designation
+        designation: event.designation,
+        zingzan: event.zingzan
       };
     }).filter(event => event.title !== 'Untitled Event' || event.programme || event.description);
 
