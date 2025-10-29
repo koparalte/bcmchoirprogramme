@@ -174,7 +174,7 @@ export async function getMembers(
         const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
         
         let kohhran: string | null = null;
-        if (cols.length > 1 && row.c.length > 1) {
+        if (row.c.length > 1) {
           const kohhranCell = row.c[1];
           kohhran = kohhranCell ? (kohhranCell.f ?? kohhranCell.v) : null;
         }
@@ -191,12 +191,19 @@ export async function getMembers(
             designation = designationCell ? (designationCell.f ?? designationCell.v) : null;
         }
 
+        let link: string | null = null;
+        if (cols.length > 4 && row.c.length > 4) {
+            const linkCell = row.c[4];
+            link = linkCell ? (linkCell.f ?? linkCell.v) : null;
+        }
+
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
           kohhran: kohhran || undefined,
           part: part || undefined,
           designation: designation || undefined,
+          link: link || undefined,
         };
       })
       .filter(member => member.name && member.name.trim().toLowerCase() !== 'name' && member.name.trim().toLowerCase() !== 'member name'); // Filter out members with no name and the header

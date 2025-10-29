@@ -16,4 +16,5 @@ export type Member = {
   kohhran?: string;
   part?: string;
   designation?: string;
+  link?: string;
 };

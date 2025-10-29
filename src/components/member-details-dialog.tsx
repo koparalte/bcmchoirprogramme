@@ -6,10 +6,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { type Member } from "@/lib/types";
 import { User, Church, Music } from "lucide-react";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 
 type MemberDetailsDialogProps = {
   member: Member | null;
@@ -29,14 +31,28 @@ export function MemberDetailsDialog({
 
   if (!member) return null;
 
+  const getInitials = (name: string) => {
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return `${names[0][0]}${names[names.length - 1][0]}`;
+    }
+    return name.substring(0, 2);
+  }
+
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-headline text-primary flex items-center gap-3">
-            <User className="w-6 h-6" />
-            {member.name}
-          </DialogTitle>
+          <div className="flex flex-col items-center gap-4">
+              <Avatar className="w-24 h-24 text-3xl">
+                <AvatarImage src={member.link} alt={member.name} />
+                <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
+              </Avatar>
+            <DialogTitle className="text-2xl font-headline text-primary text-center">
+              {member.name}
+            </DialogTitle>
+          </div>
         </DialogHeader>
         <Separator />
         <div className="space-y-4 py-2">
