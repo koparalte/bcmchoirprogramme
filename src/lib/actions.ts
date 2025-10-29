@@ -182,8 +182,11 @@ export async function getMembers(
         const nameCell = row.c[nameHeaderIndex];
         const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
         
-        const kohhranCell = kohhranHeaderIndex !== -1 ? row.c[kohhranHeaderIndex] : null;
-        const kohhran = kohhranCell ? (kohhranCell.f ?? kohhranCell.v) : null;
+        let kohhran: string | null = null;
+        if (kohhranHeaderIndex !== -1) {
+          const kohhranCell = row.c[kohhranHeaderIndex];
+          kohhran = kohhranCell ? (kohhranCell.f ?? kohhranCell.v) : null;
+        }
 
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
