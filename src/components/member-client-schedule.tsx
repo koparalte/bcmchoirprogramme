@@ -23,7 +23,7 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.3 }}
         >
-          <MemberCard name={member.name} />
+          <MemberCard member={member} />
         </motion.div>
       ))}
     </motion.div>

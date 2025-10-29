@@ -166,6 +166,7 @@ export async function getMembers(
     const headers = cols.map(col => col.label.toLowerCase());
     
     let nameHeaderIndex = headers.findIndex(h => h === 'name');
+    let kohhranHeaderIndex = headers.findIndex(h => h === 'kohhran');
 
     // Fallback: If no 'name' header is found, assume the first column contains the names.
     if (nameHeaderIndex === -1) {
@@ -181,9 +182,13 @@ export async function getMembers(
         const nameCell = row.c[nameHeaderIndex];
         const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
         
+        const kohhranCell = kohhranHeaderIndex !== -1 ? row.c[kohhranHeaderIndex] : null;
+        const kohhran = kohhranCell ? (kohhranCell.f ?? kohhranCell.v) : null;
+
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
+          kohhran: kohhran || undefined,
         };
       })
       .filter(member => member.name && member.name.trim().toLowerCase() !== 'name'); // Filter out members with no name and the header

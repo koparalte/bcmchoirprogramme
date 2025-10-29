@@ -1,16 +1,25 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { User } from "lucide-react";
+import { User, Church } from "lucide-react";
+import type { Member } from "@/lib/types";
 
-export function MemberCard({ name }: { name: string }) {
+export function MemberCard({ member }: { member: Member }) {
   return (
     <Card>
-      <CardContent className="p-4 flex items-center gap-4">
-        <div className="bg-secondary p-2 rounded-full">
+      <CardContent className="p-4 flex items-start gap-4">
+        <div className="bg-secondary p-3 rounded-full mt-1">
             <User className="w-6 h-6 text-secondary-foreground" />
         </div>
-        <p className="text-lg font-medium text-foreground">{name}</p>
+        <div className="flex flex-col">
+            <p className="text-lg font-medium text-foreground">{member.name}</p>
+            {member.kohhran && (
+                <div className="flex items-center gap-2 mt-1 text-muted-foreground">
+                    <Church className="w-4 h-4" />
+                    <p className="text-sm">{member.kohhran}</p>
+                </div>
+            )}
+        </div>
       </CardContent>
     </Card>
   );

@@ -13,4 +13,5 @@ export type Event = {
 export type Member = {
   id: string;
   name: string;
+  kohhran?: string;
 };
