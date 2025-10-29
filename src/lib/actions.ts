@@ -163,28 +163,20 @@ export async function getMembers(
 
   try {
     const {cols, rows} = gvizData.table;
-    const headers = cols.map(col => col.label.toLowerCase());
     
-    let nameHeaderIndex = headers.findIndex(h => h === 'name');
-    let kohhranHeaderIndex = headers.findIndex(h => h === 'kohhran');
-
-    // Fallback: If no 'name' header is found, assume the first column contains the names.
-    if (nameHeaderIndex === -1) {
-      if (cols.length > 0) {
-        nameHeaderIndex = 0;
-      } else {
+    if (cols.length < 1) {
         return { error: "The Google Sheet appears to have no columns. Please add a 'name' column." };
-      }
     }
 
     const members: Member[] = rows
       .map((row, index) => {
-        const nameCell = row.c[nameHeaderIndex];
+        const nameCell = row.c[0];
         const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
         
         let kohhran: string | null = null;
-        if (kohhranHeaderIndex !== -1) {
-          const kohhranCell = row.c[kohhranHeaderIndex];
+        // Check if a second column exists
+        if (cols.length > 1 && row.c.length > 1) {
+          const kohhranCell = row.c[1];
           kohhran = kohhranCell ? (kohhranCell.f ?? kohhranCell.v) : null;
         }
 
@@ -194,7 +186,7 @@ export async function getMembers(
           kohhran: kohhran || undefined,
         };
       })
-      .filter(member => member.name && member.name.trim().toLowerCase() !== 'name'); // Filter out members with no name and the header
+      .filter(member => member.name && member.name.trim().toLowerCase() !== 'name' && member.name.trim().toLowerCase() !== 'member name'); // Filter out members with no name and the header
 
     return {data: members};
   } catch (err) {
