@@ -14,9 +14,10 @@ import { Calendar, ArrowRight, Sun, Moon, Clock } from "lucide-react";
 type EventCardProps = {
   event: Event;
   onSelectEvent: (event: Event) => void;
+  isBcya?: boolean;
 };
 
-export function EventCard({ event, onSelectEvent }: EventCardProps) {
+export function EventCard({ event, onSelectEvent, isBcya }: EventCardProps) {
   const formatDateRange = (start: string, end?: string) => {
     const startDate = new Date(start);
     if (end) {
@@ -51,7 +52,11 @@ export function EventCard({ event, onSelectEvent }: EventCardProps) {
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-4 flex-grow">
         <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
-        {event.programme && !event.time && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>}
+        {isBcya ? (
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.designation}</p>
+        ) : (
+            event.programme && !event.time && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
+        )}
         {event.time && (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
               <Clock className="w-4 h-4" />
