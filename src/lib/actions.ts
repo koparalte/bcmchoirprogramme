@@ -1,7 +1,7 @@
 'use server';
 
 import {z} from 'zod';
-import type {Event} from './types';
+import type {Event, Member} from './types';
 
 const sheetUrlSchema = z.string().url();
 
@@ -38,10 +38,7 @@ function parseSheetDate(cellValue: string): string | null {
     return null;
 }
 
-
-export async function getEvents(
-  sheetUrl: string
-): Promise<{data?: Event[]; error?: string}> {
+async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, error?: string}> {
   try {
     const validatedUrl = sheetUrlSchema.parse(sheetUrl);
     const sheetId = extractSheetId(validatedUrl);
@@ -69,13 +66,43 @@ export async function getEvents(
     if (!jsonString) {
       return {error: 'Failed to parse response from Google Sheets.'};
     }
-
+    
     const gvizData: GvizResponse = JSON.parse(jsonString);
+    return { data: gvizData };
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return {error: 'Invalid URL provided.'};
+    }
+    console.error('Error fetching or parsing sheet data:', err);
+    return {
+      error:
+        'An unexpected error occurred. Check the browser console for more details.',
+    };
+  }
+}
 
+export async function getEvents(
+  sheetUrl: string
+): Promise<{data?: Event[]; error?: string}> {
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+  
+  try {
     const {cols, rows} = gvizData.table;
     const headers = cols.map(col => col.label.toLowerCase());
 
-    const requiredHeaders = ['location', 'programme', 'startdate'];
+    const requiredHeaders = ['startdate'];
+    if (!headers.includes('location') && !headers.includes('name')) {
+        return { error: "Missing required column in Google Sheet: 'location' or 'name'. Please check your column headers." };
+    }
+     if (!headers.includes('programme') && !headers.includes('kohhran')) {
+        return { error: "Missing required column in Google Sheet: 'programme' or 'kohhran'. Please check your column headers." };
+    }
+
+
     for (const h of requiredHeaders) {
       if (!headers.includes(h)) {
         return {
@@ -92,8 +119,6 @@ export async function getEvents(
           if (cell && cell.v !== null) {
             if ((header === 'startdate' || header === 'enddate') && typeof cell.v === 'string') {
               event[header] = parseSheetDate(cell.v);
-            } else if (header === 'zing&zan') {
-              event['zingzan'] = cell.f ?? cell.v;
             }
             else {
               event[header] = cell.f ?? cell.v;
@@ -104,26 +129,66 @@ export async function getEvents(
         }
       });
       return {
-        id: `${sheetId}-${index}`,
-        title: event.location || 'Untitled Event',
-        programme: event.programme || '',
-        description: event.description || '',
+        id: `${extractSheetId(sheetUrl)}-${index}`,
+        title: event.name || event.location || 'Untitled Event',
+        programme: event.kohhran || event.programme || '',
+        description: event.part || event.description || '',
         startdate: event.startdate || '',
         enddate: event.enddate,
-        zingzan: event.zingzan,
         time: event.time,
+        designation: event.designation,
       };
     });
 
     return {data: events};
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      return {error: 'Invalid URL provided.'};
-    }
-    console.error('Error fetching or parsing sheet data:', err);
+    console.error('Error processing sheet data for events:', err);
     return {
       error:
-        'An unexpected error occurred. Check the browser console for more details.',
+        'An unexpected error occurred while processing event data. Check the browser console for more details.',
+    };
+  }
+}
+
+export async function getMembers(
+  sheetUrl: string
+): Promise<{data?: Member[]; error?: string}> {
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+
+  try {
+    const {cols, rows} = gvizData.table;
+    const headers = cols.map(col => col.label.toLowerCase());
+    
+    if (!headers.includes('name')) {
+      return { error: "Missing required column in Google Sheet: 'name'. Please check your column headers." };
+    }
+
+    const members: Member[] = rows
+      .map((row, index) => {
+        const member: Record<string, any> = {};
+        row.c.forEach((cell, i) => {
+          const header = headers[i];
+          if (header) {
+            member[header] = cell ? (cell.f ?? cell.v) : null;
+          }
+        });
+        return {
+          id: `${extractSheetId(sheetUrl)}-${index}`,
+          name: member.name || '',
+        };
+      })
+      .filter(member => member.name); // Filter out members with no name
+
+    return {data: members};
+  } catch (err) {
+    console.error('Error processing sheet data for members:', err);
+    return {
+      error:
+        'An unexpected error occurred while processing member data. Check the browser console for more details.',
     };
   }
 }

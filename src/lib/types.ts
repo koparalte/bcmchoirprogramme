@@ -5,6 +5,11 @@ export type Event = {
   description: string;
   startdate: string; // YYYY-MM-DD
   enddate?: string; // YYYY-MM-DD
-  zingzan?: string; // zing (day) or zan (night)
   time?: string;
+  designation?: string;
+};
+
+export type Member = {
+  id: string;
+  name: string;
 };
