@@ -164,10 +164,15 @@ export async function getMembers(
     const {cols, rows} = gvizData.table;
     const headers = cols.map(col => col.label.toLowerCase());
     
-    const nameHeaderIndex = headers.findIndex(h => h.toLowerCase() === 'name');
+    let nameHeaderIndex = headers.findIndex(h => h === 'name');
 
+    // Fallback: If no 'name' header is found, assume the first column contains the names.
     if (nameHeaderIndex === -1) {
-      return { error: "Missing required column in Google Sheet: 'name'. Please check your column headers." };
+      if (cols.length > 0) {
+        nameHeaderIndex = 0;
+      } else {
+        return { error: "The Google Sheet appears to have no columns. Please add a 'name' column." };
+      }
     }
 
     const members: Member[] = rows
