@@ -20,7 +20,7 @@ const groupEventsByMonth = (events: Event[]) => {
   }, {} as Record<string, Event[]>);
 };
 
-const MonthEvents = ({ month, events, onSelectEvent, isBcya }: { month: string; events: Event[]; onSelectEvent: (event: Event) => void; isBcya?: boolean; }) => (
+const MonthEvents = ({ month, events, onSelectEvent, isBcya, isProgramme }: { month: string; events: Event[]; onSelectEvent: (event: Event) => void; isBcya?: boolean; isProgramme?: boolean; }) => (
   <AccordionItem value={month} key={month}>
     <AccordionTrigger className="text-2xl font-bold text-primary my-2 hover:no-underline">
       {month}
@@ -43,7 +43,7 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya }: { month: string; 
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
           >
-            <EventCard event={event} onSelectEvent={onSelectEvent} isBcya={isBcya} />
+            <EventCard event={event} onSelectEvent={onSelectEvent} isBcya={isBcya} isProgramme={isProgramme} />
           </motion.div>
         ))}
       </motion.div>
@@ -51,7 +51,7 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya }: { month: string; 
   </AccordionItem>
 );
 
-export function EventClientSchedule({ events, showAllEvents }: { events: Event[], showAllEvents?: boolean }) {
+export function EventClientSchedule({ events, showAllEvents, isProgramme }: { events: Event[], showAllEvents?: boolean, isProgramme?: boolean }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -100,7 +100,7 @@ export function EventClientSchedule({ events, showAllEvents }: { events: Event[]
             {hasUpcomingEvents ? (
                <Accordion type="multiple" defaultValue={upcomingMonthsToOpen} className="w-full">
                 {Object.entries(groupedUpcomingEvents).map(([month, monthEvents]) => (
-                  <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} />
+                  <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} isProgramme={isProgramme} />
                 ))}
               </Accordion>
             ) : (
@@ -121,7 +121,7 @@ export function EventClientSchedule({ events, showAllEvents }: { events: Event[]
             <AccordionContent>
               <Accordion type="multiple" className="w-full">
                 {Object.entries(groupedPastEvents).map(([month, monthEvents]) => (
-                  <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} />
+                  <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} isProgramme={isProgramme} />
                 ))}
               </Accordion>
             </AccordionContent>

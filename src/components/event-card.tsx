@@ -15,9 +15,10 @@ type EventCardProps = {
   event: Event;
   onSelectEvent: (event: Event) => void;
   isBcya?: boolean;
+  isProgramme?: boolean;
 };
 
-export function EventCard({ event, onSelectEvent, isBcya }: EventCardProps) {
+export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCardProps) {
   const formatDateRange = (start: string, end?: string) => {
     const startDate = new Date(start);
     if (end) {
@@ -70,7 +71,7 @@ export function EventCard({ event, onSelectEvent, isBcya }: EventCardProps) {
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDateRange(event.startdate, event.enddate)}</span>
             </div>
-            {!isBcya && renderZingZan()}
+            {isProgramme && renderZingZan()}
         </div>
         <Button
           variant="ghost"
@@ -78,7 +79,7 @@ export function EventCard({ event, onSelectEvent, isBcya }: EventCardProps) {
           onClick={() => onSelectEvent(event)}
           className="text-primary hover:text-primary h-auto py-1 px-2 text-xs"
         >
-          View Details <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
+          View Details <ArrowRight className="ml-1.5 w-3.h-3.5" />
         </Button>
       </CardFooter>
     </Card>

@@ -18,7 +18,7 @@ export default function Home() {
           <TabsTrigger value="members">MEMBERS</TabsTrigger>
         </TabsList>
         <TabsContent value="bcm" className="mt-6">
-          <EventSchedule sheetUrl={BCM_SHEET_URL} />
+          <EventSchedule sheetUrl={BCM_SHEET_URL} isProgramme={true} />
         </TabsContent>
         <TabsContent value="bcya" className="mt-6">
           <EventSchedule sheetUrl={BCYA_SHEET_URL} showAllEvents={true} />

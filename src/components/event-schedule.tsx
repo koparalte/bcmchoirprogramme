@@ -3,7 +3,7 @@ import { EventClientSchedule } from "./event-client-schedule";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
 
-export async function EventSchedule({ sheetUrl, showAllEvents }: { sheetUrl: string, showAllEvents?: boolean }) {
+export async function EventSchedule({ sheetUrl, showAllEvents, isProgramme }: { sheetUrl: string, showAllEvents?: boolean, isProgramme?: boolean }) {
   const { data: events, error } = await getEvents(sheetUrl, showAllEvents);
 
   if (error) {
@@ -29,5 +29,5 @@ export async function EventSchedule({ sheetUrl, showAllEvents }: { sheetUrl: str
     )
   }
 
-  return <EventClientSchedule events={events} showAllEvents={showAllEvents} />;
+  return <EventClientSchedule events={events} showAllEvents={showAllEvents} isProgramme={isProgramme} />;
 }
