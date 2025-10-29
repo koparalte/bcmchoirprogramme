@@ -5,8 +5,9 @@ import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
-import { endOfDay, isPast, format, parseISO } from "date-fns";
+import { endOfDay, isPast, parseISO, format } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { PartyPopper } from "lucide-react";
 
 const groupEventsByMonth = (events: Event[]) => {
   return events.reduce((acc, event) => {
@@ -27,25 +28,24 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya }: { month: string; 
     <AccordionContent>
       <motion.div
         layout
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-          {events.map((event) => (
-            <motion.div
-              key={event.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-            >
-              <EventCard event={event} onSelectEvent={onSelectEvent} isBcya={isBcya} />
-            </motion.div>
-          ))}
-        </div>
+        {events.map((event) => (
+          <motion.div
+            key={event.id}
+            layout
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+          >
+            <EventCard event={event} onSelectEvent={onSelectEvent} isBcya={isBcya} />
+          </motion.div>
+        ))}
       </motion.div>
     </AccordionContent>
   </AccordionItem>
@@ -55,44 +55,24 @@ export function EventClientSchedule({ events, showAllEvents }: { events: Event[]
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { upcomingEvents, pastEvents, upcomingMonthsToOpen } = useMemo(() => {
-    const sorted = [...events].sort((a, b) => {
-      const dateA = new Date(a.startdate).getTime();
-      const dateB = new Date(b.startdate).getTime();
-
-      if (dateA !== dateB) {
-        return dateA - dateB;
-      }
-      
-      if (a.zingzan && b.zingzan) {
-        if (a.zingzan.toLowerCase() === 'zing' && b.zingzan.toLowerCase() !== 'zing') return -1;
-        if (a.zingzan.toLowerCase() !== 'zing' && b.zingzan.toLowerCase() === 'zing') return 1;
-      }
-      return 0;
-    });
+  const { upcomingEvents, pastEvents } = useMemo(() => {
+    const sorted = [...events].sort((a, b) => new Date(a.startdate).getTime() - new Date(b.startdate).getTime());
 
     const upcoming: Event[] = [];
     const past: Event[] = [];
-    const today = endOfDay(new Date());
 
     sorted.forEach(event => {
       const eventEndDate = event.enddate ? parseISO(event.enddate) : parseISO(event.startdate);
-      if (isPast(eventEndDate)) {
+      if (isPast(endOfDay(eventEndDate))) {
         past.push(event);
       } else {
         upcoming.push(event);
       }
     });
 
-    const groupedUpcoming = groupEventsByMonth(upcoming);
-    const groupedPast = groupEventsByMonth(past.reverse());
-
-    const upcomingMonthsToOpen = Object.keys(groupedUpcoming);
-
     return {
-      upcomingEvents: groupedUpcoming,
-      pastEvents: groupedPast,
-      upcomingMonthsToOpen,
+      upcomingEvents: upcoming,
+      pastEvents: past.reverse(),
     };
   }, [events]);
 
@@ -100,9 +80,14 @@ export function EventClientSchedule({ events, showAllEvents }: { events: Event[]
     setSelectedEvent(event);
     setIsDialogOpen(true);
   };
+  
+  const groupedUpcomingEvents = groupEventsByMonth(upcomingEvents);
+  const groupedPastEvents = groupEventsByMonth(pastEvents);
+  
+  const upcomingMonthsToOpen = Object.keys(groupedUpcomingEvents);
 
-  const hasUpcomingEvents = Object.keys(upcomingEvents).length > 0;
-  const hasPastEvents = Object.keys(pastEvents).length > 0;
+  const hasUpcomingEvents = upcomingEvents.length > 0;
+  const hasPastEvents = pastEvents.length > 0;
 
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
@@ -113,13 +98,14 @@ export function EventClientSchedule({ events, showAllEvents }: { events: Event[]
           </AccordionTrigger>
           <AccordionContent>
             {hasUpcomingEvents ? (
-              <Accordion type="multiple" defaultValue={upcomingMonthsToOpen} className="w-full">
-                {Object.entries(upcomingEvents).map(([month, monthEvents]) => (
+               <Accordion type="multiple" defaultValue={upcomingMonthsToOpen} className="w-full">
+                {Object.entries(groupedUpcomingEvents).map(([month, monthEvents]) => (
                   <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} />
                 ))}
               </Accordion>
             ) : (
               <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
+                <PartyPopper className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-xl font-semibold">No Upcoming Events</h3>
                 <p className="mt-1 text-muted-foreground">Check back later for more events.</p>
               </div>
@@ -134,7 +120,7 @@ export function EventClientSchedule({ events, showAllEvents }: { events: Event[]
             </AccordionTrigger>
             <AccordionContent>
               <Accordion type="multiple" className="w-full">
-                {Object.entries(pastEvents).map(([month, monthEvents]) => (
+                {Object.entries(groupedPastEvents).map(([month, monthEvents]) => (
                   <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} />
                 ))}
               </Accordion>
