@@ -163,7 +163,8 @@ export async function getMembers(
     const {cols, rows} = gvizData.table;
     const headers = cols.map(col => col.label.toLowerCase());
     
-    if (!headers.includes('name')) {
+    const nameHeader = headers.find(h => h.toLowerCase() === 'name');
+    if (!nameHeader) {
       return { error: "Missing required column in Google Sheet: 'name'. Please check your column headers." };
     }
 
