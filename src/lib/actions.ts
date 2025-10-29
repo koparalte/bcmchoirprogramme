@@ -174,16 +174,22 @@ export async function getMembers(
         const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
         
         let kohhran: string | null = null;
-        // Check if a second column exists
         if (cols.length > 1 && row.c.length > 1) {
           const kohhranCell = row.c[1];
           kohhran = kohhranCell ? (kohhranCell.f ?? kohhranCell.v) : null;
+        }
+
+        let part: string | null = null;
+        if (cols.length > 2 && row.c.length > 2) {
+            const partCell = row.c[2];
+            part = partCell ? (partCell.f ?? partCell.v) : null;
         }
 
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
           kohhran: kohhran || undefined,
+          part: part || undefined,
         };
       })
       .filter(member => member.name && member.name.trim().toLowerCase() !== 'name' && member.name.trim().toLowerCase() !== 'member name'); // Filter out members with no name and the header

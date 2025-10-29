@@ -14,4 +14,5 @@ export type Member = {
   id: string;
   name: string;
   kohhran?: string;
+  part?: string;
 };
