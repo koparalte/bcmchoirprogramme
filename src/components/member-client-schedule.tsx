@@ -15,25 +15,26 @@ import {
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
-    const part = member.part?.trim() || "Unassigned";
-    if (!acc[part]) {
-      acc[part] = [];
+    const part = member.part?.trim();
+    if (part) {
+        if (!acc[part]) {
+            acc[part] = [];
+        }
+        acc[part].push(member);
     }
-    acc[part].push(member);
     return acc;
   }, {} as Record<string, Member[]>);
 
-  // Sort parts to have Soprano, Alto, Tenor, Bass first, then others alphabetically, then Unassigned last.
-  const partOrder = ['Soprano', 'Alto', 'Tenor', 'Bass'];
+  // Sort parts to have Conductor, Soprano, Contralto, Tenor, Bass first, then others alphabetically.
+  const partOrder = ['Conductor', 'Soprano', 'Contralto', 'Tenor', 'Bass'];
   const sortedParts = Object.keys(grouped).sort((a, b) => {
-      if (a === 'Unassigned') return 1;
-      if (b === 'Unassigned') return -1;
       const indexA = partOrder.indexOf(a);
       const indexB = partOrder.indexOf(b);
-      if (indexA > -1 && indexB > -1) return indexA - indexB;
-      if (indexA > -1) return -1;
-      if (indexB > -1) return 1;
-      return a.localeCompare(b);
+
+      if (indexA > -1 && indexB > -1) return indexA - indexB; // Both in order list
+      if (indexA > -1) return -1; // Only A is in order list
+      if (indexB > -1) return 1;  // Only B is in order list
+      return a.localeCompare(b); // Neither in order list, sort alphabetically
   });
   
   const sortedGrouped: Record<string, Member[]> = {};
