@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { type Event } from "@/lib/types";
 import { Calendar, ArrowRight, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type EventCardProps = {
   event: Event;
@@ -39,13 +40,13 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
   const zingZanText = event.zingzan?.trim().toLowerCase();
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 min-h-[170px]">
+    <Card className={cn("flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1", isProgramme && "min-h-[170px]")}>
       <CardHeader className="p-4 flex-grow">
         <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
         {isBcya ? (
             <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.designation}</p>
         ) : (
-            event.programme && !event.time && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
+            event.programme && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
         )}
         {isProgramme && zingZanText && (
             <p className={`font-semibold capitalize mt-1 ${zingZanText === 'zing' ? 'text-accent' : 'text-foreground'}`}>
