@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import type { Member } from "@/lib/types";
 import { MemberCard } from "./member-card";
 import { MemberDetailsDialog } from "./member-details-dialog";
@@ -31,10 +31,10 @@ const groupMembersByPart = (members: Member[]) => {
       const indexA = partOrder.indexOf(a);
       const indexB = partOrder.indexOf(b);
 
-      if (indexA > -1 && indexB > -1) return indexA - indexB; // Both in order list
-      if (indexA > -1) return -1; // Only A is in order list
-      if (indexB > -1) return 1;  // Only B is in order list
-      return a.localeCompare(b); // Neither in order list, sort alphabetically
+      if (indexA > -1 && indexB > -1) return indexA - indexB;
+      if (indexA > -1) return -1;
+      if (indexB > -1) return 1;
+      return a.localeCompare(b);
   });
   
   const sortedGrouped: Record<string, Member[]> = {};
@@ -44,6 +44,22 @@ const groupMembersByPart = (members: Member[]) => {
 
   return sortedGrouped;
 };
+
+const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelectMember: (member: Member) => void }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+
+  return (
+    <motion.div ref={ref} style={{ y }}>
+      <MemberCard member={member} onSelectMember={onSelectMember} />
+    </motion.div>
+  );
+};
+
 
 export function MemberClientSchedule({ members }: { members: Member[] }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
@@ -73,16 +89,11 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
                 transition={{ duration: 0.5 }}
             >
                 {conductors.map((member) => (
-                    <motion.div
+                    <MotionMemberCard
                         key={member.id}
-                        layout
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <MemberCard member={member} onSelectMember={handleSelectMember} />
-                    </motion.div>
+                        member={member}
+                        onSelectMember={handleSelectMember}
+                    />
                 ))}
             </motion.div>
         </div>
@@ -104,16 +115,11 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
                 transition={{ duration: 0.5 }}
               >
                 {partMembers.map((member) => (
-                  <motion.div
-                    key={member.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <MemberCard member={member} onSelectMember={handleSelectMember} />
-                  </motion.div>
+                    <MotionMemberCard
+                        key={member.id}
+                        member={member}
+                        onSelectMember={handleSelectMember}
+                    />
                 ))}
               </motion.div>
             </AccordionContent>
