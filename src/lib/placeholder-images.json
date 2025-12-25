@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "members-banner",
+      "description": "A banner image for the members page, showing a choir or musical group.",
+      "imageUrl": "https://images.unsplash.com/photo-1617544558413-b89365e03fd8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjaG9pciUyMG11c2ljfGVufDB8fHx8MTc2NjY2MzY0Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "choir music"
+    }
+  ]
 }
