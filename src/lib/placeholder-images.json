@@ -1,10 +1,16 @@
 {
   "placeholderImages": [
     {
-      "id": "members-banner",
+      "id": "members-banner-1",
       "description": "A banner image for the members page, showing a choir or musical group.",
       "imageUrl": "https://lh3.googleusercontent.com/pw/AP1GczMBLScZTA3P8sBg0E1gE0LRRFMnrrj6DhtPL5eywIZHnpHGHLrM4cJdplGSeMbo_h5Xw9BdyRF9mMTrLiZP7I57BUFdYe3_o0Nw2OqlbJAK5y0ASKeKlJRTDVLdTN0FyKbqecDcWmQDd6HybeStqHs_=w1418-h945-s-no-gm?authuser=0",
       "imageHint": "choir music"
+    },
+    {
+      "id": "members-banner-2",
+      "description": "A second banner image for the members page, showing another view of the choir.",
+      "imageUrl": "https://lh3.googleusercontent.com/pw/AP1GczMNIUVt3188D_RoGkzfGkJYjSDhlY_BW_-vh_Y92AYPySgExjqKcSsY4zX9_jgOKmfjj1a4ZcEK9uthXO1lAAaXFU4QSRy0lDHuRh2al_s-6HkOKg1B31ztJ1q0YSrj6hWXm1jDCeWu2H9V8ikm2UX_=w1418-h945-s-no-gm?authuser=0",
+      "imageHint": "choir singing"
     }
   ]
 }
