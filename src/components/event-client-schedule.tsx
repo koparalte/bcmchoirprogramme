@@ -7,7 +7,7 @@ import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
 import { endOfDay, isPast, parseISO, format } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { PartyPopper } from "lucide-react";
+import { Clock } from "lucide-react";
 
 const groupEventsByMonth = (events: Event[]) => {
   return events.reduce((acc, event) => {
@@ -105,9 +105,7 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
               </Accordion>
             ) : (
               <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-                <PartyPopper className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-xl font-semibold">No Upcoming Events</h3>
-                <p className="mt-1 text-muted-foreground">Check back later for more events.</p>
+                <h3 className="text-xl font-semibold text-muted-foreground">Will be Updated Soon</h3>
               </div>
             )}
           </AccordionContent>
