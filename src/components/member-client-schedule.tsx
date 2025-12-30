@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import type { Member } from "@/lib/types";
 import { MemberCard } from "./member-card";
@@ -14,13 +14,6 @@ import {
 } from "@/components/ui/accordion";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
-import { cn } from "@/lib/utils";
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
@@ -76,12 +69,8 @@ const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelect
 export function MemberClientSchedule({ members }: { members: Member[] }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const bannerImages = PlaceHolderImages.filter(img => img.id.startsWith('members-banner'));
+  const bannerImage = PlaceHolderImages.find(img => img.id.startsWith('members-banner'));
   
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -89,20 +78,6 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
   });
 
   const bannerY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-
-  useEffect(() => {
-    if (!carouselApi) return;
-
-    const onSelect = (api: CarouselApi) => {
-      setCurrentSlide(api.selectedScrollSnap());
-    };
-
-    carouselApi.on("select", onSelect);
-
-    return () => {
-      carouselApi.off("select", onSelect);
-    };
-  }, [carouselApi]);
 
   const handleSelectMember = (member: Member) => {
     setSelectedMember(member);
@@ -117,43 +92,22 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
 
   return (
     <div ref={containerRef} className="relative">
-      {bannerImages.length > 0 && (
+      {bannerImage && (
         <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
-          <Carousel setApi={setCarouselApi} opts={{ loop: true }} className="h-full">
-            <CarouselContent className="h-full">
-              {bannerImages.map((image, index) => (
-                <CarouselItem key={image.id} className="h-full">
-                  <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
-                    <Image
-                      src={image.imageUrl}
-                      alt={image.description}
-                      fill
-                      className="object-cover"
-                      data-ai-hint={image.imageHint}
-                      priority={index === 0}
-                    />
-                    <div className="absolute inset-0 bg-black/30" />
-                  </motion.div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
+            <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
+              <Image
+                src={bannerImage.imageUrl}
+                alt={bannerImage.description}
+                fill
+                className="object-cover"
+                data-ai-hint={bannerImage.imageHint}
+                priority
+              />
+              <div className="absolute inset-0 bg-black/30" />
+            </motion.div>
            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Our Members</h2>
            </div>
-           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {bannerImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => carouselApi?.scrollTo(index)}
-                className={cn(
-                  "w-2 h-2 rounded-full transition-all",
-                  currentSlide === index ? "p-1.5 bg-white" : "bg-white/50"
-                )}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
         </div>
       )}
       
