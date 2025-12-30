@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
 import { MemberClientSchedule } from "./member-client-schedule";
 
-const BANNER_SHEET_URL = "https://docs.google.com/spreadsheets/d/1BQS43nQ2u8k_9b3e13022G_N-sK0Z1p2jB-8Z0u_5qA/edit?gid=0#gid=0";
+const BANNER_SHEET_URL = "https://docs.google.com/spreadsheets/d/1EeZKOlNySd3VG93XPWMAs5moSGfzsPQ0kjl9Bqugu7s/edit?usp=sharing";
 
 export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
   const { data: members, error: membersError } = await getMembers(sheetUrl);
