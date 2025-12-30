@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import type { Member } from "@/lib/types";
 import { MemberCard } from "./member-card";
 import { MemberDetailsDialog } from "./member-details-dialog";
@@ -13,8 +13,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
@@ -70,6 +68,7 @@ const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelect
 export function MemberClientSchedule({ members, bannerUrls }: { members: Member[], bannerUrls?: string[] }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -78,6 +77,16 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
   });
 
   const bannerY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+
+  useEffect(() => {
+    if (bannerUrls && bannerUrls.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
+      }, 10000);
+      return () => clearInterval(timer);
+    }
+  }, [bannerUrls]);
+
 
   const handleSelectMember = (member: Member) => {
     setSelectedMember(member);
@@ -91,52 +100,32 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
   const defaultOpen = Object.keys(groupedMembers);
 
   const hasBanner = bannerUrls && bannerUrls.length > 0;
-  const useCarousel = hasBanner && bannerUrls.length > 1;
 
   return (
     <div ref={containerRef} className="relative">
       {hasBanner && (
         <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
-          {useCarousel ? (
-            <Carousel
-              className="w-full h-full"
-              plugins={[
-                Autoplay({
-                  delay: 10000,
-                  stopOnInteraction: true,
-                }),
-              ]}
-              opts={{ loop: true }}
-            >
-              <CarouselContent>
-                {bannerUrls.map((url, index) => (
-                  <CarouselItem key={index}>
-                    <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
+           <AnimatePresence>
+              <motion.div
+                key={currentBannerIndex}
+                className="h-full w-full absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+              >
+                  <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
                       <Image
-                        src={url}
-                        alt={`Members Banner ${index + 1}`}
+                        src={bannerUrls[currentBannerIndex]}
+                        alt={`Members Banner ${currentBannerIndex + 1}`}
                         fill
                         className="object-cover"
-                        priority={index === 0}
+                        priority={currentBannerIndex === 0}
                       />
                        <div className="absolute inset-0 bg-black/30" />
-                    </motion.div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          ) : (
-             <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
-              <Image
-                src={bannerUrls[0]}
-                alt="Members Banner"
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-black/30" />
-            </motion.div>
-          )}
+                  </motion.div>
+              </motion.div>
+           </AnimatePresence>
            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Our Members</h2>
            </div>

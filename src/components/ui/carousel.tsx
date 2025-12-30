@@ -1,263 +1,190 @@
+"use client";
 
-"use client"
+import { useState, useRef, useEffect } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import type { Member } from "@/lib/types";
+import { MemberCard } from "./member-card";
+import { MemberDetailsDialog } from "./member-details-dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import Image from "next/image";
 
-import * as React from "react"
-import useEmblaCarousel, {
-  type UseEmblaCarouselType,
-} from "embla-carousel-react"
+const groupMembersByPart = (members: Member[]) => {
+  const grouped = members.reduce((acc, member) => {
+    const part = member.part?.trim() || "Unassigned";
+    if (!acc[part]) {
+      acc[part] = [];
+    }
+    acc[part].push(member);
+    return acc;
+  }, {} as Record<string, Member[]>);
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+  const partOrder = ['Conductor', 'Soprano', 'Contralto', 'Tenor', 'Bass'];
+  const sortedParts = Object.keys(grouped).sort((a, b) => {
+    const indexA = partOrder.indexOf(a);
+    const indexB = partOrder.indexOf(b);
 
-type CarouselApi = UseEmblaCarouselType[1]
-type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
-type CarouselOptions = UseCarouselParameters[0]
-type CarouselPlugin = UseCarouselParameters[1]
+    if (a === 'Conductor') return -1;
+    if (b === 'Conductor') return 1;
 
-type CarouselProps = {
-  opts?: CarouselOptions
-  plugins?: CarouselPlugin
-  orientation?: "horizontal" | "vertical"
-  setApi?: (api: CarouselApi) => void
-}
+    if (indexA > -1 && indexB > -1) return indexA - indexB;
+    if (indexA > -1) return -1;
+    if (indexB > -1) return 1;
+    if (a === 'Unassigned') return 1;
+    if (b === 'Unassigned') return -1;
+    return a.localeCompare(b);
+  });
 
-type CarouselContextProps = {
-  carouselRef: ReturnType<typeof useEmblaCarousel>[0]
-  api: ReturnType<typeof useEmblaCarousel>[1]
-  scrollPrev: () => void
-  scrollNext: () => void
-  canScrollPrev: boolean
-  canScrollNext: boolean
-} & CarouselProps
-
-const CarouselContext = React.createContext<CarouselContextProps | null>(null)
-
-function useCarousel() {
-  const context = React.useContext(CarouselContext)
-
-  if (!context) {
-    throw new Error("useCarousel must be used within a <Carousel />")
+  const sortedGrouped: Record<string, Member[]> = {};
+  for (const part of sortedParts) {
+    if (part !== 'Unassigned') {
+      sortedGrouped[part] = grouped[part];
+    }
   }
 
-  return context
-}
+  return sortedGrouped;
+};
 
-const Carousel = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & CarouselProps
->(
-  (
-    {
-      orientation = "horizontal",
-      opts,
-      setApi,
-      plugins,
-      className,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const [carouselRef, api] = useEmblaCarousel(
-      {
-        ...opts,
-        axis: orientation === "horizontal" ? "x" : "y",
-      },
-      plugins
-    )
-    const [canScrollPrev, setCanScrollPrev] = React.useState(false)
-    const [canScrollNext, setCanScrollNext] = React.useState(false)
-
-    const onSelect = React.useCallback((api: CarouselApi) => {
-      if (!api) {
-        return
-      }
-
-      setCanScrollPrev(api.canScrollPrev())
-      setCanScrollNext(api.canScrollNext())
-    }, [])
-
-    const scrollPrev = React.useCallback(() => {
-      api?.scrollPrev()
-    }, [api])
-
-    const scrollNext = React.useCallback(() => {
-      api?.scrollNext()
-    }, [api])
-
-    const handleKeyDown = React.useCallback(
-      (event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === "ArrowLeft") {
-          event.preventDefault()
-          scrollPrev()
-        } else if (event.key === "ArrowRight") {
-          event.preventDefault()
-          scrollNext()
-        }
-      },
-      [scrollPrev, scrollNext]
-    )
-
-    React.useEffect(() => {
-      if (!api || !setApi) {
-        return
-      }
-
-      setApi(api)
-    }, [api, setApi])
-
-    React.useEffect(() => {
-      if (!api) {
-        return
-      }
-
-      onSelect(api)
-      api.on("reInit", onSelect)
-      api.on("select", onSelect)
-
-      return () => {
-        api?.off("select", onSelect)
-      }
-    }, [api, onSelect])
-
-    return (
-      <CarouselContext.Provider
-        value={{
-          carouselRef,
-          api: api,
-          opts,
-          orientation:
-            orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
-          scrollPrev,
-          scrollNext,
-          canScrollPrev,
-          canScrollNext,
-        }}
-      >
-        <div
-          ref={ref}
-          onKeyDownCapture={handleKeyDown}
-          className={cn("relative", className)}
-          role="region"
-          aria-roledescription="carousel"
-          {...props}
-        >
-          {children}
-        </div>
-      </CarouselContext.Provider>
-    )
-  }
-)
-Carousel.displayName = "Carousel"
-
-const CarouselContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  const { carouselRef, orientation } = useCarousel()
+const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelectMember: (member: Member) => void }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
   return (
-    <div ref={carouselRef} className="overflow-hidden">
-      <div
-        ref={ref}
-        className={cn(
-          "flex",
-          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
-          className
-        )}
-        {...props}
+    <motion.div ref={ref} style={{ y }}>
+      <MemberCard member={member} onSelectMember={onSelectMember} />
+    </motion.div>
+  );
+};
+
+export function MemberClientSchedule({ members, bannerUrls }: { members: Member[], bannerUrls?: string[] }) {
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start']
+  });
+
+  const bannerY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+
+  useEffect(() => {
+    if (bannerUrls && bannerUrls.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
+      }, 10000);
+      return () => clearInterval(timer);
+    }
+  }, [bannerUrls]);
+
+
+  const handleSelectMember = (member: Member) => {
+    setSelectedMember(member);
+    setIsDialogOpen(true);
+  };
+
+  const groupedMembers = groupMembersByPart(members);
+  const conductors = groupedMembers['Conductor'] || [];
+  delete groupedMembers['Conductor'];
+
+  const defaultOpen = Object.keys(groupedMembers);
+
+  const hasBanner = bannerUrls && bannerUrls.length > 0;
+
+  return (
+    <div ref={containerRef} className="relative">
+      {hasBanner && (
+        <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
+           <AnimatePresence>
+              <motion.div
+                key={currentBannerIndex}
+                className="h-full w-full absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+              >
+                  <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
+                      <Image
+                        src={bannerUrls[currentBannerIndex]}
+                        alt={`Members Banner ${currentBannerIndex + 1}`}
+                        fill
+                        className="object-cover"
+                        priority={currentBannerIndex === 0}
+                      />
+                       <div className="absolute inset-0 bg-black/30" />
+                  </motion.div>
+              </motion.div>
+           </AnimatePresence>
+           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Our Members</h2>
+           </div>
+        </div>
+      )}
+      
+      {conductors.length > 0 && (
+        <div className="mb-6">
+          <motion.div
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {conductors.map((member) => (
+              <MemberCard
+                key={member.id}
+                member={member}
+                onSelectMember={handleSelectMember}
+              />
+            ))}
+          </motion.div>
+        </div>
+      )}
+
+      <Accordion type="multiple" defaultValue={defaultOpen} className="w-full space-y-4">
+        {Object.entries(groupedMembers).map(([part, partMembers]) => (
+          <AccordionItem value={part} key={part}>
+            <AccordionTrigger className="text-2xl font-bold text-primary hover:no-underline capitalize">
+              {part} ({partMembers.length})
+            </AccordionTrigger>
+            <AccordionContent>
+              <motion.div
+                layout
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {partMembers.map((member) => (
+                  <MotionMemberCard
+                    key={member.id}
+                    member={member}
+                    onSelectMember={handleSelectMember}
+                  />
+                ))}
+              </motion.div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+
+      <MemberDetailsDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        member={selectedMember}
       />
     </div>
-  )
-})
-CarouselContent.displayName = "CarouselContent"
-
-const CarouselItem = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  const { orientation } = useCarousel()
-
-  return (
-    <div
-      ref={ref}
-      role="group"
-      aria-roledescription="slide"
-      className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
-        className
-      )}
-      {...props}
-    />
-  )
-})
-CarouselItem.displayName = "CarouselItem"
-
-const CarouselPrevious = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<typeof Button>
->(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
-
-  return (
-    <Button
-      ref={ref}
-      variant={variant}
-      size={size}
-      className={cn(
-        "absolute  h-8 w-8 rounded-full",
-        orientation === "horizontal"
-          ? "-left-12 top-1/2 -translate-y-1/2"
-          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
-      disabled={!canScrollPrev}
-      onClick={scrollPrev}
-      {...props}
-    >
-      <ArrowLeft className="h-4 w-4" />
-      <span className="sr-only">Previous slide</span>
-    </Button>
-  )
-})
-CarouselPrevious.displayName = "CarouselPrevious"
-
-const CarouselNext = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<typeof Button>
->(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollNext, canScrollNext } = useCarousel()
-
-  return (
-    <Button
-      ref={ref}
-      variant={variant}
-      size={size}
-      className={cn(
-        "absolute h-8 w-8 rounded-full",
-        orientation === "horizontal"
-          ? "-right-12 top-1/2 -translate-y-1/2"
-          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
-      disabled={!canScrollNext}
-      onClick={scrollNext}
-      {...props}
-    >
-      <ArrowRight className="h-4 w-4" />
-      <span className="sr-only">Next slide</span>
-    </Button>
-  )
-})
-CarouselNext.displayName = "CarouselNext"
-
-export {
-  type CarouselApi,
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
+  );
 }
