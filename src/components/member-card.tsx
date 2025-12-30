@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,12 +33,12 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
           className="cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full"
           onClick={() => onSelectMember(member)}
       >
-        <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
-            <div className="relative w-24 h-24 rounded-full overflow-hidden bg-muted flex items-center justify-center mb-4">
+        <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-muted flex items-center justify-center mb-3">
               {member.link ? (
                 <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
               ) : (
-                <span className="text-3xl text-muted-foreground">{getInitials(member.name)}</span>
+                <span className="text-2xl text-muted-foreground">{getInitials(member.name)}</span>
               )}
             </div>
           
