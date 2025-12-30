@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -40,11 +41,14 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
   const zingZanText = event.zingzan?.trim().toLowerCase();
 
   return (
-    <Card className={cn("flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1", isProgramme && "min-h-[170px]")}>
+    <Card className={cn("flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1", (isProgramme || isBcya) && "min-h-[170px]")}>
       <CardHeader className="p-4 flex-grow">
         <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
         {isBcya ? (
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.designation}</p>
+            <>
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.designation}</p>
+            </>
         ) : (
             event.programme && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
         )}
