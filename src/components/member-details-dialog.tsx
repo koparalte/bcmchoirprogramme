@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -45,11 +46,11 @@ export function MemberDetailsDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex flex-col items-center gap-4">
-              <div className="relative w-32 h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center">
+              <div className="relative w-48 h-48 rounded-full overflow-hidden bg-muted flex items-center justify-center">
                 {member.link ? (
                   <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
                 ) : (
-                  <span className="text-4xl text-muted-foreground">{getInitials(member.name)}</span>
+                  <span className="text-7xl text-muted-foreground">{getInitials(member.name)}</span>
                 )}
               </div>
             <DialogTitle className="text-2xl font-headline text-primary text-center">
