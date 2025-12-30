@@ -217,3 +217,27 @@ export async function getMembers(
     };
   }
 }
+
+
+export async function getBannerUrl(sheetUrl: string): Promise<{ data?: string; error?: string }> {
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+
+  try {
+    const { rows } = gvizData.table;
+    if (rows.length > 0 && rows[0].c.length > 0 && rows[0].c[0]?.v) {
+      const bannerUrl = rows[0].c[0]?.v as string;
+      return { data: bannerUrl };
+    }
+    return { error: 'No banner URL found in the sheet.' };
+  } catch(err) {
+    console.error('Error processing sheet data for banner URL:', err);
+    return {
+      error:
+        'An unexpected error occurred while processing banner data. Check the browser console for more details.',
+    };
+  }
+}

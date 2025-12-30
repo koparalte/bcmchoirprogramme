@@ -13,7 +13,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
@@ -66,10 +65,9 @@ const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelect
   );
 };
 
-export function MemberClientSchedule({ members }: { members: Member[] }) {
+export function MemberClientSchedule({ members, bannerUrl }: { members: Member[], bannerUrl?: string }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const bannerImage = PlaceHolderImages.find(img => img.id.startsWith('members-banner'));
   
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -92,15 +90,14 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
 
   return (
     <div ref={containerRef} className="relative">
-      {bannerImage && (
+      {bannerUrl && (
         <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
             <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
               <Image
-                src={bannerImage.imageUrl}
-                alt={bannerImage.description}
+                src={bannerUrl}
+                alt="Members Banner"
                 fill
                 className="object-cover"
-                data-ai-hint={bannerImage.imageHint}
                 priority
               />
               <div className="absolute inset-0 bg-black/30" />
