@@ -6,8 +6,17 @@ import type {Event, Member} from './types';
 const sheetUrlSchema = z.string().url();
 
 function extractSheetId(url: string): string | null {
-  const match = /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/.exec(url);
-  return match ? match[1] : null;
+    // Standard editor URL: /spreadsheets/d/{sheet_id}/...
+    let match = /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/.exec(url);
+    if (match) {
+        return match[1];
+    }
+    // Published URL: /spreadsheets/d/e/{sheet_id}/pubhtml
+    match = /\/spreadsheets\/d\/e\/([a-zA-Z0-9-_]+)/.exec(url);
+    if (match) {
+        return match[1];
+    }
+    return null;
 }
 
 interface GvizResponse {
