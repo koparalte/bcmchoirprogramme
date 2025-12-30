@@ -119,18 +119,18 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
     <div ref={containerRef} className="relative">
       {bannerImages.length > 0 && (
         <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
-          <Carousel setApi={setCarouselApi} opts={{ loop: true }}>
-            <CarouselContent>
-              {bannerImages.map((image) => (
-                <CarouselItem key={image.id}>
-                  <motion.div className="absolute inset-0" style={{ y: bannerY }}>
+          <Carousel setApi={setCarouselApi} opts={{ loop: true }} className="h-full">
+            <CarouselContent className="h-full">
+              {bannerImages.map((image, index) => (
+                <CarouselItem key={image.id} className="h-full">
+                  <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
                     <Image
                       src={image.imageUrl}
                       alt={image.description}
                       fill
                       className="object-cover"
                       data-ai-hint={image.imageHint}
-                      priority={bannerImages.indexOf(image) === 0}
+                      priority={index === 0}
                     />
                     <div className="absolute inset-0 bg-black/30" />
                   </motion.div>
@@ -138,7 +138,7 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
               ))}
             </CarouselContent>
           </Carousel>
-           <div className="absolute inset-0 flex items-center justify-center">
+           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Our Members</h2>
            </div>
            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -150,6 +150,7 @@ export function MemberClientSchedule({ members }: { members: Member[] }) {
                   "w-2 h-2 rounded-full transition-all",
                   currentSlide === index ? "p-1.5 bg-white" : "bg-white/50"
                 )}
+                aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
