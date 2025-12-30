@@ -34,11 +34,11 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
           onClick={() => onSelectMember(member)}
       >
         <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-muted flex items-center justify-center mb-3">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted flex items-center justify-center mb-3">
               {member.link ? (
                 <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
               ) : (
-                <span className="text-2xl text-muted-foreground">{getInitials(member.name)}</span>
+                <span className="text-xl text-muted-foreground">{getInitials(member.name)}</span>
               )}
             </div>
           
