@@ -1,5 +1,5 @@
 
-import { getMembers, getBannerUrl } from "@/lib/actions";
+import { getMembers, getBannerUrls } from "@/lib/actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
 import { MemberClientSchedule } from "./member-client-schedule";
@@ -8,11 +8,11 @@ const BANNER_SHEET_URL = "https://docs.google.com/spreadsheets/d/1EeZKOlNySd3VG9
 
 export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
   const { data: members, error: membersError } = await getMembers(sheetUrl);
-  const { data: bannerUrl, error: bannerError } = await getBannerUrl(BANNER_SHEET_URL);
+  const { data: bannerUrls, error: bannerError } = await getBannerUrls(BANNER_SHEET_URL);
 
   const error = membersError || bannerError;
 
-  if (error) {
+  if (error && !bannerUrls) {
     return (
        <Card className="max-w-3xl mx-auto text-center p-8 border-destructive/50 bg-destructive/10">
          <CardContent className="pt-6">
@@ -35,5 +35,5 @@ export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
     )
   }
 
-  return <MemberClientSchedule members={members} bannerUrl={bannerUrl} />;
+  return <MemberClientSchedule members={members} bannerUrls={bannerUrls} />;
 }

@@ -1,3 +1,4 @@
+
 'use server';
 
 import {z} from 'zod';
@@ -228,7 +229,7 @@ export async function getMembers(
 }
 
 
-export async function getBannerUrl(sheetUrl: string): Promise<{ data?: string; error?: string }> {
+export async function getBannerUrls(sheetUrl: string): Promise<{ data?: string[]; error?: string }> {
   const { data: gvizData, error } = await fetchSheetData(sheetUrl);
 
   if (error || !gvizData) {
@@ -237,11 +238,16 @@ export async function getBannerUrl(sheetUrl: string): Promise<{ data?: string; e
 
   try {
     const { rows } = gvizData.table;
-    if (rows.length > 0 && rows[0].c.length > 0 && rows[0].c[0]?.v) {
-      const bannerUrl = rows[0].c[0]?.v as string;
-      return { data: bannerUrl };
+    if (rows.length > 0) {
+      const bannerUrls = rows
+        .map(row => row.c[0]?.v as string)
+        .filter(url => url && typeof url === 'string');
+
+      if (bannerUrls.length > 0) {
+        return { data: bannerUrls };
+      }
     }
-    return { error: 'No banner URL found in the sheet.' };
+    return { error: 'No banner URLs found in the sheet.' };
   } catch(err) {
     console.error('Error processing sheet data for banner URL:', err);
     return {

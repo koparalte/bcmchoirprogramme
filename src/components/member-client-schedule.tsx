@@ -13,6 +13,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
@@ -65,7 +67,7 @@ const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelect
   );
 };
 
-export function MemberClientSchedule({ members, bannerUrl }: { members: Member[], bannerUrl?: string }) {
+export function MemberClientSchedule({ members, bannerUrls }: { members: Member[], bannerUrls?: string[] }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
@@ -88,13 +90,45 @@ export function MemberClientSchedule({ members, bannerUrl }: { members: Member[]
 
   const defaultOpen = Object.keys(groupedMembers);
 
+  const hasBanner = bannerUrls && bannerUrls.length > 0;
+  const useCarousel = hasBanner && bannerUrls.length > 1;
+
   return (
     <div ref={containerRef} className="relative">
-      {bannerUrl && (
+      {hasBanner && (
         <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
-            <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
+          {useCarousel ? (
+            <Carousel
+              className="w-full h-full"
+              plugins={[
+                Autoplay({
+                  delay: 10000,
+                  stopOnInteraction: true,
+                }),
+              ]}
+              opts={{ loop: true }}
+            >
+              <CarouselContent>
+                {bannerUrls.map((url, index) => (
+                  <CarouselItem key={index}>
+                    <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
+                      <Image
+                        src={url}
+                        alt={`Members Banner ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                      />
+                       <div className="absolute inset-0 bg-black/30" />
+                    </motion.div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          ) : (
+             <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
               <Image
-                src={bannerUrl}
+                src={bannerUrls[0]}
                 alt="Members Banner"
                 fill
                 className="object-cover"
@@ -102,6 +136,7 @@ export function MemberClientSchedule({ members, bannerUrl }: { members: Member[]
               />
               <div className="absolute inset-0 bg-black/30" />
             </motion.div>
+          )}
            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Our Members</h2>
            </div>
