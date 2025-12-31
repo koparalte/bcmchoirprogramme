@@ -97,7 +97,10 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
         <Card className="mb-8 bg-secondary/30 border-primary/20">
           <CardContent className="p-4 text-center">
             <p className="font-semibold text-primary">
-              Upcoming Programme - <span className="font-bold">{upcomingEvents.length}</span> and Past Programme - <span className="font-bold">{pastEvents.length}</span>
+              Upcoming Programme - <span className="font-bold">{upcomingEvents.length}</span>
+            </p>
+            <p className="font-semibold text-primary">
+              Past Programme - <span className="font-bold">{pastEvents.length}</span>
             </p>
           </CardContent>
         </Card>
