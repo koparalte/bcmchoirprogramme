@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -128,7 +129,7 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
                 </motion.div>
             </AnimatePresence>
           </div>
-          <div className="text-center mt-2 mb-8">
+           <div className="text-center mt-2 mb-8">
             <p className="text-muted-foreground font-semibold">Tap to view more</p>
           </div>
         </>
