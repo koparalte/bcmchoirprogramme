@@ -129,7 +129,7 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
         {hasPastEvents && (
           <AccordionItem value="past">
             <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
-              Past
+              Past {showAllEvents && `(${pastEvents.length})`}
             </AccordionTrigger>
             <AccordionContent>
               <Accordion type="multiple" className="w-full">
