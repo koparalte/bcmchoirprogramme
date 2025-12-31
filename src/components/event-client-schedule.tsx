@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -7,7 +8,8 @@ import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
 import { endOfDay, isPast, parseISO, format } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, CheckCircle } from "lucide-react";
 
 const groupEventsByMonth = (events: Event[]) => {
   return events.reduce((acc, event) => {
@@ -91,6 +93,16 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
 
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
+      {isProgramme && (
+        <Card className="mb-8 bg-secondary/30 border-primary/20">
+          <CardContent className="p-4 text-center">
+            <p className="font-semibold text-primary">
+              Upcoming Programme - <span className="font-bold">{upcomingEvents.length}</span> and Past Programme - <span className="font-bold">{pastEvents.length}</span>
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8">
         <AccordionItem value="upcoming">
           <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
