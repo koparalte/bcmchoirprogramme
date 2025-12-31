@@ -104,32 +104,34 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
   return (
     <div ref={containerRef} className="relative">
       {hasBanner && (
-        <div className="relative h-64 md:h-80 w-full rounded-lg mb-8 shadow-lg overflow-hidden">
-           <AnimatePresence>
-              <motion.div
-                key={currentBannerIndex}
-                className="h-full w-full absolute inset-0"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1 }}
-              >
-                  <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
-                      <Image
-                        src={bannerUrls[currentBannerIndex]}
-                        alt={`Members Banner ${currentBannerIndex + 1}`}
-                        fill
-                        className="object-cover"
-                        priority={currentBannerIndex === 0}
-                      />
-                       <div className="absolute inset-0 bg-black/30" />
-                  </motion.div>
-              </motion.div>
-           </AnimatePresence>
-           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Tap to view more</h2>
-           </div>
-        </div>
+        <>
+          <div className="relative h-64 md:h-80 w-full rounded-lg shadow-lg overflow-hidden">
+            <AnimatePresence>
+                <motion.div
+                  key={currentBannerIndex}
+                  className="h-full w-full absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                >
+                    <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
+                        <Image
+                          src={bannerUrls[currentBannerIndex]}
+                          alt={`Members Banner ${currentBannerIndex + 1}`}
+                          fill
+                          className="object-cover"
+                          priority={currentBannerIndex === 0}
+                        />
+                        <div className="absolute inset-0 bg-black/30" />
+                    </motion.div>
+                </motion.div>
+            </AnimatePresence>
+          </div>
+          <div className="text-center mt-2 mb-8">
+            <p className="text-muted-foreground italic">Tap to view more</p>
+          </div>
+        </>
       )}
       
       {conductors.length > 0 && (
