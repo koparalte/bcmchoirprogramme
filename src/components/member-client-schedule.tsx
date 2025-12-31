@@ -129,7 +129,7 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
             </AnimatePresence>
           </div>
           <div className="text-center mt-2 mb-8">
-            <p className="text-muted-foreground italic">Tap to view more</p>
+            <p className="text-muted-foreground font-semibold">Tap to view more</p>
           </div>
         </>
       )}
