@@ -127,7 +127,7 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
               </motion.div>
            </AnimatePresence>
            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Our Members</h2>
+              <h2 className="text-4xl md:text-6xl font-bold text-white text-center shadow-md">Tap to view more</h2>
            </div>
         </div>
       )}
