@@ -102,25 +102,11 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
     }
   };
 
-  const downloadImage = async () => {
+  const downloadImage = () => {
     if (bannerUrls) {
         const imageUrl = bannerUrls[currentBannerIndex];
-        try {
-            const response = await fetch(imageUrl);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `bcm-choir-banner-${currentBannerIndex + 1}.jpg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Failed to download image:", error);
-            // Fallback for cross-origin issues: open in new tab
-            window.open(imageUrl, '_blank');
-        }
+        // Open in new tab is a reliable fallback for cross-origin images
+        window.open(imageUrl, '_blank');
     }
   };
 
