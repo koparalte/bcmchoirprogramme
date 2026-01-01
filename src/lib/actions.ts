@@ -61,7 +61,7 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
 
     const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    const response = await fetch(gvizUrl, { cache: 'no-store' });
+    const response = await fetch(gvizUrl, { cache: 'force-cache' });
 
     if (!response.ok) {
       return {
