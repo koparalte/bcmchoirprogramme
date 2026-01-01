@@ -3,6 +3,7 @@
 
 import {z} from 'zod';
 import type {Event, Member} from './types';
+import { unstable_cache } from 'next/cache';
 
 const sheetUrlSchema = z.string().url();
 
@@ -48,47 +49,56 @@ function parseSheetDate(cellValue: string): string | null {
     return null;
 }
 
+const getCachedSheetData = unstable_cache(
+    async (sheetUrl: string) => {
+        try {
+            const validatedUrl = sheetUrlSchema.parse(sheetUrl);
+            const sheetId = extractSheetId(validatedUrl);
+
+            if (!sheetId) {
+                return {
+                error: 'Invalid Google Sheet URL format. Could not find sheet ID.',
+                };
+            }
+
+            const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+            const response = await fetch(gvizUrl);
+
+            if (!response.ok) {
+                return {
+                error: `Failed to fetch sheet data. Status: ${response.status}. Make sure your sheet is published to the web.`,
+                };
+            }
+
+            const responseText = await response.text();
+            const jsonString = responseText
+                .match(/(?<=google\.visualization\.Query\.setResponse\().*(?=\);)/s)?.[0];
+
+            if (!jsonString) {
+                return {error: 'Failed to parse response from Google Sheets.'};
+            }
+            
+            const gvizData: GvizResponse = JSON.parse(jsonString);
+            return { data: gvizData };
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                return {error: 'Invalid URL provided.'};
+            }
+            console.error('Error fetching or parsing sheet data:', err);
+            return {
+                error:
+                'An unexpected error occurred. Check the browser console for more details.',
+            };
+        }
+    },
+    ['sheet-data'],
+    { revalidate: 3600 } // Revalidate every hour
+);
+
+
 async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, error?: string}> {
-  try {
-    const validatedUrl = sheetUrlSchema.parse(sheetUrl);
-    const sheetId = extractSheetId(validatedUrl);
-
-    if (!sheetId) {
-      return {
-        error: 'Invalid Google Sheet URL format. Could not find sheet ID.',
-      };
-    }
-
-    const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-
-    const response = await fetch(gvizUrl, { cache: 'force-cache' });
-
-    if (!response.ok) {
-      return {
-        error: `Failed to fetch sheet data. Status: ${response.status}. Make sure your sheet is published to the web.`,
-      };
-    }
-
-    const responseText = await response.text();
-    const jsonString = responseText
-      .match(/(?<=google\.visualization\.Query\.setResponse\().*(?=\);)/s)?.[0];
-
-    if (!jsonString) {
-      return {error: 'Failed to parse response from Google Sheets.'};
-    }
-    
-    const gvizData: GvizResponse = JSON.parse(jsonString);
-    return { data: gvizData };
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return {error: 'Invalid URL provided.'};
-    }
-    console.error('Error fetching or parsing sheet data:', err);
-    return {
-      error:
-        'An unexpected error occurred. Check the browser console for more details.',
-    };
-  }
+    return getCachedSheetData(sheetUrl);
 }
 
 export async function getEvents(

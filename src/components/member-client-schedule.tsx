@@ -53,21 +53,6 @@ const groupMembersByPart = (members: Member[]) => {
   return sortedGrouped;
 };
 
-const MotionMemberCard = ({ member, onSelectMember }: { member: Member, onSelectMember: (member: Member) => void }) => {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
-
-  return (
-    <motion.div ref={ref} style={{ y }}>
-      <MemberCard member={member} onSelectMember={onSelectMember} />
-    </motion.div>
-  );
-};
-
 export function MemberClientSchedule({ members, bannerUrls }: { members: Member[], bannerUrls?: string[] }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -208,7 +193,7 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
                 transition={{ duration: 0.5 }}
               >
                 {partMembers.map((member) => (
-                  <MotionMemberCard
+                  <MemberCard
                     key={member.id}
                     member={member}
                     onSelectMember={handleSelectMember}

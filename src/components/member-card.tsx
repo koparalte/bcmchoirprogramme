@@ -38,7 +38,7 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
               {member.link ? (
                 <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
               ) : (
-                <span className="text-xl text-muted-foreground">{getInitials(member.name)}</span>
+                <span className="text-xl font-semibold text-muted-foreground">{getInitials(member.name)}</span>
               )}
             </div>
           
