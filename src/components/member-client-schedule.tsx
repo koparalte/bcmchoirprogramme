@@ -14,6 +14,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
@@ -83,10 +85,44 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
     if (bannerUrls && bannerUrls.length > 1) {
       const timer = setInterval(() => {
         setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
-      }, 10000);
+      }, 5000);
       return () => clearInterval(timer);
     }
   }, [bannerUrls]);
+
+  const nextImage = () => {
+    if (bannerUrls) {
+      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (bannerUrls) {
+      setCurrentBannerIndex((prevIndex) => (prevIndex - 1 + bannerUrls.length) % bannerUrls.length);
+    }
+  };
+
+  const downloadImage = async () => {
+    if (bannerUrls) {
+        const imageUrl = bannerUrls[currentBannerIndex];
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `bcm-choir-banner-${currentBannerIndex + 1}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Failed to download image:", error);
+            // Fallback for cross-origin issues: open in new tab
+            window.open(imageUrl, '_blank');
+        }
+    }
+  };
 
 
   const handleSelectMember = (member: Member) => {
@@ -106,8 +142,8 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
     <div ref={containerRef} className="relative">
       {hasBanner && (
         <>
-          <div className="relative h-64 md:h-80 w-full rounded-lg shadow-lg overflow-hidden">
-            <AnimatePresence>
+          <div className="relative h-64 md:h-80 w-full rounded-lg shadow-lg overflow-hidden group">
+            <AnimatePresence initial={false}>
                 <motion.div
                   key={currentBannerIndex}
                   className="h-full w-full absolute inset-0"
@@ -128,6 +164,20 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
                     </motion.div>
                 </motion.div>
             </AnimatePresence>
+            {bannerUrls && bannerUrls.length > 1 && (
+                <>
+                    <Button onClick={prevImage} variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 text-white hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ChevronLeft className="h-6 w-6" />
+                    </Button>
+                    <Button onClick={nextImage} variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 text-white hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ChevronRight className="h-6 w-6" />
+                    </Button>
+                </>
+            )}
+             <Button onClick={downloadImage} variant="outline" size="sm" className="absolute bottom-4 right-4 bg-black/50 text-white border-white/50 hover:bg-black/70 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                <Download className="mr-2 h-4 w-4" />
+                Download
+            </Button>
           </div>
            <div className="text-center mt-2 mb-8">
             <p className="text-muted-foreground font-semibold">Tap to view more</p>
