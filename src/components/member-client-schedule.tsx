@@ -59,6 +59,8 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   
   const containerRef = useRef(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start']
@@ -66,24 +68,37 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
 
   const bannerY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
-  useEffect(() => {
+  const resetTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     if (bannerUrls && bannerUrls.length > 1) {
-      const timer = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
       }, 5000);
-      return () => clearInterval(timer);
     }
+  };
+
+  useEffect(() => {
+    resetTimer();
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [bannerUrls]);
 
   const nextImage = () => {
     if (bannerUrls) {
       setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
+      resetTimer();
     }
   };
 
   const prevImage = () => {
     if (bannerUrls) {
       setCurrentBannerIndex((prevIndex) => (prevIndex - 1 + bannerUrls.length) % bannerUrls.length);
+      resetTimer();
     }
   };
 
