@@ -133,10 +133,10 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
                 <motion.div
                   key={currentBannerIndex}
                   className="h-full w-full absolute inset-0"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1 }}
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
                 >
                     <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
                         <Image
