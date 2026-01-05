@@ -4,7 +4,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import type { Member } from "@/lib/types";
+import type { Member, Banner } from "@/lib/types";
 import { MemberCard } from "./member-card";
 import { MemberDetailsDialog } from "./member-details-dialog";
 import {
@@ -53,7 +53,7 @@ const groupMembersByPart = (members: Member[]) => {
   return sortedGrouped;
 };
 
-export function MemberClientSchedule({ members, bannerUrls }: { members: Member[], bannerUrls?: string[] }) {
+export function MemberClientSchedule({ members, banners }: { members: Member[], banners?: Banner[] }) {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
@@ -72,9 +72,9 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    if (bannerUrls && bannerUrls.length > 1) {
+    if (banners && banners.length > 1) {
       timerRef.current = setInterval(() => {
-        setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
+        setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % banners.length);
       }, 5000);
     }
   };
@@ -86,25 +86,25 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
         clearInterval(timerRef.current);
       }
     };
-  }, [bannerUrls]);
+  }, [banners]);
 
   const nextImage = () => {
-    if (bannerUrls) {
-      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % bannerUrls.length);
+    if (banners) {
+      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % banners.length);
       resetTimer();
     }
   };
 
   const prevImage = () => {
-    if (bannerUrls) {
-      setCurrentBannerIndex((prevIndex) => (prevIndex - 1 + bannerUrls.length) % bannerUrls.length);
+    if (banners) {
+      setCurrentBannerIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
       resetTimer();
     }
   };
 
   const downloadImage = () => {
-    if (bannerUrls) {
-        const imageUrl = bannerUrls[currentBannerIndex];
+    if (banners) {
+        const imageUrl = banners[currentBannerIndex].url;
         // Open in new tab is a reliable fallback for cross-origin images
         window.open(imageUrl, '_blank');
     }
@@ -122,7 +122,7 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
 
   const defaultOpen = Object.keys(groupedMembers);
 
-  const hasBanner = bannerUrls && bannerUrls.length > 0;
+  const hasBanner = banners && banners.length > 0;
 
   return (
     <div ref={containerRef} className="relative">
@@ -140,17 +140,22 @@ export function MemberClientSchedule({ members, bannerUrls }: { members: Member[
                 >
                     <motion.div className="h-full w-full relative" style={{ y: bannerY }}>
                         <Image
-                          src={bannerUrls[currentBannerIndex]}
+                          src={banners[currentBannerIndex].url}
                           alt={`Members Banner ${currentBannerIndex + 1}`}
                           fill
                           className="object-cover"
                           priority={currentBannerIndex === 0}
                         />
                         <div className="absolute inset-0 bg-black/30" />
+                        {banners[currentBannerIndex].name && (
+                            <div className="absolute bottom-0 left-0 p-4">
+                                <p className="text-white font-semibold text-lg drop-shadow-md">{banners[currentBannerIndex].name}</p>
+                            </div>
+                        )}
                     </motion.div>
                 </motion.div>
             </AnimatePresence>
-            {bannerUrls && bannerUrls.length > 1 && (
+            {banners && banners.length > 1 && (
                 <>
                     <Button onClick={prevImage} variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 text-white hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
                         <ChevronLeft className="h-6 w-6" />

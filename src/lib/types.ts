@@ -1,3 +1,4 @@
+
 export type Event = {
   id: string;
   title: string;
@@ -17,4 +18,9 @@ export type Member = {
   part?: string;
   designation?: string;
   link?: string;
+};
+
+export type Banner = {
+  url: string;
+  name?: string;
 };

@@ -2,7 +2,7 @@
 'use server';
 
 import {z} from 'zod';
-import type {Event, Member} from './types';
+import type {Banner, Event, Member} from './types';
 import { unstable_cache } from 'next/cache';
 
 const sheetUrlSchema = z.string().url();
@@ -239,7 +239,7 @@ export async function getMembers(
 }
 
 
-export async function getBannerUrls(sheetUrl: string): Promise<{ data?: string[]; error?: string }> {
+export async function getBannerUrls(sheetUrl: string): Promise<{ data?: Banner[]; error?: string }> {
   const { data: gvizData, error } = await fetchSheetData(sheetUrl);
 
   if (error || !gvizData) {
@@ -249,12 +249,16 @@ export async function getBannerUrls(sheetUrl: string): Promise<{ data?: string[]
   try {
     const { rows } = gvizData.table;
     if (rows.length > 0) {
-      const bannerUrls = rows
-        .map(row => row.c[0]?.v as string)
-        .filter(url => url && typeof url === 'string');
+      const banners: Banner[] = rows
+        .map(row => {
+            const url = row.c[0]?.v as string;
+            const name = row.c.length > 1 ? (row.c[1]?.v as string) : undefined;
+            return { url, name };
+        })
+        .filter(banner => banner.url && typeof banner.url === 'string');
 
-      if (bannerUrls.length > 0) {
-        return { data: bannerUrls };
+      if (banners.length > 0) {
+        return { data: banners };
       }
     }
     return { error: 'No banner URLs found in the sheet.' };

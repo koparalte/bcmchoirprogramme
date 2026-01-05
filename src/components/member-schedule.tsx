@@ -8,11 +8,11 @@ const BANNER_SHEET_URL = "https://docs.google.com/spreadsheets/d/1EeZKOlNySd3VG9
 
 export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
   const { data: members, error: membersError } = await getMembers(sheetUrl);
-  const { data: bannerUrls, error: bannerError } = await getBannerUrls(BANNER_SHEET_URL);
+  const { data: banners, error: bannerError } = await getBannerUrls(BANNER_SHEET_URL);
 
   const error = membersError || bannerError;
 
-  if (error && !bannerUrls) {
+  if (error && !banners) {
     return (
        <Card className="max-w-3xl mx-auto text-center p-8 border-destructive/50 bg-destructive/10">
          <CardContent className="pt-6">
@@ -35,5 +35,5 @@ export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
     )
   }
 
-  return <MemberClientSchedule members={members} bannerUrls={bannerUrls} />;
+  return <MemberClientSchedule members={members} banners={banners} />;
 }
