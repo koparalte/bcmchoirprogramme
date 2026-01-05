@@ -63,7 +63,7 @@ const getCachedSheetData = unstable_cache(
 
             const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-            const response = await fetch(gvizUrl);
+            const response = await fetch(gvizUrl, { next: { revalidate: 3600 } });
 
             if (!response.ok) {
                 return {
@@ -92,8 +92,7 @@ const getCachedSheetData = unstable_cache(
             };
         }
     },
-    ['sheet-data'],
-    { revalidate: 3600 } // Revalidate every hour
+    ['sheet-data']
 );
 
 
@@ -251,11 +250,11 @@ export async function getBannerUrls(sheetUrl: string): Promise<{ data?: Banner[]
     if (rows.length > 0) {
       const banners: Banner[] = rows
         .map(row => {
-            const url = row.c[0]?.v as string;
-            const name = row.c.length > 1 ? (row.c[1]?.v as string) : undefined;
-            return { url, name };
+            const url = row.c[0]?.v as string | null;
+            const name = row.c.length > 1 ? (row.c[1]?.v as string | null) : undefined;
+            return { url: url || '', name: name || undefined };
         })
-        .filter(banner => banner.url && typeof banner.url === 'string');
+        .filter(banner => banner.url && typeof banner.url === 'string' && banner.url.trim() !== '');
 
       if (banners.length > 0) {
         return { data: banners };
