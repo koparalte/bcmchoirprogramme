@@ -36,13 +36,6 @@ export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
   }
 
   return (
-    <>
-      {banners && (
-        <pre className="p-4 bg-muted rounded-md my-4 overflow-x-auto text-xs">
-          {JSON.stringify(banners, null, 2)}
-        </pre>
-      )}
       <MemberClientSchedule members={members} banners={banners} />
-    </>
   );
 }
