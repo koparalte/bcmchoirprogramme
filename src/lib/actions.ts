@@ -63,7 +63,7 @@ const getCachedSheetData = unstable_cache(
 
             const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-            const response = await fetch(gvizUrl, { next: { revalidate: 3600 } });
+            const response = await fetch(gvizUrl, { next: { revalidate: 0 } });
 
             if (!response.ok) {
                 return {
