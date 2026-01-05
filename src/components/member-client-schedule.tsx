@@ -147,14 +147,16 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
                           priority={currentBannerIndex === 0}
                         />
                         <div className="absolute inset-0 bg-black/30" />
-                        {banners[currentBannerIndex].name && (
-                            <div className="absolute bottom-0 left-0 p-4">
-                                <p className="text-white font-semibold text-lg drop-shadow-md">{banners[currentBannerIndex].name}</p>
-                            </div>
-                        )}
                     </motion.div>
                 </motion.div>
             </AnimatePresence>
+
+            {banners[currentBannerIndex].name && (
+                <div className="absolute bottom-4 left-4 p-2 bg-black/50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="text-white font-semibold text-sm drop-shadow-md">{banners[currentBannerIndex].name}</p>
+                </div>
+            )}
+
             {banners && banners.length > 1 && (
                 <>
                     <Button onClick={prevImage} variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 text-white hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
