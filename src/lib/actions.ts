@@ -61,8 +61,8 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
 
         const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-        // Setting revalidate to 0 ensures we always get fresh data.
-        const response = await fetch(gvizUrl, { next: { revalidate: 0 } });
+        // Setting revalidate to 60 ensures data is cached for 60 seconds.
+        const response = await fetch(gvizUrl, { next: { revalidate: 60 } });
 
         if (!response.ok) {
             return {
