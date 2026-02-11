@@ -8,7 +8,7 @@ import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
 import { endOfDay, isPast, parseISO, format, eachDayOfInterval } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 
@@ -121,11 +121,30 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
     return { programmeDays: pDays, hlazirDays: hDays };
   }, [allEventsForCalendar, events]);
 
+  const { programmeOnly, hlazirOnly, both } = useMemo(() => {
+    const pTimes = new Set(programmeDays.map(d => d.getTime()));
+    const hTimes = new Set(hlazirDays.map(d => d.getTime()));
+
+    const bothDays: Date[] = [];
+    pTimes.forEach(time => {
+        if (hTimes.has(time)) {
+            bothDays.push(new Date(time));
+        }
+    });
+    const bothTimes = new Set(bothDays.map(d => d.getTime()));
+
+    const pOnly = programmeDays.filter(d => !bothTimes.has(d.getTime()));
+    const hOnly = hlazirDays.filter(d => !bothTimes.has(d.getTime()));
+
+    return { programmeOnly: pOnly, hlazirOnly: hOnly, both: bothDays };
+  }, [programmeDays, hlazirDays]);
+
   const eventDays = useMemo(() => [...programmeDays, ...hlazirDays], [programmeDays, hlazirDays]);
 
   const modifiers = {
-    programme: programmeDays,
-    hlazir: hlazirDays,
+    programme: programmeOnly,
+    hlazir: hlazirOnly,
+    both: both,
   };
 
   const modifiersStyles: Record<string, CSSProperties> = {
@@ -136,6 +155,10 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
     hlazir: {
         color: 'hsl(var(--primary-foreground))',
         backgroundColor: 'hsl(var(--primary))',
+    },
+    both: {
+        color: 'hsl(var(--primary-foreground))',
+        background: `linear-gradient(45deg, hsl(var(--destructive)) 49%, hsl(var(--primary)) 51%)`,
     }
   };
 
@@ -154,18 +177,32 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
           </CardContent>
         </Card>
         
-        <Card className="mb-8">
+        <Card className="mb-8 border shadow-md">
             <CardContent className="p-2 md:p-4 flex justify-center">
               <Calendar
                 mode="multiple"
                 selected={eventDays}
                 onSelect={() => {}}
-                className="p-0 rounded-md border"
+                className="p-0 rounded-md"
                 showOutsideDays
                 modifiers={modifiers}
                 modifiersStyles={modifiersStyles}
               />
             </CardContent>
+            <CardFooter className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-3 bg-muted/50 border-t text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'hsl(var(--destructive))' }} />
+                    <span>Programme</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'hsl(var(--primary))' }} />
+                    <span>Hla Zir</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full" style={{ background: 'linear-gradient(45deg, hsl(var(--destructive)) 49%, hsl(var(--primary)) 51%)' }} />
+                    <span>Both</span>
+                </div>
+            </CardFooter>
           </Card>
         </>
       )}
