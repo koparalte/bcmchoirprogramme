@@ -130,6 +130,7 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
   const modifiers = {
     programme: programmeDays,
     hlazir: hlazirDays,
+    sunday: { dayOfWeek: [0] } as const,
   };
 
   const modifiersStyles: Record<string, CSSProperties> = {
@@ -143,6 +144,9 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
         backgroundColor: 'hsl(var(--primary))',
         borderRadius: '50%',
     },
+    sunday: {
+        color: 'hsl(var(--destructive))'
+    }
   };
 
   return (
@@ -174,6 +178,7 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                   cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-transparent focus-within:relative focus-within:z-20",
                   day_today: "bg-transparent text-foreground",
                   caption_label: "text-sm font-bold uppercase",
+                  head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] first:text-destructive",
                 }}
               />
             </CardContent>
