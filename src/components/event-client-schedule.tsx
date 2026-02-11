@@ -176,7 +176,7 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                 modifiersStyles={modifiersStyles}
                 classNames={{
                   cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-transparent focus-within:relative focus-within:z-20",
-                  day_today: "bg-transparent text-foreground",
+                  day_today: "bg-transparent text-foreground ring-1 ring-primary rounded-full",
                   caption_label: "text-sm font-bold uppercase",
                   head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] first:text-destructive",
                 }}
