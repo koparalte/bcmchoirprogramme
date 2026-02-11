@@ -54,7 +54,7 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya, isProgramme }: { mo
   </AccordionItem>
 );
 
-export function EventClientSchedule({ events, allEventsForCalendar, showAllEvents, isProgramme }: { events: Event[], allEventsForCalendar?: Event[], showAllEvents?: boolean, isProgramme?: boolean }) {
+export function EventClientSchedule({ events, allEventsForCalendar, showAllEvents, isProgramme, isHlaZirTab }: { events: Event[], allEventsForCalendar?: Event[], showAllEvents?: boolean, isProgramme?: boolean, isHlaZirTab?: boolean }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -119,7 +119,6 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
         }
     });
     
-    // If a day is in both, we'll let hlazir (blue) take precedence.
     const uniqueProgrammeDays = pDays.filter(pDay => !hDays.some(hDay => isSameDay(pDay, hDay)));
 
     return { programmeDays: uniqueProgrammeDays, hlazirDays: hDays };
@@ -149,10 +148,11 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
     }
   };
 
+  const showCalendar = isProgramme || isHlaZirTab;
+
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
       {isProgramme && (
-        <>
         <Card className="mb-8 bg-secondary/30 border-primary/20">
           <CardContent className="p-4 text-center">
             <p className="font-semibold text-primary">
@@ -163,7 +163,9 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
             </p>
           </CardContent>
         </Card>
-        
+      )}
+
+      {showCalendar && (
         <Card className="mb-8 border shadow-md">
             <CardContent className="p-2 md:p-4 flex justify-center">
               <Calendar
@@ -193,8 +195,8 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                 </div>
             </CardFooter>
           </Card>
-        </>
       )}
+
 
       <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8">
         <AccordionItem value="upcoming">

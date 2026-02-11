@@ -3,8 +3,8 @@ import { PageHeader } from "@/components/page-header";
 import { MemberSchedule } from "@/components/member-schedule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgrammeTab } from "@/components/programme-tab";
+import { HlaZirTab } from "@/components/hla-zir-tab";
 
-const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
           <ProgrammeTab />
         </TabsContent>
         <TabsContent value="bcya" className="mt-6">
-          <EventSchedule sheetUrl={BCYA_SHEET_URL} showAllEvents={true} />
+          <HlaZirTab />
         </TabsContent>
         <TabsContent value="members" className="mt-6">
           <MemberSchedule sheetUrl={MEMBERS_SHEET_URL} />
