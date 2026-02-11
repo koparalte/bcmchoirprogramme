@@ -170,6 +170,9 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                 showOutsideDays
                 modifiers={modifiers}
                 modifiersStyles={modifiersStyles}
+                classNames={{
+                  day_today: "bg-transparent text-foreground",
+                }}
               />
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-3 bg-muted/50 border-t text-sm text-muted-foreground">
