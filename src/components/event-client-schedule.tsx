@@ -6,10 +6,11 @@ import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
-import { endOfDay, isPast, parseISO, format } from "date-fns";
+import { endOfDay, isPast, parseISO, format, eachDayOfInterval } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, CheckCircle } from "lucide-react";
+import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 
 const groupEventsByMonth = (events: Event[]) => {
   return events.reduce((acc, event) => {
@@ -53,7 +54,7 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya, isProgramme }: { mo
   </AccordionItem>
 );
 
-export function EventClientSchedule({ events, showAllEvents, isProgramme }: { events: Event[], showAllEvents?: boolean, isProgramme?: boolean }) {
+export function EventClientSchedule({ events, allEventsForCalendar, showAllEvents, isProgramme }: { events: Event[], allEventsForCalendar?: Event[], showAllEvents?: boolean, isProgramme?: boolean }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -90,10 +91,32 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
 
   const hasUpcomingEvents = upcomingEvents.length > 0;
   const hasPastEvents = pastEvents.length > 0;
+  
+  const calendarEvents = allEventsForCalendar || events;
+
+  const eventDays = useMemo(() => {
+    const days: Date[] = [];
+    calendarEvents.forEach(event => {
+      if (event.startdate) {
+        try {
+          const start = parseISO(event.startdate);
+          const end = event.enddate ? parseISO(event.enddate) : start;
+          if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+            const interval = eachDayOfInterval({ start, end });
+            days.push(...interval);
+          }
+        } catch (e) {
+          console.warn("Invalid date format for event", event);
+        }
+      }
+    });
+    return days;
+  }, [calendarEvents]);
 
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
       {isProgramme && (
+        <>
         <Card className="mb-8 bg-secondary/30 border-primary/20">
           <CardContent className="p-4 text-center">
             <p className="font-semibold text-primary">
@@ -104,6 +127,19 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
             </p>
           </CardContent>
         </Card>
+        
+        <Card className="mb-8">
+            <CardContent className="p-2 md:p-4 flex justify-center">
+              <Calendar
+                mode="multiple"
+                selected={eventDays}
+                onSelect={() => {}}
+                className="p-0 rounded-md border"
+                showOutsideDays
+              />
+            </CardContent>
+          </Card>
+        </>
       )}
 
       <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8">
