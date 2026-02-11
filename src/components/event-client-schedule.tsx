@@ -173,6 +173,7 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                 classNames={{
                   cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-transparent focus-within:relative focus-within:z-20",
                   day_today: "bg-transparent text-foreground",
+                  caption_label: "text-sm font-bold uppercase",
                 }}
               />
             </CardContent>
