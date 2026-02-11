@@ -128,9 +128,9 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
   const eventDays = useMemo(() => [...programmeDays, ...hlazirDays], [programmeDays, hlazirDays]);
 
   const modifiers = {
+    sunday: { dayOfWeek: [0] } as const,
     programme: programmeDays,
     hlazir: hlazirDays,
-    sunday: { dayOfWeek: [0] } as const,
   };
 
   const modifiersStyles: Record<string, CSSProperties> = {
