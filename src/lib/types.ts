@@ -9,6 +9,7 @@ export type Event = {
   time?: string;
   designation?: string;
   zingzan?: string;
+  type?: string;
 };
 
 export type Member = {

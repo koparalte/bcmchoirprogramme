@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, type CSSProperties } from "react";
 import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
@@ -92,26 +92,52 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
   const hasUpcomingEvents = upcomingEvents.length > 0;
   const hasPastEvents = pastEvents.length > 0;
   
-  const calendarEvents = allEventsForCalendar || events;
+  const { programmeDays, hlazirDays } = useMemo(() => {
+    const pDays: Date[] = [];
+    const hDays: Date[] = [];
+    const calendarEvents = allEventsForCalendar || events;
 
-  const eventDays = useMemo(() => {
-    const days: Date[] = [];
     calendarEvents.forEach(event => {
-      if (event.startdate) {
-        try {
-          const start = parseISO(event.startdate);
-          const end = event.enddate ? parseISO(event.enddate) : start;
-          if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-            const interval = eachDayOfInterval({ start, end });
-            days.push(...interval);
-          }
-        } catch (e) {
-          console.warn("Invalid date format for event", event);
+        if (event.startdate) {
+            try {
+                const start = parseISO(event.startdate);
+                const end = event.enddate ? parseISO(event.enddate) : start;
+                if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                    const interval = eachDayOfInterval({ start, end });
+                    if (event.type === 'programme') {
+                        pDays.push(...interval);
+                    } else if (event.type === 'hlazir') {
+                        hDays.push(...interval);
+                    } else {
+                        // Default for events without type
+                        pDays.push(...interval);
+                    }
+                }
+            } catch (e) {
+                console.warn("Invalid date format for event", event);
+            }
         }
-      }
     });
-    return days;
-  }, [calendarEvents]);
+    return { programmeDays: pDays, hlazirDays: hDays };
+  }, [allEventsForCalendar, events]);
+
+  const eventDays = useMemo(() => [...programmeDays, ...hlazirDays], [programmeDays, hlazirDays]);
+
+  const modifiers = {
+    programme: programmeDays,
+    hlazir: hlazirDays,
+  };
+
+  const modifiersStyles: Record<string, CSSProperties> = {
+    programme: { 
+        color: 'hsl(var(--destructive-foreground))',
+        backgroundColor: 'hsl(var(--destructive))',
+    },
+    hlazir: {
+        color: 'hsl(var(--primary-foreground))',
+        backgroundColor: 'hsl(var(--primary))',
+    }
+  };
 
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
@@ -136,6 +162,8 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                 onSelect={() => {}}
                 className="p-0 rounded-md border"
                 showOutsideDays
+                modifiers={modifiers}
+                modifiersStyles={modifiersStyles}
               />
             </CardContent>
           </Card>

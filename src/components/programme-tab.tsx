@@ -2,6 +2,7 @@ import { getEvents } from "@/lib/actions";
 import { EventClientSchedule } from "./event-client-schedule";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
+import type { Event } from "@/lib/types";
 
 const BCM_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xeyiLqMDULNfycqE2zStdsABz_I1eXqXBvqnOqEhs3U/edit?gid=0#gid=0";
 const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
@@ -42,7 +43,11 @@ export async function ProgrammeTab() {
     )
   }
   
-  const allEventsForCalendar = [...(programmeEvents || []), ...(hlazirEvents || [])];
+  const allEventsForCalendar: Event[] = [
+    ...(programmeEvents || []).map(e => ({ ...e, type: 'programme' })),
+    ...(hlazirEvents || []).map(e => ({ ...e, type: 'hlazir' }))
+  ];
+
 
   return <EventClientSchedule events={eventsForList} allEventsForCalendar={allEventsForCalendar} isProgramme={true} />;
 }
