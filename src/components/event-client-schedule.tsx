@@ -6,7 +6,7 @@ import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
-import { endOfDay, isPast, parseISO, format, eachDayOfInterval } from "date-fns";
+import { endOfDay, isPast, parseISO, format, eachDayOfInterval, isSameDay } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
@@ -118,7 +118,11 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
             }
         }
     });
-    return { programmeDays: pDays, hlazirDays: hDays };
+    
+    // If a day is in both, we'll let hlazir (blue) take precedence.
+    const uniqueProgrammeDays = pDays.filter(pDay => !hDays.some(hDay => isSameDay(pDay, hDay)));
+
+    return { programmeDays: uniqueProgrammeDays, hlazirDays: hDays };
   }, [allEventsForCalendar, events]);
 
   const eventDays = useMemo(() => [...programmeDays, ...hlazirDays], [programmeDays, hlazirDays]);
@@ -132,10 +136,12 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
     programme: { 
         color: 'hsl(var(--destructive-foreground))',
         backgroundColor: 'hsl(var(--destructive))',
+        borderRadius: '50%',
     },
     hlazir: {
         color: 'hsl(var(--primary-foreground))',
         backgroundColor: 'hsl(var(--primary))',
+        borderRadius: '50%',
     },
   };
 
