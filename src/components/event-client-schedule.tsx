@@ -121,30 +121,11 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
     return { programmeDays: pDays, hlazirDays: hDays };
   }, [allEventsForCalendar, events]);
 
-  const { programmeOnly, hlazirOnly, both } = useMemo(() => {
-    const pTimes = new Set(programmeDays.map(d => d.getTime()));
-    const hTimes = new Set(hlazirDays.map(d => d.getTime()));
-
-    const bothDays: Date[] = [];
-    pTimes.forEach(time => {
-        if (hTimes.has(time)) {
-            bothDays.push(new Date(time));
-        }
-    });
-    const bothTimes = new Set(bothDays.map(d => d.getTime()));
-
-    const pOnly = programmeDays.filter(d => !bothTimes.has(d.getTime()));
-    const hOnly = hlazirDays.filter(d => !bothTimes.has(d.getTime()));
-
-    return { programmeOnly: pOnly, hlazirOnly: hOnly, both: bothDays };
-  }, [programmeDays, hlazirDays]);
-
   const eventDays = useMemo(() => [...programmeDays, ...hlazirDays], [programmeDays, hlazirDays]);
 
   const modifiers = {
-    programme: programmeOnly,
-    hlazir: hlazirOnly,
-    both: both,
+    programme: programmeDays,
+    hlazir: hlazirDays,
   };
 
   const modifiersStyles: Record<string, CSSProperties> = {
@@ -156,10 +137,6 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
         color: 'hsl(var(--primary-foreground))',
         backgroundColor: 'hsl(var(--primary))',
     },
-    both: {
-        color: 'hsl(var(--primary-foreground))',
-        background: `linear-gradient(45deg, hsl(var(--destructive)) 49%, hsl(var(--primary)) 51%)`,
-    }
   };
 
   return (
@@ -197,10 +174,6 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                 <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'hsl(var(--primary))' }} />
                     <span>Hla Zir</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full" style={{ background: 'linear-gradient(45deg, hsl(var(--destructive)) 49%, hsl(var(--primary)) 51%)' }} />
-                    <span>Both</span>
                 </div>
             </CardFooter>
           </Card>
