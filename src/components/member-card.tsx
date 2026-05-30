@@ -39,8 +39,7 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ 
         once: false, 
-        amount: isMobile ? 0.4 : 0.1,
-        margin: isMobile ? "-25% 0px -25% 0px" : "0px"
+        margin: isMobile ? "-40% 0px -40% 0px" : "0px"
       }}
       onViewportEnter={() => isMobile && setIsFocused(true)}
       onViewportLeave={() => isMobile && setIsFocused(false)}
