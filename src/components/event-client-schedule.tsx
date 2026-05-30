@@ -1,15 +1,16 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, type CSSProperties } from "react";
 import type { Event } from "@/lib/types";
 import { EventCard } from "@/components/event-card";
 import { EventSummaryDialog } from "@/components/event-summary-dialog";
 import { motion } from "framer-motion";
-import { endOfDay, isPast, parseISO, format } from "date-fns";
+import { endOfDay, isPast, parseISO, format, eachDayOfInterval, isSameDay } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Calendar as CalendarIcon, CheckCircle } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 
 const groupEventsByMonth = (events: Event[]) => {
   return events.reduce((acc, event) => {
@@ -53,7 +54,7 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya, isProgramme }: { mo
   </AccordionItem>
 );
 
-export function EventClientSchedule({ events, showAllEvents, isProgramme }: { events: Event[], showAllEvents?: boolean, isProgramme?: boolean }) {
+export function EventClientSchedule({ events, allEventsForCalendar, showAllEvents, isProgramme, isHlaZirTab }: { events: Event[], allEventsForCalendar?: Event[], showAllEvents?: boolean, isProgramme?: boolean, isHlaZirTab?: boolean }) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -90,6 +91,64 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
 
   const hasUpcomingEvents = upcomingEvents.length > 0;
   const hasPastEvents = pastEvents.length > 0;
+  
+  const { programmeDays, hlazirDays } = useMemo(() => {
+    const pDays: Date[] = [];
+    const hDays: Date[] = [];
+    const calendarEvents = allEventsForCalendar || events;
+
+    calendarEvents.forEach(event => {
+        if (event.startdate) {
+            try {
+                const start = parseISO(event.startdate);
+                const end = event.enddate ? parseISO(event.enddate) : start;
+                if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                    const interval = eachDayOfInterval({ start, end });
+                    if (event.type === 'programme') {
+                        pDays.push(...interval);
+                    } else if (event.type === 'hlazir') {
+                        hDays.push(...interval);
+                    } else {
+                        // Default for events without type
+                        pDays.push(...interval);
+                    }
+                }
+            } catch (e) {
+                console.warn("Invalid date format for event", event);
+            }
+        }
+    });
+    
+    const uniqueProgrammeDays = pDays.filter(pDay => !hDays.some(hDay => isSameDay(pDay, hDay)));
+
+    return { programmeDays: uniqueProgrammeDays, hlazirDays: hDays };
+  }, [allEventsForCalendar, events]);
+
+  const eventDays = useMemo(() => [...programmeDays, ...hlazirDays], [programmeDays, hlazirDays]);
+
+  const modifiers = {
+    sunday: { dayOfWeek: [0] } as const,
+    programme: programmeDays,
+    hlazir: hlazirDays,
+  };
+
+  const modifiersStyles: Record<string, CSSProperties> = {
+    programme: { 
+        color: 'hsl(var(--destructive-foreground))',
+        backgroundColor: 'hsl(var(--destructive))',
+        borderRadius: '50%',
+    },
+    hlazir: {
+        color: 'hsl(var(--primary-foreground))',
+        backgroundColor: 'hsl(var(--primary))',
+        borderRadius: '50%',
+    },
+    sunday: {
+        color: 'hsl(var(--destructive))'
+    }
+  };
+
+  const showCalendar = isProgramme || isHlaZirTab;
 
   return (
     <div className="animate-in fade-in-50 duration-500 w-full">
@@ -105,6 +164,39 @@ export function EventClientSchedule({ events, showAllEvents, isProgramme }: { ev
           </CardContent>
         </Card>
       )}
+
+      {showCalendar && (
+        <Card className="mb-8 border shadow-md">
+            <CardContent className="p-2 md:p-4 flex justify-center">
+              <Calendar
+                mode="multiple"
+                selected={eventDays}
+                onSelect={() => {}}
+                className="p-0 rounded-md"
+                showOutsideDays
+                modifiers={modifiers}
+                modifiersStyles={modifiersStyles}
+                classNames={{
+                  cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-transparent focus-within:relative focus-within:z-20",
+                  day_today: "bg-transparent text-foreground ring-1 ring-primary rounded-full",
+                  caption_label: "text-sm font-bold uppercase",
+                  head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] first:text-destructive",
+                }}
+              />
+            </CardContent>
+            <CardFooter className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-3 bg-muted/50 border-t text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'hsl(var(--destructive))' }} />
+                    <span>Programme</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'hsl(var(--primary))' }} />
+                    <span>Hla Zir</span>
+                </div>
+            </CardFooter>
+          </Card>
+      )}
+
 
       <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8">
         <AccordionItem value="upcoming">

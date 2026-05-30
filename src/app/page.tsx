@@ -2,16 +2,15 @@ import { EventSchedule } from "@/components/event-schedule";
 import { PageHeader } from "@/components/page-header";
 import { MemberSchedule } from "@/components/member-schedule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProgrammeTab } from "@/components/programme-tab";
+import { HlaZirTab } from "@/components/hla-zir-tab";
 
-const BCM_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xeyiLqMDULNfycqE2zStdsABz_I1eXqXBvqnOqEhs3U/edit?gid=0#gid=0";
-const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
 
 export default function Home() {
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
-      
       <div className="w-full max-w-5xl">
         <Tabs defaultValue="bcm" className="w-full">
           <TabsList className="flex justify-center w-full max-w-[500px] mx-auto bg-transparent mb-10 h-12 gap-2 md:gap-8 border-b border-white/10 rounded-none p-0">
@@ -22,10 +21,10 @@ export default function Home() {
           
           <div className="relative">
             <TabsContent value="bcm" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-              <EventSchedule sheetUrl={BCM_SHEET_URL} isProgramme={true} />
+              <ProgrammeTab />
             </TabsContent>
             <TabsContent value="bcya" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-              <EventSchedule sheetUrl={BCYA_SHEET_URL} showAllEvents={true} />
+              <HlaZirTab />
             </TabsContent>
             <TabsContent value="members" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               <MemberSchedule sheetUrl={MEMBERS_SHEET_URL} />
