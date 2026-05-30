@@ -13,7 +13,7 @@ import { type Event } from "@/lib/types";
 import { Calendar, ArrowRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 type EventCardProps = {
@@ -26,6 +26,12 @@ type EventCardProps = {
 export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCardProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isFocusedRef = useRef(false);
+
+  useEffect(() => {
+    isFocusedRef.current = isFocused;
+  }, [isFocused]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -33,6 +39,40 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    let rafId: number;
+    const checkCenter = () => {
+       if (!cardRef.current) return;
+       const rect = cardRef.current.getBoundingClientRect();
+       const screenCenter = window.innerHeight / 2;
+       
+       const isIntersectingCenter = screenCenter >= (rect.top - 10) && screenCenter <= (rect.bottom + 10);
+       
+       if (isIntersectingCenter && !isFocusedRef.current) {
+          setIsFocused(true);
+       } else if (!isIntersectingCenter && isFocusedRef.current) {
+          setIsFocused(false);
+       }
+    };
+
+    const onScroll = () => {
+       cancelAnimationFrame(rafId);
+       rafId = requestAnimationFrame(checkCenter);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    checkCenter();
+    
+    return () => {
+       window.removeEventListener('scroll', onScroll);
+       window.removeEventListener('resize', onScroll);
+       cancelAnimationFrame(rafId);
+    };
+  }, [isMobile]);
 
   const formatDateRange = (start: string, end?: string) => {
     const startDate = new Date(start);
@@ -55,11 +95,10 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, margin: "-20% 0px -20% 0px" }}
-      onViewportEnter={() => isMobile && setIsFocused(true)}
-      onViewportLeave={() => isMobile && setIsFocused(false)}
+      viewport={{ once: false, margin: "0px" }}
       transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
       className="h-full"
     >

@@ -6,7 +6,7 @@ import type { Member } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 type MemberCardProps = {
@@ -17,6 +17,12 @@ type MemberCardProps = {
 export function MemberCard({ member, onSelectMember }: MemberCardProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isFocusedRef = useRef(false);
+
+  useEffect(() => {
+    isFocusedRef.current = isFocused;
+  }, [isFocused]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -24,6 +30,41 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    let rafId: number;
+    const checkCenter = () => {
+       if (!cardRef.current) return;
+       const rect = cardRef.current.getBoundingClientRect();
+       const screenCenter = window.innerHeight / 2;
+       
+       // Check if the screen center line falls inside the card (with a 10px buffer to prevent flickering in gaps)
+       const isIntersectingCenter = screenCenter >= (rect.top - 10) && screenCenter <= (rect.bottom + 10);
+       
+       if (isIntersectingCenter && !isFocusedRef.current) {
+          setIsFocused(true);
+       } else if (!isIntersectingCenter && isFocusedRef.current) {
+          setIsFocused(false);
+       }
+    };
+
+    const onScroll = () => {
+       cancelAnimationFrame(rafId);
+       rafId = requestAnimationFrame(checkCenter);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    checkCenter();
+    
+    return () => {
+       window.removeEventListener('scroll', onScroll);
+       window.removeEventListener('resize', onScroll);
+       cancelAnimationFrame(rafId);
+    };
+  }, [isMobile]);
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -35,14 +76,10 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ 
-        once: false, 
-        margin: isMobile ? "-40% 0px -40% 0px" : "0px"
-      }}
-      onViewportEnter={() => isMobile && setIsFocused(true)}
-      onViewportLeave={() => isMobile && setIsFocused(false)}
+      viewport={{ once: false, margin: "0px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="h-full"
     >
