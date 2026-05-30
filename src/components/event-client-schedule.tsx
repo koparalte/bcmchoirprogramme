@@ -38,16 +38,9 @@ const MonthEvents = ({ month, events, onSelectEvent, isBcya, isProgramme }: { mo
         transition={{ duration: 0.5 }}
       >
         {events.map((event) => (
-          <motion.div
-            key={event.id}
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-          >
+          <div key={event.id}>
             <EventCard event={event} onSelectEvent={onSelectEvent} isBcya={isBcya} isProgramme={isProgramme} />
-          </motion.div>
+          </div>
         ))}
       </motion.div>
     </AccordionContent>
@@ -231,41 +224,71 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
       )}
 
 
-      <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8">
-        <AccordionItem value="upcoming">
-          <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
-            Upcoming
-          </AccordionTrigger>
-          <AccordionContent>
-            {hasUpcomingEvents ? (
-               <Accordion type="multiple" defaultValue={upcomingMonthsToOpen} className="w-full">
-                {Object.entries(groupedUpcomingEvents).map(([month, monthEvents]) => (
-                  <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} isProgramme={isProgramme} />
+      {isProgramme ? (
+        <div className="w-full space-y-12 mt-8">
+          {hasUpcomingEvents && (
+            <div>
+              <h2 className="text-2xl md:text-3xl font-headline font-black uppercase tracking-widest text-primary mb-6">Upcoming</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} onSelectEvent={handleSelectEvent} isProgramme={true} />
                 ))}
-              </Accordion>
-            ) : (
-              <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-                <h3 className="text-xl font-semibold text-muted-foreground">Will be Updated Soon</h3>
               </div>
-            )}
-          </AccordionContent>
-        </AccordionItem>
-
-        {hasPastEvents && (
-          <AccordionItem value="past">
-            <AccordionTrigger className="text-3xl font-bold text-foreground my-4 hover:no-underline">
-              Past {showAllEvents && `(${pastEvents.length})`}
+            </div>
+          )}
+          {hasPastEvents && (
+            <div>
+              <h2 className="text-2xl md:text-3xl font-headline font-black uppercase tracking-widest text-muted-foreground mb-6">Past</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-70">
+                {pastEvents.map((event) => (
+                  <EventCard key={event.id} event={event} onSelectEvent={handleSelectEvent} isProgramme={true} />
+                ))}
+              </div>
+            </div>
+          )}
+          {!hasUpcomingEvents && !hasPastEvents && (
+            <div className="text-center py-16 px-4 border border-white/5 rounded-2xl bg-black/20">
+              <h3 className="text-xl font-headline font-bold text-muted-foreground uppercase tracking-widest">Will be Updated Soon</h3>
+            </div>
+          )}
+        </div>
+      ) : (
+        <Accordion type="multiple" defaultValue={['upcoming']} className="w-full space-y-8 mt-8">
+          <AccordionItem value="upcoming">
+            <AccordionTrigger className="text-2xl font-headline font-bold text-foreground my-2 hover:no-underline uppercase tracking-widest">
+              Upcoming
             </AccordionTrigger>
             <AccordionContent>
-              <Accordion type="multiple" className="w-full">
-                {Object.entries(groupedPastEvents).map(([month, monthEvents]) => (
-                  <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} isProgramme={isProgramme} />
-                ))}
-              </Accordion>
+              {hasUpcomingEvents ? (
+                 <Accordion type="multiple" defaultValue={upcomingMonthsToOpen} className="w-full">
+                  {Object.entries(groupedUpcomingEvents).map(([month, monthEvents]) => (
+                    <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} isProgramme={isProgramme} />
+                  ))}
+                </Accordion>
+              ) : (
+                <div className="text-center py-16 px-4 border border-white/5 rounded-2xl bg-black/20">
+                  <h3 className="text-xl font-headline font-bold text-muted-foreground uppercase tracking-widest">Will be Updated Soon</h3>
+                </div>
+              )}
             </AccordionContent>
           </AccordionItem>
-        )}
-      </Accordion>
+  
+          {hasPastEvents && (
+            <AccordionItem value="past">
+              <AccordionTrigger className="text-2xl font-headline font-bold text-foreground my-2 hover:no-underline uppercase tracking-widest">
+                Past {showAllEvents && `(${pastEvents.length})`}
+              </AccordionTrigger>
+              <AccordionContent>
+                <Accordion type="multiple" className="w-full">
+                  {Object.entries(groupedPastEvents).map(([month, monthEvents]) => (
+                    <MonthEvents key={month} month={month} events={monthEvents} onSelectEvent={handleSelectEvent} isBcya={showAllEvents} isProgramme={isProgramme} />
+                  ))}
+                </Accordion>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+        </Accordion>
+      )}
 
       <EventSummaryDialog
         isOpen={isDialogOpen}
