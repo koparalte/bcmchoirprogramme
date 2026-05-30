@@ -1,8 +1,10 @@
 import type {Metadata} from 'next';
+import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
-const logoUrl = "https://lh3.googleusercontent.com/d/1yOgPWEoQhO6nWt2AmwM4lxXgRsoZs7nM";
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
   title: 'BCM CHOIR PROGRAMME & HLA ZIR',
@@ -15,14 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
       <head>
         <link rel="icon" href="/icon.ico" sizes="any" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased min-h-screen bg-background text-foreground selection:bg-primary/30">
         {children}
         <Toaster />
       </body>

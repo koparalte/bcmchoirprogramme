@@ -9,24 +9,30 @@ const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV
 
 export default function Home() {
   return (
-    <main className="min-h-screen container mx-auto px-4 py-8 md:py-12">
+    <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
-      <Tabs defaultValue="bcm" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
-          <TabsTrigger value="bcm">PROGRAMME</TabsTrigger>
-          <TabsTrigger value="bcya">HLA ZIR</TabsTrigger>
-          <TabsTrigger value="members">MEMBERS</TabsTrigger>
-        </TabsList>
-        <TabsContent value="bcm" className="mt-6">
-          <EventSchedule sheetUrl={BCM_SHEET_URL} isProgramme={true} />
-        </TabsContent>
-        <TabsContent value="bcya" className="mt-6">
-          <EventSchedule sheetUrl={BCYA_SHEET_URL} showAllEvents={true} />
-        </TabsContent>
-        <TabsContent value="members" className="mt-6">
-          <MemberSchedule sheetUrl={MEMBERS_SHEET_URL} />
-        </TabsContent>
-      </Tabs>
+      
+      <div className="w-full max-w-5xl">
+        <Tabs defaultValue="bcm" className="w-full">
+          <TabsList className="flex justify-center w-full max-w-[500px] mx-auto bg-transparent mb-10 h-12 gap-2 md:gap-8 border-b border-white/10 rounded-none p-0">
+            <TabsTrigger value="bcm" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground">PROGRAMME</TabsTrigger>
+            <TabsTrigger value="bcya" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground">HLA ZIR</TabsTrigger>
+            <TabsTrigger value="members" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground">MEMBERS</TabsTrigger>
+          </TabsList>
+          
+          <div className="relative">
+            <TabsContent value="bcm" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <EventSchedule sheetUrl={BCM_SHEET_URL} isProgramme={true} />
+            </TabsContent>
+            <TabsContent value="bcya" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <EventSchedule sheetUrl={BCYA_SHEET_URL} showAllEvents={true} />
+            </TabsContent>
+            <TabsContent value="members" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <MemberSchedule sheetUrl={MEMBERS_SHEET_URL} />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </main>
   );
 }

@@ -25,15 +25,15 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
     const startDate = new Date(start);
     if (end) {
       const endDate = new Date(end);
-      const startMonth = startDate.toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
-      const endMonth = endDate.toLocaleDateString(undefined, { month: 'short', timeZone: 'UTC' });
+      const startMonth = startDate.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+      const endMonth = endDate.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
 
       if (startMonth === endMonth) {
-         return `${startDate.toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' })} ${startDate.getUTCDate()} - ${endDate.toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' })} ${endDate.getUTCDate()} ${startMonth}, ${startDate.getUTCFullYear()}`;
+         return `${startDate.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' })} ${startDate.getUTCDate()} - ${endDate.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' })} ${endDate.getUTCDate()} ${startMonth}, ${startDate.getUTCFullYear()}`;
       }
-      return `${startDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} - ${endDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`;
+      return `${startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} - ${endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`;
     }
-    return startDate.toLocaleDateString(undefined, {
+    return startDate.toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
     });
   }
@@ -41,31 +41,31 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
   const zingZanText = event.zingzan?.trim().toLowerCase();
 
   return (
-    <Card className={cn("flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1", (isProgramme || isBcya) && "min-h-[170px]")}>
-      <CardHeader className="p-4 flex-grow">
-        <CardTitle className="font-headline text-lg text-primary">{event.title}</CardTitle>
+    <Card className={cn("flex flex-col h-full overflow-hidden transition-all duration-500 hover:shadow-[0_0_2rem_-0.5rem_rgba(59,130,246,0.2)] hover:-translate-y-1 bg-card border border-white/10 hover:border-primary/40 rounded-2xl group", (isProgramme || isBcya) && "min-h-[170px]")}>
+      <CardHeader className="p-5 flex-grow relative z-10">
+        <CardTitle className="font-headline text-xl text-primary font-bold tracking-tight mb-1 group-hover:text-primary transition-colors">{event.title}</CardTitle>
         {isBcya ? (
             <>
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.designation}</p>
+                <p className="text-sm font-medium text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
+                <p className="text-xs text-muted-foreground/80 mt-1 line-clamp-1">{event.designation}</p>
             </>
         ) : (
-            event.programme && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
+            event.programme && <p className="text-sm font-medium text-muted-foreground mt-1 line-clamp-1">{event.programme}</p>
         )}
         {isProgramme && zingZanText && (
-            <p className={`font-semibold capitalize mt-1 ${zingZanText === 'zing' ? 'text-accent' : 'text-foreground'}`}>
+            <div className={`mt-2 inline-flex items-center rounded-sm px-2 py-0.5 text-[10px] uppercase font-bold tracking-widest transition-colors ${zingZanText === 'zing' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-primary/10 text-primary border border-primary/20'}`}>
                 {event.zingzan}
-            </p>
+            </div>
         )}
         {event.time && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-              <Clock className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground mt-4 bg-secondary/30 w-fit px-2 py-1 rounded border border-white/5">
+              <Clock className="w-3.5 h-3.5 text-primary" />
               <span>{event.time}</span>
           </div>
         )}
       </CardHeader>
-      <CardFooter className="flex justify-between items-center bg-secondary/30 p-3 mt-auto">
-        <div className="flex flex-col items-start gap-1 text-xs text-muted-foreground">
+      <CardFooter className="flex justify-between items-center bg-secondary/10 p-4 mt-auto border-t border-white/5 relative z-10">
+        <div className="flex flex-col items-start gap-1 text-xs font-medium text-muted-foreground">
             <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDateRange(event.startdate, event.enddate)}</span>

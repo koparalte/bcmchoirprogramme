@@ -6,6 +6,8 @@ import type { Member } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 type MemberCardProps = {
     member: Member;
@@ -13,6 +15,15 @@ type MemberCardProps = {
 }
 
 export function MemberCard({ member, onSelectMember }: MemberCardProps) {
+  const [isFocused, setIsFocused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -24,36 +35,64 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ 
+        once: false, 
+        amount: isMobile ? 0.4 : 0.1,
+        margin: isMobile ? "-25% 0px -25% 0px" : "0px"
+      }}
+      onViewportEnter={() => isMobile && setIsFocused(true)}
+      onViewportLeave={() => isMobile && setIsFocused(false)}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="h-full"
     >
       <Card 
-          className="cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full"
+          className={cn(
+            "cursor-pointer transition-all duration-500 h-full bg-card border rounded-2xl overflow-hidden relative group",
+            isFocused 
+              ? "shadow-[0_0_2rem_-0.5rem_rgba(59,130,246,0.3)] -translate-y-1 border-primary/40" 
+              : "border-white/10 hover:shadow-[0_0_2rem_-0.5rem_rgba(59,130,246,0.2)] hover:-translate-y-1 hover:border-primary/40"
+          )}
           onClick={() => onSelectMember(member)}
       >
-        <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full">
-            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted flex items-center justify-center mb-3">
+        <div className={cn(
+          "absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent transition-opacity duration-500 z-0 pointer-events-none",
+          isFocused ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        )}></div>
+        
+        <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full relative z-10">
+            <div className={cn(
+              "relative w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-transparent flex items-center justify-center mb-5 ring-2 shadow-inner transition-all duration-500",
+              isFocused ? "ring-primary/40 shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "ring-white/5 group-hover:ring-primary/40 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+            )}>
               {member.link ? (
-                <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
+                <Image 
+                  src={member.link} 
+                  alt={member.name} 
+                  layout="fill" 
+                  objectFit="cover" 
+                  className={cn("transition-transform duration-700 ease-out", isFocused ? "scale-110" : "group-hover:scale-110")} 
+                />
               ) : (
-                <span className="text-xl font-semibold text-muted-foreground">{getInitials(member.name)}</span>
+                <span className="text-3xl font-bold text-primary/70">{getInitials(member.name)}</span>
               )}
             </div>
           
             <div className="flex flex-col items-center flex-grow">
                 <div className="flex items-center gap-2">
-                    <p className="text-lg font-medium text-foreground">{member.name}</p>
-                    
+                    <p className={cn(
+                      "text-xl font-bold tracking-tight transition-colors",
+                      isFocused ? "text-primary" : "text-foreground group-hover:text-primary"
+                    )}>{member.name}</p>
                 </div>
                 {member.designation && (
-                    <Badge variant="destructive" className="mt-1">{member.designation}</Badge>
+                    <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary border border-primary/20 font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm">{member.designation}</Badge>
                 )}
                 {member.kohhran && (
-                    <div className="flex items-center gap-2 mt-2 text-muted-foreground">
-                        <Church className="w-4 h-4" />
-                        <p className="text-sm">{member.kohhran}</p>
+                    <div className="flex items-center gap-2 mt-4 text-muted-foreground bg-secondary/20 px-3 py-1.5 rounded border border-white/5">
+                        <Church className="w-3.5 h-3.5 text-primary" />
+                        <p className="text-xs font-semibold">{member.kohhran}</p>
                     </div>
                 )}
             </div>
