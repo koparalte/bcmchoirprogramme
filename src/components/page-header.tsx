@@ -20,9 +20,6 @@ export function PageHeader() {
         BCM Choir <br className="md:hidden" /> Programme
       </h1>
       <div className="h-1 w-24 bg-primary mt-6 mb-6"></div>
-      <p className="text-lg text-muted-foreground max-w-xl mx-auto px-4 font-medium">
-        Stay updated with the latest events, Hla Zir schedules, and member details.
-      </p>
     </motion.header>
   );
 }
