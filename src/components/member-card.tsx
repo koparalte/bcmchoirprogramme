@@ -97,9 +97,9 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
           isFocused ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}></div>
         
-        <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full relative z-10">
+        <CardContent className="p-4 md:p-5 flex flex-col items-center justify-center text-center h-full relative z-10">
             <div className={cn(
-              "relative w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-transparent flex items-center justify-center mb-5 ring-2 shadow-inner transition-all duration-500",
+              "relative w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-transparent flex items-center justify-center mb-3 ring-2 shadow-inner transition-all duration-500",
               isFocused ? "ring-primary/40 shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "ring-white/5 group-hover:ring-primary/40 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
             )}>
               {member.link ? (
@@ -118,7 +118,7 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
             <div className="flex flex-col items-center flex-grow">
                 <div className="flex items-center gap-2">
                     <p className={cn(
-                      "text-xl font-bold tracking-tight transition-colors",
+                      "text-xl font-semibold tracking-wider uppercase transition-colors",
                       isFocused ? "text-primary" : "text-foreground group-hover:text-primary"
                     )}>{member.name}</p>
                 </div>
@@ -126,7 +126,7 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
                     <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary border border-primary/20 font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm">{member.designation}</Badge>
                 )}
                 {member.kohhran && (
-                    <div className="flex items-center gap-2 mt-4 text-muted-foreground bg-secondary/20 px-3 py-1.5 rounded border border-white/5">
+                    <div className="flex items-center gap-2 mt-3 text-muted-foreground bg-secondary/20 px-3 py-1.5 rounded border border-white/5">
                         <Church className="w-3.5 h-3.5 text-primary" />
                         <p className="text-xs font-semibold">{member.kohhran}</p>
                     </div>

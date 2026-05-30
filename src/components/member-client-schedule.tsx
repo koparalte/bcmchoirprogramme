@@ -214,7 +214,10 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
       )}
       
       {conductors.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-12 mt-8">
+          <div className="flex items-center gap-4 mb-6 pb-4 border-b border-white/5">
+            <span className="font-headline font-black uppercase tracking-[0.2em] text-xl md:text-2xl text-foreground">Conductor</span>
+          </div>
           <motion.div
             layout
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
@@ -234,16 +237,20 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
         </div>
       )}
 
-      <Accordion type="multiple" defaultValue={defaultOpen} className="w-full space-y-4">
+      <Accordion type="multiple" defaultValue={defaultOpen} className="w-full space-y-6">
         {Object.entries(groupedMembers).map(([part, partMembers]) => (
-          <AccordionItem value={part} key={part}>
-            <AccordionTrigger className="text-2xl font-bold text-primary hover:no-underline capitalize">
-              {part} ({partMembers.length})
+          <AccordionItem value={part} key={part} className="border-white/5 data-[state=open]:border-primary/20 transition-colors duration-500">
+            <AccordionTrigger className="flex flex-row items-center justify-between py-6 group hover:no-underline">
+              <div className="flex items-center gap-4 text-left">
+                <span className="font-headline font-black uppercase tracking-[0.2em] text-xl md:text-2xl text-foreground group-hover:text-primary transition-colors">
+                  {part.toLowerCase() === 'bass' ? `${part}es` : part.toLowerCase() === 'unassigned' ? part : `${part}s`}
+                </span>
+              </div>
             </AccordionTrigger>
             <AccordionContent>
               <motion.div
                 layout
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-4"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-4 pb-6"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

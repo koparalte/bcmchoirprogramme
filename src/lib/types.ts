@@ -19,6 +19,7 @@ export type Member = {
   part?: string;
   designation?: string;
   link?: string;
+  phone?: string;
 };
 
 export type Banner = {

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { type Member } from "@/lib/types";
-import { Church, Music } from "lucide-react";
+import { Church, Music, Phone } from "lucide-react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -59,7 +59,7 @@ export function MemberDetailsDialog({
                           <span className="text-8xl text-muted-foreground">{getInitials(member.name)}</span>
                         )}
                       </div>
-                    <DialogTitle className="text-2xl font-headline text-primary text-center">
+                    <DialogTitle className="text-2xl font-headline font-semibold uppercase tracking-wider text-primary text-center">
                       {member.name}
                     </DialogTitle>
                   </div>
@@ -70,6 +70,12 @@ export function MemberDetailsDialog({
                         <div className="flex items-center gap-3 text-muted-foreground">
                             <Church className="w-5 h-5" />
                             <span>{member.kohhran}</span>
+                        </div>
+                    )}
+                    {member.phone && (
+                        <div className="flex items-center gap-3 text-muted-foreground">
+                            <Phone className="w-5 h-5" />
+                            <span>{member.phone}</span>
                         </div>
                     )}
                     <div className="flex items-start gap-3 text-muted-foreground">
