@@ -205,7 +205,7 @@ export function EventClientSchedule({ events, allEventsForCalendar, showAllEvent
                   row: "flex justify-between w-full mt-2",
                   cell: "h-10 w-10 md:h-12 md:w-12 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
                   day: "h-10 w-10 md:h-12 md:w-12 p-0 font-medium transition-all hover:bg-white/5 rounded-md aria-selected:opacity-100 text-foreground",
-                  day_today: "bg-transparent text-foreground ring-1 ring-primary/40 shadow-[0_0_10px_rgba(59,130,246,0.1)] rounded-md font-bold",
+                  day_today: "bg-transparent text-foreground ring-1 ring-emerald-500/40 shadow-[inset_0_0_10px_rgba(16,185,129,0.2),0_0_15px_rgba(16,185,129,0.2)] rounded-md font-bold",
                   day_outside: "text-muted-foreground/30",
                 }}
               />
