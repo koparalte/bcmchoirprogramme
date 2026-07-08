@@ -2,7 +2,7 @@
 'use server';
 
 import {z} from 'zod';
-import type {Banner, Event, Member} from './types';
+import type {Banner, Event, Member, ProgressMember} from './types';
 
 const sheetUrlSchema = z.string().url();
 
@@ -28,19 +28,21 @@ interface GvizResponse {
 }
 
 function parseSheetDate(cellValue: string): string | null {
-    if (typeof cellValue === 'string' && cellValue.startsWith('Date(')) {
-        const dateParts = cellValue
-        .replace('Date(', '')
-        .replace(')', '')
-        .split(',');
-        const dateObj = new Date(
-        parseInt(dateParts[0]),
-        parseInt(dateParts[1]),
-        parseInt(dateParts[2])
-        );
-        return dateObj.toISOString().split('T')[0];
+    if (typeof cellValue === 'string') {
+        if (cellValue.startsWith('Date(')) {
+            const dateParts = cellValue.replace('Date(', '').replace(')', '').split(',');
+            const year = parseInt(dateParts[0]);
+            const month = parseInt(dateParts[1]) + 1; // gviz months are 0-indexed
+            const day = parseInt(dateParts[2]);
+            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+        
+        // If it's already YYYY-MM-DD
+        const isoMatch = cellValue.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (isoMatch) return isoMatch[1];
     }
-    // Handle cases where date might be a simple string
+    
+    // Fallback
     const date = new Date(cellValue);
     if (!isNaN(date.getTime())) {
         return date.toISOString().split('T')[0];
@@ -72,7 +74,7 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
 
         const responseText = await response.text();
         const jsonString = responseText
-            .match(/(?<=google\.visualization\.Query\.setResponse\().*(?=\);)/s)?.[0];
+            .match(/(?<=google\.visualization\.Query\.setResponse\()[\s\S]*(?=\);)/)?.[0];
 
         if (!jsonString) {
             return {error: 'Failed to parse response from Google Sheets.'};
@@ -214,6 +216,12 @@ export async function getMembers(
             phone = phoneCell ? (phoneCell.f ?? phoneCell.v?.toString()) : null;
         }
 
+        let email: string | null = null;
+        if (row.c.length > 6) {
+            const emailCell = row.c[6];
+            email = emailCell ? (emailCell.f ?? emailCell.v) : null;
+        }
+
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
@@ -222,6 +230,7 @@ export async function getMembers(
           designation: designation || undefined,
           link: link || undefined,
           phone: phone || undefined,
+          email: email || undefined,
         };
       })
       .filter(member => member.name && member.name.trim().toLowerCase() !== 'name' && member.name.trim().toLowerCase() !== 'member name'); // Filter out members with no name and the header
@@ -268,3 +277,65 @@ export async function getBannerUrls(sheetUrl: string): Promise<{ data?: Banner[]
     };
   }
 }
+
+export async function getProgress(
+  sheetUrl: string
+): Promise<{data?: ProgressMember[]; error?: string}> {
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+
+  try {
+    const {cols, rows} = gvizData.table;
+    
+    if (cols.length < 2) {
+        return { error: "The Google Sheet appears to be missing required columns." };
+    }
+
+    // First two columns are Name and Part. 
+    // The rest of the columns are songs.
+    const songHeaders = cols.slice(2).map(col => col.label);
+
+    const members: ProgressMember[] = rows
+      .map((row, index) => {
+        const nameCell = row.c[0];
+        const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
+        
+        let part: string = '';
+        if (row.c.length > 1) {
+          const partCell = row.c[1];
+          part = partCell ? (partCell.f ?? partCell.v) : '';
+        }
+
+        const songs = songHeaders.map((songName, songIndex) => {
+           const cell = row.c[songIndex + 2];
+           let completed = false;
+           if (cell) {
+              completed = cell.v === true || cell.v === 'TRUE' || cell.v === 'true' || cell.v === 1;
+           }
+           return {
+              name: songName,
+              completed
+           };
+        });
+
+        return {
+          id: `${extractSheetId(sheetUrl)}-${index}`,
+          name: (name as string) || '',
+          part: (part as string) || '',
+          songs
+        };
+      })
+      .filter(member => member.name && member.name.trim().toLowerCase() !== 'name');
+
+    return {data: members};
+  } catch (err) {
+    console.error('Error processing sheet data for progress:', err);
+    return {
+      error: 'An unexpected error occurred while processing progress data.',
+    };
+  }
+}
+

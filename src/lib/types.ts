@@ -20,9 +20,25 @@ export type Member = {
   designation?: string;
   link?: string;
   phone?: string;
+  email?: string;
 };
 
 export type Banner = {
   url: string;
   name?: string;
+};
+
+export type SongProgress = {
+  name: string;
+  completed: boolean;
+};
+
+export type ProgressMember = {
+  id: string;
+  name: string;
+  part: string;
+  songs: SongProgress[];
+  link?: string;
+  email?: string;
+  medal?: 'gold' | 'silver' | 'bronze';
 };

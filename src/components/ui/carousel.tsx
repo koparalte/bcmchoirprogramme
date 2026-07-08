@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import type { Member } from "@/lib/types";
-import { MemberCard } from "./member-card";
-import { MemberDetailsDialog } from "./member-details-dialog";
+import { MemberCard } from "@/components/member-card";
+import { MemberDetailsDialog } from "@/components/member-details-dialog";
 import {
   Accordion,
   AccordionContent,
