@@ -9,7 +9,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const isOnProgress = nextUrl.pathname.startsWith('/progress');
       if (isOnProgress) {
         if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
+        return Response.redirect(new URL('/', nextUrl)); // Redirect unauthenticated users to home page
       }
       return true;
     },
