@@ -51,19 +51,41 @@ export default async function ProgressPage() {
   // If the logged in user is in Members but NOT in Progress (like a Conductor), add them manually!
   const loggedInMember = (membersData || []).find(m => m.email && userEmail && m.email.toLowerCase() === userEmail.toLowerCase());
   
-  if (loggedInMember) {
-      const existsInProgress = mergedMembers.some(m => m.email?.toLowerCase() === userEmail?.toLowerCase());
-      if (!existsInProgress) {
-          // Add the conductor/missing member manually to the array
-          mergedMembers.push({
-              id: `conductor-${loggedInMember.id}`,
-              name: loggedInMember.name,
-              part: loggedInMember.part || loggedInMember.designation || 'Conductor',
-              songs: [], // No songs to track for conductors
-              link: loggedInMember.link,
-              email: loggedInMember.email
-          });
-      }
+  // AUTHORIZATION CHECK: Block non-members
+  if (!loggedInMember) {
+     return (
+       <main className="min-h-screen container mx-auto px-4 py-8 flex flex-col items-center justify-center text-center">
+         <PageHeader />
+         <div className="w-full max-w-2xl mt-24 p-8 border border-white/10 bg-black/40 rounded-3xl shadow-2xl backdrop-blur-sm">
+            <h2 className="text-3xl font-black text-destructive uppercase tracking-widest drop-shadow-md">Access Denied</h2>
+            <p className="mt-4 text-muted-foreground text-lg">
+               You are logged in, but your Google account (<span className="text-foreground font-semibold">{userEmail}</span>) is not registered as a member of the choir.
+            </p>
+            <p className="mt-2 text-muted-foreground">
+               Only official choir members can view the progress tracking page.
+            </p>
+            <div className="mt-8">
+               <a href="/" className="px-8 py-3 bg-primary text-primary-foreground font-bold tracking-widest uppercase rounded-lg hover:bg-primary/90 transition-colors">
+                  Return Home
+               </a>
+            </div>
+         </div>
+       </main>
+     );
+  }
+
+  // They are a member! Check if they need to be added to the progress list manually (like conductors)
+  const existsInProgress = mergedMembers.some(m => m.email?.toLowerCase() === userEmail?.toLowerCase());
+  if (!existsInProgress) {
+      // Add the conductor/missing member manually to the array
+      mergedMembers.push({
+          id: `conductor-${loggedInMember.id}`,
+          name: loggedInMember.name,
+          part: loggedInMember.part || loggedInMember.designation || 'Conductor',
+          songs: [], // No songs to track for conductors
+          link: loggedInMember.link,
+          email: loggedInMember.email
+      });
   }
 
   // --- Leaderboard Calculation ---
