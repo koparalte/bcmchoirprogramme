@@ -133,25 +133,65 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
   const t = themeConfig[theme];
 
   const partUpper = (member.part || 'CONDUCTOR').toUpperCase();
+  
+  // Default to slate/gray if no part matched
   let heroTheme = {
-      cardBorder: "border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.2)]",
-      bgGradient: "from-blue-500/20 via-blue-500/5",
-      borderB: "border-blue-500/20",
-      avatarBg: "bg-blue-500/10",
-      avatarBorder: "border-blue-500/30",
-      avatarShadow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
-      textPrimary: "text-blue-500",
-      textPrimaryHover: "group-hover:text-blue-500",
-      badgeBg: "bg-blue-500/10 border-blue-500/20",
-      dropShadow: "drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]",
-      bibleBorder: "border-blue-500/20",
-      bibleQuote: "text-blue-500/20",
-      bibleText: "text-blue-500/90",
-      bibleBadgeText: "text-blue-500/80",
-      dialogBg: "bg-blue-500/5"
+      cardBorder: "border-slate-500/50 shadow-[0_0_30px_rgba(100,116,139,0.2)]",
+      bgGradient: "from-slate-500/20 via-slate-500/5",
+      borderB: "border-slate-500/20",
+      avatarBg: "bg-slate-500/10",
+      avatarBorder: "border-slate-500/30",
+      avatarShadow: "shadow-[0_0_20px_rgba(100,116,139,0.3)]",
+      textPrimary: "text-slate-500",
+      textPrimaryHover: "group-hover:text-slate-500",
+      badgeBg: "bg-slate-500/10 border-slate-500/20",
+      dropShadow: "drop-shadow-[0_0_15px_rgba(100,116,139,0.4)]",
+      bibleBorder: "border-slate-500/20",
+      bibleQuote: "text-slate-500/20",
+      bibleText: "text-slate-500/90",
+      bibleBadgeText: "text-slate-500/80",
+      dialogBg: "bg-slate-500/5"
   };
 
-  if (partUpper.includes('SOPRANO')) {
+  if (partUpper.includes('ASST') || partUpper.includes('ASSISTANT')) {
+      // Asst. Conductor gets Blue
+      heroTheme = {
+          cardBorder: "border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.2)]",
+          bgGradient: "from-blue-500/20 via-blue-500/5",
+          borderB: "border-blue-500/20",
+          avatarBg: "bg-blue-500/10",
+          avatarBorder: "border-blue-500/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+          textPrimary: "text-blue-500",
+          textPrimaryHover: "group-hover:text-blue-500",
+          badgeBg: "bg-blue-500/10 border-blue-500/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]",
+          bibleBorder: "border-blue-500/20",
+          bibleQuote: "text-blue-500/20",
+          bibleText: "text-blue-500/90",
+          bibleBadgeText: "text-blue-500/80",
+          dialogBg: "bg-blue-500/5"
+      };
+  } else if (partUpper.includes('CONDUCTOR')) {
+      // Main Conductor gets a higher priority color (Gold/Amber)
+      heroTheme = {
+          cardBorder: "border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.2)]",
+          bgGradient: "from-amber-500/20 via-amber-500/5",
+          borderB: "border-amber-500/20",
+          avatarBg: "bg-amber-500/10",
+          avatarBorder: "border-amber-500/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]",
+          textPrimary: "text-amber-500",
+          textPrimaryHover: "group-hover:text-amber-500",
+          badgeBg: "bg-amber-500/10 border-amber-500/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]",
+          bibleBorder: "border-amber-500/20",
+          bibleQuote: "text-amber-500/20",
+          bibleText: "text-amber-500/90",
+          bibleBadgeText: "text-amber-500/80",
+          dialogBg: "bg-amber-500/5"
+      };
+  } else if (partUpper.includes('SOPRANO')) {
       heroTheme = {
           cardBorder: "border-rose-400/50 shadow-[0_0_30px_rgba(251,113,133,0.2)]",
           bgGradient: "from-rose-400/20 via-rose-400/5",
