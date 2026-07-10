@@ -598,3 +598,150 @@ export async function saveManualOverrides(
     return { error: err.message };
   }
 }
+
+import { generateNextBatches } from './queue-algorithm';
+
+export async function setPracticeCanceled(sheetUrl: string, canceled: boolean) {
+  try {
+    const serviceAccountAuth = new JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(extractSheetId(sheetUrl)!, serviceAccountAuth);
+    await doc.loadInfo();
+    
+    let configSheet = doc.sheetsByTitle['Config'];
+    if (!configSheet) {
+        configSheet = await doc.addSheet({ title: 'Config', headerValues: ['Key', 'Value'] });
+    }
+    
+    const rows = await configSheet.getRows();
+    let cancelRow = rows.find(r => r.get('Key') === 'Cancel_Practice');
+    
+    if (cancelRow) {
+        cancelRow.set('Value', canceled ? 'TRUE' : 'FALSE');
+        await cancelRow.save();
+    } else {
+        await configSheet.addRow({ Key: 'Cancel_Practice', Value: canceled ? 'TRUE' : 'FALSE' });
+    }
+    
+    revalidatePath('/admin/schedule');
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
+}
+
+export async function getPracticeCanceled(sheetUrl: string) {
+  try {
+    const serviceAccountAuth = new JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(extractSheetId(sheetUrl)!, serviceAccountAuth);
+    await doc.loadInfo();
+    
+    const configSheet = doc.sheetsByTitle['Config'];
+    if (!configSheet) return { canceled: false };
+    
+    const rows = await configSheet.getRows();
+    const cancelRow = rows.find(r => r.get('Key') === 'Cancel_Practice');
+    return { canceled: cancelRow?.get('Value') === 'TRUE' };
+  } catch (err: any) {
+    return { canceled: false };
+  }
+}
+
+export async function triggerAutoRotation(
+   progressSheetUrl: string, 
+   bcyaSheetUrl: string
+) {
+   try {
+      // 1. Get Events to find the most recently passed date
+      const { data: events } = await getEvents(bcyaSheetUrl, true);
+      if (!events || events.length === 0) return { success: false, reason: 'No events' };
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      
+      // Find the most recent event that is STRICTLY in the past
+      // (If today is practice day, we don't rotate until tomorrow!)
+      const pastEvents = events
+         .filter(e => e.startdate && new Date(e.startdate) < today)
+         .sort((a, b) => new Date(b.startdate!).getTime() - new Date(a.startdate!).getTime());
+         
+      if (pastEvents.length === 0) return { success: false, reason: 'No past events' };
+      
+      const mostRecentPastDate = pastEvents[0].startdate!;
+      
+      // 2. Connect to Config sheet
+      const serviceAccountAuth = new JWT({
+        email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      });
+
+      const doc = new GoogleSpreadsheet(extractSheetId(progressSheetUrl)!, serviceAccountAuth);
+      await doc.loadInfo();
+      
+      let configSheet = doc.sheetsByTitle['Config'];
+      if (!configSheet) {
+          configSheet = await doc.addSheet({ title: 'Config', headerValues: ['Key', 'Value'] });
+      }
+      
+      const rows = await configSheet.getRows();
+      let lastPracticedRow = rows.find(r => r.get('Key') === 'Last_Practiced_Date');
+      let cancelRow = rows.find(r => r.get('Key') === 'Cancel_Practice');
+      
+      const lastDate = lastPracticedRow?.get('Value');
+      const isCanceled = cancelRow?.get('Value') === 'TRUE';
+      
+      // If we've already rotated for this past date, do nothing
+      if (lastDate === mostRecentPastDate) {
+          return { success: true, reason: 'Already up to date' };
+      }
+      
+      // 3. We need to process the passing of this date
+      if (isCanceled) {
+          // Practice was canceled. We do NOT advance the queue.
+          // We just update the last practiced date so we don't check again, and reset the cancel flag for next week.
+      } else {
+          // Practice happened! Advance the queue.
+          const { data: progressMembers } = await getProgress(progressSheetUrl);
+          const { history } = await getQueueHistory(progressSheetUrl);
+          
+          if (progressMembers && history) {
+             const { batch1, batch2 } = generateNextBatches(progressMembers, history);
+             await generateQueueSchedule(progressSheetUrl, batch1, batch2);
+          }
+      }
+      
+      // Update Config
+      if (lastPracticedRow) {
+          lastPracticedRow.set('Value', mostRecentPastDate);
+          await lastPracticedRow.save();
+      } else {
+          await configSheet.addRow({ Key: 'Last_Practiced_Date', Value: mostRecentPastDate });
+      }
+      
+      if (cancelRow) {
+          cancelRow.set('Value', 'FALSE');
+          await cancelRow.save();
+      } else {
+          await configSheet.addRow({ Key: 'Cancel_Practice', Value: 'FALSE' });
+      }
+      
+      revalidatePath('/progress');
+      revalidatePath('/');
+      revalidatePath('/admin/schedule');
+      
+      return { success: true, rotated: !isCanceled };
+   } catch (e: any) {
+      console.error("Error in auto rotation:", e);
+      return { error: e.message };
+   }
+}

@@ -1,58 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import { generateNextBatches } from "@/lib/queue-algorithm";
-import { generateQueueSchedule, saveManualOverrides } from "@/lib/actions";
+import { useState, useTransition } from "react";
+import { saveManualOverrides, setPracticeCanceled } from "@/lib/actions";
 import { ProgressMember } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Edit2, Save, X } from "lucide-react";
+import { Loader2, Edit2, Save, X, Ban } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export function AdminScheduleClient({ 
     members, 
     historyMap, 
     sheetUrl,
     nextEventDate,
-    secondEventDate
+    secondEventDate,
+    initialCanceled
 }: { 
     members: ProgressMember[], 
     historyMap: Map<string, number>,
     sheetUrl: string,
     nextEventDate: string,
-    secondEventDate: string
+    secondEventDate: string,
+    initialCanceled: boolean
 }) {
     const { toast } = useToast();
-    const [isGenerating, setIsGenerating] = useState(false);
+    const [isPending, startTransition] = useTransition();
     
     // Edit mode state
     const [isEditMode, setIsEditMode] = useState(false);
     const [isSavingOverrides, setIsSavingOverrides] = useState(false);
     const [localOverrides, setLocalOverrides] = useState<Record<string, '1' | '2' | ''>>({});
 
-    const handleGenerate = async () => {
-        if (!confirm("Are you sure? This will overwrite the current queue assignments in Google Sheets and increment the history count for selected members.")) return;
-        
-        setIsGenerating(true);
-        try {
-            const { batch1, batch2 } = generateNextBatches(members, historyMap);
-            const result = await generateQueueSchedule(sheetUrl, batch1, batch2);
-            
-            if (result.success) {
-                toast({ title: "Schedule Generated", description: "Batches saved successfully." });
-                setLocalOverrides({});
-                setIsEditMode(false);
-            } else {
-                throw new Error(result.error);
-            }
-        } catch (e: any) {
-            toast({ title: "Generation Failed", description: e.message, variant: "destructive" });
-        } finally {
-            setIsGenerating(false);
-        }
+    const handleToggleCancel = async (checked: boolean) => {
+        startTransition(async () => {
+           const res = await setPracticeCanceled(sheetUrl, checked);
+           if (res.success) {
+               toast({ 
+                  title: checked ? "Practice Canceled" : "Practice Restored", 
+                  description: checked ? "The queue will NOT advance when this date passes." : "The queue will advance normally." 
+               });
+           } else {
+               toast({ title: "Failed", description: res.error, variant: "destructive" });
+           }
+        });
     };
-    
+
     const handleSaveOverrides = async () => {
         if (Object.keys(localOverrides).length === 0) {
             setIsEditMode(false);
@@ -101,22 +95,26 @@ export function AdminScheduleClient({
 
     return (
         <div className="space-y-8">
-            <div className="flex flex-col md:flex-row items-center justify-between p-6 bg-card border rounded-xl gap-4">
+            <div className={`flex flex-col md:flex-row items-center justify-between p-6 border rounded-xl gap-4 transition-colors ${initialCanceled ? 'bg-destructive/10 border-destructive/30' : 'bg-card'}`}>
                <div>
-                  <h3 className="text-xl font-bold uppercase tracking-widest text-primary">Next Practice</h3>
+                  <h3 className="text-xl font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                      Next Practice {initialCanceled && <Badge variant="destructive" className="ml-2 uppercase font-black">Canceled</Badge>}
+                  </h3>
                   <p className="text-muted-foreground font-semibold mt-1">
                      {nextEventDate ? new Date(nextEventDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : "No upcoming date found"}
                   </p>
                </div>
-               <div className="flex gap-4">
-                  <Button 
-                    onClick={handleGenerate} 
-                    disabled={isGenerating || isEditMode}
-                    className="font-bold tracking-widest uppercase bg-blue-600 hover:bg-blue-500 text-white"
-                  >
-                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                     Randomize Next Batches
-                  </Button>
+               <div className="flex items-center gap-4 bg-black/40 px-6 py-3 rounded-xl border border-white/10">
+                  <div className="text-right">
+                     <p className="text-sm font-bold uppercase tracking-widest">Cancel Practice</p>
+                     <p className="text-xs text-muted-foreground font-semibold">Freeze the queue</p>
+                  </div>
+                  <Switch 
+                     checked={initialCanceled}
+                     onCheckedChange={handleToggleCancel}
+                     disabled={isPending}
+                     className="data-[state=checked]:bg-destructive"
+                  />
                </div>
             </div>
 

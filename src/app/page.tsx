@@ -5,14 +5,17 @@ import { MemberSchedule } from "@/components/member-schedule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgrammeTab } from "@/components/programme-tab";
 import { HlaZirTab } from "@/components/hla-zir-tab";
-
+import { AutoQueueTrigger } from "@/components/auto-queue-trigger";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
+const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing";
+const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
 
 export default function Home() {
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
       <HomeHero />
+      <AutoQueueTrigger progressSheetUrl={PROGRESS_SHEET_URL} bcyaSheetUrl={BCYA_SHEET_URL} />
       <div className="w-full max-w-5xl">
         <Tabs defaultValue="bcm" className="w-full">
           <TabsList className="flex justify-center w-full max-w-[500px] mx-auto bg-transparent mb-10 h-12 gap-2 md:gap-8 border-b border-white/10 rounded-none p-0">

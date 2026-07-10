@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getProgress, getMembers, getEvents, getQueueHistory } from "@/lib/actions";
+import { getProgress, getMembers, getEvents, getQueueHistory, getPracticeCanceled } from "@/lib/actions";
 import { PageHeader } from "@/components/page-header";
 import { AdminScheduleClient } from "./client-page";
 
@@ -17,12 +17,14 @@ export default async function AdminSchedulePage() {
     { data: progressData }, 
     { data: membersData },
     { history: queueHistory },
-    { data: hlazirEvents }
+    { data: hlazirEvents },
+    { canceled: isCanceled }
   ] = await Promise.all([
     getProgress(PROGRESS_SHEET_URL),
     getMembers(MEMBERS_SHEET_URL),
     getQueueHistory(PROGRESS_SHEET_URL),
-    getEvents(BCYA_SHEET_URL, true)
+    getEvents(BCYA_SHEET_URL, true),
+    getPracticeCanceled(PROGRESS_SHEET_URL)
   ]);
 
   const loggedInMember = (membersData || []).find(m => m.email && m.email.toLowerCase() === userEmail.toLowerCase());
@@ -70,6 +72,7 @@ export default async function AdminSchedulePage() {
             sheetUrl={PROGRESS_SHEET_URL} 
             nextEventDate={nextEventDate}
             secondEventDate={secondEventDate}
+            initialCanceled={isCanceled}
          />
       </div>
     </main>
