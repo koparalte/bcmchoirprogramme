@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ProgressMember } from "@/lib/types";
-import { CheckCircle2, Circle, Crown, ExternalLink } from "lucide-react";
+import { CheckCircle2, Circle, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useState, useMemo } from "react";
@@ -85,17 +85,6 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                        <span className={cn("font-bold text-primary/70", isHero ? "text-4xl md:text-5xl" : "text-xl")}>{getInitials(member.name)}</span>
                      )}
                   </div>
-                  
-                  {member.medal && (
-                     <div className={cn("absolute z-20", isHero ? "top-4 left-4" : "top-2 left-2")}>
-                         <Crown className={cn(
-                            "w-7 h-7 -rotate-12",
-                            member.medal === 'gold' && "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)] fill-yellow-400/20",
-                            member.medal === 'silver' && "text-slate-300 drop-shadow-[0_0_8px_rgba(203,213,225,0.6)] fill-slate-300/20",
-                            member.medal === 'bronze' && "text-amber-600 drop-shadow-[0_0_8px_rgba(217,119,6,0.6)] fill-amber-600/20"
-                         )} />
-                     </div>
-                  )}
                   
                   <div className={cn("z-10", isHero ? "flex flex-col items-center" : "flex-grow")}>
                      <h3 className={cn("font-semibold tracking-wider uppercase text-foreground", isHero ? "text-2xl md:text-4xl text-primary drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]" : "text-lg")}>

@@ -88,34 +88,8 @@ export default async function ProgressPage() {
       });
   }
 
-  // --- Leaderboard Calculation ---
-  const scores = Array.from(new Set(mergedMembers.map(m => m.songs.filter(s => s.completed).length)))
-      .filter(score => score > 0)
-      .sort((a, b) => b - a);
-      
-  const goldScore = scores[0];
-  const silverScore = scores[1];
-  const bronzeScore = scores[2];
-
-  // Assign medals to the members
-  const membersWithMedals = mergedMembers.map(member => {
-      const completed = member.songs.filter(s => s.completed).length;
-      let medal: 'gold' | 'silver' | 'bronze' | undefined = undefined;
-      
-      if (completed > 0) {
-          if (completed === goldScore) medal = 'gold';
-          else if (completed === silverScore) medal = 'silver';
-          else if (completed === bronzeScore) medal = 'bronze';
-      }
-      
-      return {
-          ...member,
-          medal
-      };
-  });
-
   // Sort so the logged-in user is exactly at the top
-  const sortedMembers = [...membersWithMedals].sort((a, b) => {
+  const sortedMembers = [...mergedMembers].sort((a, b) => {
       if (a.email && userEmail && a.email.toLowerCase() === userEmail.toLowerCase()) return -1;
       if (b.email && userEmail && b.email.toLowerCase() === userEmail.toLowerCase()) return 1;
       return 0;
@@ -139,7 +113,7 @@ export default async function ProgressPage() {
            })}
         </div>
         
-        {membersWithMedals.length === 0 && (
+        {sortedMembers.length === 0 && (
            <div className="text-center py-16 border border-white/5 bg-black/20 rounded-2xl shadow-inner">
               <h3 className="text-xl font-headline font-bold text-muted-foreground uppercase tracking-widest">No members found</h3>
            </div>

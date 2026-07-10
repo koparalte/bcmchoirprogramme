@@ -40,5 +40,4 @@ export type ProgressMember = {
   songs: SongProgress[];
   link?: string;
   email?: string;
-  medal?: 'gold' | 'silver' | 'bronze';
 };
