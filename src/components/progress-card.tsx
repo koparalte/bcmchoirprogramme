@@ -349,7 +349,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                         {isSingingToday && (
                            <Badge className="px-2 py-0.5 text-[10px] font-black tracking-widest uppercase bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
                               <Flame className="w-3 h-3 text-orange-500" />
-                              Zai Zan
+                              Zanin Zai Hun
                            </Badge>
                         )}
                         {totalSongs > 0 ? (
@@ -407,7 +407,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                         {isSingingToday && (
                            <Badge className="px-2 py-0.5 text-[10px] sm:text-xs font-black tracking-widest uppercase bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
                               <Flame className="w-3 h-3 text-orange-500" />
-                              Zai Zan
+                              Zanin Zai Hun
                            </Badge>
                         )}
                      <h3 className={cn("text-xl md:text-2xl font-black uppercase tracking-wider leading-tight mt-2 line-clamp-2 md:line-clamp-1 transition-colors", isHero ? heroTheme.textPrimary : "text-foreground")}>
