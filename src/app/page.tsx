@@ -10,12 +10,33 @@ const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV
 const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing";
 const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
 
-export default function Home() {
+export default async function Home() {
+  const [{ data: eventsData }] = await Promise.all([
+    getEvents(BCYA_SHEET_URL, true)
+  ]);
+
+  let mostRecentPastDate = "";
+  if (eventsData && eventsData.length > 0) {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const pastEvents = eventsData
+         .filter((e: any) => e.startdate && new Date(e.startdate) < today)
+         .sort((a: any, b: any) => new Date(b.startdate).getTime() - new Date(a.startdate).getTime());
+      
+      if (pastEvents.length > 0) {
+          mostRecentPastDate = pastEvents[0].startdate;
+      }
+  }
+
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
       <HomeHero />
-      <AutoQueueTrigger progressSheetUrl={PROGRESS_SHEET_URL} bcyaSheetUrl={BCYA_SHEET_URL} />
+      <AutoQueueTrigger 
+         progressSheetUrl={PROGRESS_SHEET_URL} 
+         bcyaSheetUrl={BCYA_SHEET_URL} 
+         mostRecentPastDate={mostRecentPastDate} 
+      />
       <div className="w-full max-w-5xl">
         <Tabs defaultValue="bcm" className="w-full">
           <TabsList className="flex justify-center w-full max-w-[500px] mx-auto bg-transparent mb-10 h-12 gap-2 md:gap-8 border-b border-white/10 rounded-none p-0">
