@@ -93,7 +93,8 @@ export default async function ProgressPage() {
           songs: [],
           queue: '',
           link: loggedInMember.link,
-          email: loggedInMember.email
+          email: loggedInMember.email,
+          designation: loggedInMember.designation
       });
   }
 
