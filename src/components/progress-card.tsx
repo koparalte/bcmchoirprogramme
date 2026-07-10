@@ -54,12 +54,14 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
         )}>
            <CardContent className="p-0 flex flex-col h-full">
               <div className={cn(
-                 "p-6 pb-4 flex items-center gap-4 relative overflow-hidden flex-shrink-0 h-full",
-                 isHero ? "bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border-b border-primary/20" : "bg-gradient-to-br from-primary/5 to-transparent border-b border-white/5"
+                 "flex items-center relative overflow-hidden flex-shrink-0 h-full",
+                 isHero 
+                   ? "p-8 md:p-10 pb-6 md:pb-8 gap-6 md:gap-8 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border-b border-primary/20" 
+                   : "p-6 pb-4 gap-4 bg-gradient-to-br from-primary/5 to-transparent border-b border-white/5"
               )}>
                  {isHero && (
                     <div className="absolute top-0 right-0 p-3 opacity-20 pointer-events-none">
-                       <span className="text-6xl font-black italic tracking-tighter">YOU</span>
+                       <span className="text-6xl md:text-8xl font-black italic tracking-tighter">YOU</span>
                     </div>
                  )}
                  {/* Progress Bar background hint */}
@@ -68,7 +70,10 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                    style={{ width: `${progressPercent}%` }}
                  />
                  
-                 <div className="relative w-16 h-16 rounded-full overflow-hidden bg-primary/10 flex-shrink-0 border border-primary/20 flex items-center justify-center">
+                 <div className={cn(
+                     "relative rounded-full overflow-hidden bg-primary/10 flex-shrink-0 border border-primary/20 flex items-center justify-center",
+                     isHero ? "w-20 h-20 md:w-28 md:h-28 border-2" : "w-16 h-16"
+                  )}>
                     {member.link ? (
                       <Image 
                         src={member.link} 
@@ -77,7 +82,7 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                         objectFit="cover" 
                       />
                     ) : (
-                      <span className="text-xl font-bold text-primary/70">{getInitials(member.name)}</span>
+                      <span className={cn("font-bold text-primary/70", isHero ? "text-3xl md:text-4xl" : "text-xl")}>{getInitials(member.name)}</span>
                     )}
                  </div>
                  
