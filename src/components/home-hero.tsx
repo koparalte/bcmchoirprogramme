@@ -64,11 +64,13 @@ export async function HomeHero() {
       const verseIndex = (dayOfYear + memberOffset) % bibleVerses.length;
       assignedVerse = bibleVerses[verseIndex];
   }
+  
+  const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || false;
 
   return (
     <div className="w-full max-w-5xl mb-12">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-         <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} />
+         <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} />
       </div>
     </div>
   );

@@ -396,3 +396,57 @@ export async function getBibleVerses(
   }
 }
 
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { JWT } from 'google-auth-library';
+import { revalidatePath } from 'next/cache';
+
+export async function toggleSongProgress(sheetUrl: string, memberName: string, songName: string, currentStatus: boolean) {
+  try {
+    const validatedUrl = sheetUrlSchema.parse(sheetUrl);
+    const sheetId = extractSheetId(validatedUrl);
+    if (!sheetId) throw new Error("Invalid sheet URL");
+
+    const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+    if (!email || !key) {
+      throw new Error("Missing Google Service Account credentials");
+    }
+
+    const auth = new JWT({
+      email,
+      key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(sheetId, auth);
+    await doc.loadInfo();
+
+    const gid = extractGid(validatedUrl);
+    let sheet = doc.sheetsByIndex[0];
+    if (gid) {
+      sheet = doc.sheetsById[parseInt(gid)] || sheet;
+    }
+
+    await sheet.loadHeaderRow();
+    const rows = await sheet.getRows();
+
+    const row = rows.find(r => r.get(sheet.headerValues[0])?.toString().trim().toLowerCase() === memberName.trim().toLowerCase());
+
+    if (!row) {
+      throw new Error("Member not found in sheet");
+    }
+
+    row.set(songName, !currentStatus ? 'TRUE' : 'FALSE');
+    await row.save();
+
+    revalidatePath('/progress');
+    revalidatePath('/');
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error toggling song:", error);
+    return { error: error.message || "Failed to update Google Sheet" };
+  }
+}
+

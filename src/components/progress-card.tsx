@@ -6,7 +6,9 @@ import type { ProgressMember, BibleVerse } from "@/lib/types";
 import { CheckCircle2, Circle, ExternalLink, Quote } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
+import { toggleSongProgress } from "@/lib/actions";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
-// Helper function moved outside component so it isn't recreated every render
 const getInitials = (name: string) => {
   if (!name) return "";
   const names = name.split(' ');
@@ -26,8 +27,36 @@ const getInitials = (name: string) => {
   return name.substring(0, 2);
 }
 
-export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse }) {
+export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse, isConductor = false }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse, isConductor?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  const handleToggle = (songName: string, currentStatus: boolean) => {
+    if (!isConductor) return;
+    
+    startTransition(async () => {
+       const result = await toggleSongProgress(
+          "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing",
+          member.name,
+          songName,
+          currentStatus
+       );
+       
+       if (result.error) {
+          toast({
+             title: "Update Failed",
+             description: result.error,
+             variant: "destructive"
+          });
+       } else {
+          toast({
+             title: "Song Updated!",
+             description: `${songName} marked as ${!currentStatus ? "finished" : "unfinished"}.`,
+          });
+       }
+    });
+  };
 
   // Memoize the derived calculations so they don't re-run on simple state changes (like hovering or opening the dialog)
   const { completedSongs, totalSongs, progressPercent } = useMemo(() => {
@@ -297,10 +326,17 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
               </div>
            ) : (
               member.songs.map((song) => (
-                 <div key={song.name} className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg transition-colors border",
-                    song.completed ? "bg-primary/5 border-primary/20" : "border-transparent opacity-60"
-                 )}>
+                 <button 
+                    key={song.name} 
+                    onClick={() => handleToggle(song.name, song.completed)}
+                    disabled={!isConductor || isPending}
+                    className={cn(
+                       "w-full flex items-center gap-3 p-3 rounded-lg transition-all border text-left",
+                       song.completed ? "bg-primary/5 border-primary/20" : "border-transparent opacity-60",
+                       isConductor ? "cursor-pointer hover:bg-white/10 hover:opacity-100 active:scale-[0.98]" : "cursor-default",
+                       isPending ? "opacity-50 pointer-events-none" : ""
+                    )}
+                 >
                     {song.completed ? (
                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     ) : (
@@ -312,7 +348,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                     )}>
                        {song.name}
                     </span>
-                 </div>
+                 </button>
               ))
            )}
         </div>
