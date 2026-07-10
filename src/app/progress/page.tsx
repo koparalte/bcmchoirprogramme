@@ -1,7 +1,7 @@
-import { PageHeader } from "@/components/page-header";
 import { getProgress, getMembers, getEvents, getBibleVerses } from "@/lib/actions";
 import type { BibleVerse } from "@/lib/types";
 import { ProgressCard } from "@/components/progress-card";
+import { getISTDate } from "@/lib/utils";
 import { auth } from "@/auth";
 
 export const revalidate = 60; // Cache for 60 seconds
@@ -98,7 +98,7 @@ export default async function ProgressPage() {
   let date1Str = "UPCOMING";
   let date2Str = "UPCOMING";
   if (hlazirEvents && hlazirEvents.length > 0) {
-    const today = new Date();
+    const today = getISTDate();
     today.setHours(0,0,0,0);
     
     // Filter and sort upcoming events to be safe
@@ -122,7 +122,7 @@ export default async function ProgressPage() {
   
   let assignedVerse: BibleVerse | undefined = undefined;
   if (heroMember && bibleVerses && bibleVerses.length > 0) {
-      const today = new Date();
+      const today = getISTDate();
       
       // Calculate day of year (1-365)
       const start = new Date(today.getFullYear(), 0, 0);

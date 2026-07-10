@@ -2,6 +2,7 @@ import { getProgress, getMembers, getBibleVerses } from "@/lib/actions";
 import { ProgressCard } from "@/components/progress-card";
 import { auth } from "@/auth";
 import type { BibleVerse } from "@/lib/types";
+import { getISTDate } from "@/lib/utils";
 
 const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
@@ -48,7 +49,7 @@ export async function HomeHero() {
 
   let assignedVerse: BibleVerse | undefined = undefined;
   if (bibleVerses && bibleVerses.length > 0) {
-      const today = new Date();
+      const today = getISTDate();
       const start = new Date(today.getFullYear(), 0, 0);
       const diff = today.getTime() - start.getTime();
       const oneDay = 1000 * 60 * 60 * 24;
