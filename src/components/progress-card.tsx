@@ -6,8 +6,8 @@ import type { ProgressMember, BibleVerse } from "@/lib/types";
 import { CheckCircle2, Circle, ExternalLink, Quote } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { useState, useMemo, useTransition } from "react";
-import { toggleSongProgress } from "@/lib/actions";
+import { useState, useMemo, useTransition, useEffect } from "react";
+import { updateMemberProgress } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -32,28 +32,53 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
+  // Local state for interactive ticking
+  const [localSongs, setLocalSongs] = useState(member.songs);
+  
+  // Reset local state when dialog opens or member data changes
+  useEffect(() => {
+     setLocalSongs(member.songs);
+  }, [member.songs, isOpen]);
+
+  // Check if there are unsaved changes
+  const hasChanges = useMemo(() => {
+     return localSongs.some((localSong, i) => localSong.completed !== member.songs[i]?.completed);
+  }, [localSongs, member.songs]);
+
   const handleToggle = (songName: string, currentStatus: boolean) => {
     if (!isConductor) return;
-    
-    startTransition(async () => {
-       const result = await toggleSongProgress(
+    setLocalSongs(prev => prev.map(s => s.name === songName ? { ...s, completed: !currentStatus } : s));
+  };
+
+  const handleSave = () => {
+     if (!isConductor || !hasChanges) return;
+
+     const updates: Record<string, boolean> = {};
+     localSongs.forEach((localSong, i) => {
+        if (localSong.completed !== member.songs[i]?.completed) {
+           updates[localSong.name] = localSong.completed;
+        }
+     });
+
+     startTransition(async () => {
+       const result = await updateMemberProgress(
           "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing",
           member.name,
-          songName,
-          currentStatus
+          updates
        );
        
        if (result.error) {
           toast({
-             title: "Update Failed",
+             title: "Save Failed",
              description: result.error,
              variant: "destructive"
           });
        } else {
           toast({
-             title: "Song Updated!",
-             description: `${songName} marked as ${!currentStatus ? "finished" : "unfinished"}.`,
+             title: "Progress Saved!",
+             description: `Successfully updated songs for ${member.name}.`,
           });
+          setIsOpen(false);
        }
     });
   };
@@ -325,7 +350,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                  <span className="text-muted-foreground font-medium italic">As a conductor, you oversee the choir's progress!</span>
               </div>
            ) : (
-              member.songs.map((song) => (
+              localSongs.map((song) => (
                  <button 
                     key={song.name} 
                     onClick={() => handleToggle(song.name, song.completed)}
@@ -353,13 +378,27 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
            )}
         </div>
         
-        {/* Sticky Footer with a clear Close button */}
-        <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center flex-shrink-0">
+        {/* Sticky Footer with Save (for conductors) and Close buttons */}
+        <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center gap-4 flex-shrink-0">
            <DialogClose asChild>
-              <button className="px-8 py-2.5 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground hover:text-foreground font-bold tracking-widest uppercase rounded-lg border border-white/10 transition-all">
+              <button disabled={isPending} className="px-8 py-2.5 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground hover:text-foreground font-bold tracking-widest uppercase rounded-lg border border-white/10 transition-all">
                  Close
               </button>
            </DialogClose>
+           {isConductor && (
+              <button 
+                 disabled={!hasChanges || isPending}
+                 onClick={handleSave}
+                 className={cn(
+                    "px-8 py-2.5 font-bold tracking-widest uppercase rounded-lg border transition-all",
+                    hasChanges && !isPending
+                       ? "bg-primary/20 hover:bg-primary/30 text-primary border-primary/40 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                       : "bg-primary/5 text-primary/40 border-primary/10 cursor-not-allowed"
+                 )}
+              >
+                 {isPending ? "Saving..." : "Save"}
+              </button>
+           )}
         </div>
       </DialogContent>
     </Dialog>

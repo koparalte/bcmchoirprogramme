@@ -400,7 +400,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { revalidatePath } from 'next/cache';
 
-export async function toggleSongProgress(sheetUrl: string, memberName: string, songName: string, currentStatus: boolean) {
+export async function updateMemberProgress(sheetUrl: string, memberName: string, updates: Record<string, boolean>) {
   try {
     const validatedUrl = sheetUrlSchema.parse(sheetUrl);
     const sheetId = extractSheetId(validatedUrl);
@@ -437,15 +437,23 @@ export async function toggleSongProgress(sheetUrl: string, memberName: string, s
       throw new Error("Member not found in sheet");
     }
 
-    row.set(songName, !currentStatus ? 'TRUE' : 'FALSE');
-    await row.save();
+    // Apply all updates
+    let hasChanges = false;
+    for (const [songName, isCompleted] of Object.entries(updates)) {
+      row.set(songName, isCompleted ? 'TRUE' : 'FALSE');
+      hasChanges = true;
+    }
+
+    if (hasChanges) {
+      await row.save();
+    }
 
     revalidatePath('/progress');
     revalidatePath('/');
     
     return { success: true };
   } catch (error: any) {
-    console.error("Error toggling song:", error);
+    console.error("Error updating member progress:", error);
     return { error: error.message || "Failed to update Google Sheet" };
   }
 }
