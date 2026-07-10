@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ProgressMember, BibleVerse } from "@/lib/types";
-import { CheckCircle2, Circle, ExternalLink, Quote } from "lucide-react";
+import { CheckCircle2, Circle, ExternalLink, Quote, Flame } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useState, useMemo, useTransition, useEffect } from "react";
@@ -27,7 +27,7 @@ const getInitials = (name: string) => {
   return name.substring(0, 2);
 }
 
-export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse, isConductor = false }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse, isConductor?: boolean }) {
+export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse, isConductor = false, isSingingToday = false }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse, isConductor?: boolean, isSingingToday?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
@@ -342,10 +342,16 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                            </div>
                         ) : member.name}
                      </h3>
-                     <div className={cn("flex items-center gap-2 mt-2", isHero ? "justify-center mt-4" : "")}>
+                     <div className={cn("flex flex-wrap items-center mt-2", isHero ? "justify-center gap-3" : "gap-2")}>
                         <Badge variant="secondary" className={cn("font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm border", isHero ? `${heroTheme.badgeBg} ${heroTheme.textPrimary}` : t.badgeBg)}>
                            {isHero ? badgeText : member.part}
                         </Badge>
+                        {isSingingToday && (
+                           <Badge className="px-2 py-0.5 text-[10px] font-black tracking-widest uppercase bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
+                              <Flame className="w-3 h-3 text-orange-500" />
+                              Zai Zan
+                           </Badge>
+                        )}
                         {totalSongs > 0 ? (
                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                               {completedSongs}/{totalSongs} Done
@@ -395,9 +401,15 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                   )}
               </div>
                   <div className="flex flex-col flex-grow items-start md:items-center">
-                     <Badge className={cn("px-3 py-1 font-semibold tracking-wide uppercase transition-colors text-xs", isHero ? heroTheme.badgeBg : t.badgeBg)}>
-                        {isHero ? badgeText : member.part}
-                     </Badge>
+                        <Badge className={cn("px-2 py-0.5 text-[10px] sm:text-xs font-semibold tracking-wider uppercase", isHero ? heroTheme.badgeBg : t.badgeBg)}>
+                           {isHero ? badgeText : member.part}
+                        </Badge>
+                        {isSingingToday && (
+                           <Badge className="px-2 py-0.5 text-[10px] sm:text-xs font-black tracking-widest uppercase bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
+                              <Flame className="w-3 h-3 text-orange-500" />
+                              Zai Zan
+                           </Badge>
+                        )}
                      <h3 className={cn("text-xl md:text-2xl font-black uppercase tracking-wider leading-tight mt-2 line-clamp-2 md:line-clamp-1 transition-colors", isHero ? heroTheme.textPrimary : "text-foreground")}>
                         {member.name}
                      </h3>

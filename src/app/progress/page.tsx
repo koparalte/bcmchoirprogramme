@@ -149,6 +149,17 @@ export default async function ProgressPage() {
   
   const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || heroMember?.designation?.toUpperCase().includes('CONDUCTOR') || false;
 
+  let isEventToday = false;
+  if (sortedUpcoming && sortedUpcoming.length > 0) {
+      const todayStr = getISTDate().toDateString();
+      const eventStr = new Date(sortedUpcoming[0].startdate!).toDateString();
+      if (todayStr === eventStr) {
+          isEventToday = true;
+      }
+  }
+  
+  let isSingingToday = isEventToday && heroMember?.queue === '1';
+
   const getMemberTheme = (member: any, queueTheme: string) => {
      const p = (member.part || '').toUpperCase();
      const d = (member.designation || '').toUpperCase();
@@ -171,7 +182,7 @@ export default async function ProgressPage() {
         
         {heroMember && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-12">
-             <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} />
+             <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} />
           </div>
         )}
 
@@ -183,7 +194,7 @@ export default async function ProgressPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                {queue1Members.map(member => (
-                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'red') as any} isConductor={isConductor} />
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'red') as any} isConductor={isConductor} isSingingToday={isEventToday} />
                ))}
             </div>
           </div>

@@ -17,9 +17,11 @@ export default async function Home() {
   ]);
 
   let mostRecentPastDate = "";
+  let nextEventDate = "";
   if (eventsData && eventsData.length > 0) {
       const today = new Date();
       today.setHours(0,0,0,0);
+      
       const pastEvents = eventsData
          .filter((e: any) => e.startdate && new Date(e.startdate) < today)
          .sort((a: any, b: any) => new Date(b.startdate).getTime() - new Date(a.startdate).getTime());
@@ -27,12 +29,20 @@ export default async function Home() {
       if (pastEvents.length > 0) {
           mostRecentPastDate = pastEvents[0].startdate;
       }
+      
+      const futureEvents = eventsData
+         .filter((e: any) => e.startdate && new Date(e.startdate) >= today)
+         .sort((a: any, b: any) => new Date(a.startdate).getTime() - new Date(b.startdate).getTime());
+         
+      if (futureEvents.length > 0) {
+          nextEventDate = futureEvents[0].startdate;
+      }
   }
 
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
-      <HomeHero />
+      <HomeHero nextEventDate={nextEventDate} />
       <AutoQueueTrigger 
          progressSheetUrl={PROGRESS_SHEET_URL} 
          bcyaSheetUrl={BCYA_SHEET_URL} 
