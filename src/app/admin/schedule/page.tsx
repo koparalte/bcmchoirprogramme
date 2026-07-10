@@ -37,8 +37,9 @@ export default async function AdminSchedulePage() {
      return <AccessDenied email={userEmail} isMemberButNotConductor={true} />;
   }
 
-  // Next Practice Date
+  // Next Practice Dates
   let nextEventDate = "";
+  let secondEventDate = "";
   if (hlazirEvents && hlazirEvents.length > 0) {
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -48,6 +49,9 @@ export default async function AdminSchedulePage() {
       
       if (sortedUpcoming.length > 0) {
           nextEventDate = sortedUpcoming[0].startdate;
+      }
+      if (sortedUpcoming.length > 1) {
+          secondEventDate = sortedUpcoming[1].startdate;
       }
   }
 
@@ -65,6 +69,7 @@ export default async function AdminSchedulePage() {
             historyMap={queueHistory || new Map()} 
             sheetUrl={PROGRESS_SHEET_URL} 
             nextEventDate={nextEventDate}
+            secondEventDate={secondEventDate}
          />
       </div>
     </main>

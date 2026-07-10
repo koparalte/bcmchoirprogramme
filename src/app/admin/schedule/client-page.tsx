@@ -14,12 +14,14 @@ export function AdminScheduleClient({
     members, 
     historyMap, 
     sheetUrl,
-    nextEventDate
+    nextEventDate,
+    secondEventDate
 }: { 
     members: ProgressMember[], 
     historyMap: Map<string, number>,
     sheetUrl: string,
-    nextEventDate: string
+    nextEventDate: string,
+    secondEventDate: string
 }) {
     const { toast } = useToast();
     const [isGenerating, setIsGenerating] = useState(false);
@@ -138,8 +140,22 @@ export function AdminScheduleClient({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <BatchCard title="Batch 1" members={currentBatch1} theme="red" isEditMode={isEditMode} onOverride={handleOverrideChange} />
-                <BatchCard title="Batch 2" members={currentBatch2} theme="purple" isEditMode={isEditMode} onOverride={handleOverrideChange} />
+                <BatchCard 
+                   title="Batch 1" 
+                   date={nextEventDate}
+                   members={currentBatch1} 
+                   theme="red" 
+                   isEditMode={isEditMode} 
+                   onOverride={handleOverrideChange} 
+                />
+                <BatchCard 
+                   title="Batch 2" 
+                   date={secondEventDate}
+                   members={currentBatch2} 
+                   theme="purple" 
+                   isEditMode={isEditMode} 
+                   onOverride={handleOverrideChange} 
+                />
             </div>
             
             {isEditMode && (
@@ -152,14 +168,21 @@ export function AdminScheduleClient({
     );
 }
 
-function BatchCard({ title, members, theme, isEditMode, onOverride }: { title: string, members: ProgressMember[], theme: 'red' | 'purple', isEditMode: boolean, onOverride: (name: string, val: string) => void }) {
+function BatchCard({ title, date, members, theme, isEditMode, onOverride }: { title: string, date?: string, members: ProgressMember[], theme: 'red' | 'purple', isEditMode: boolean, onOverride: (name: string, val: string) => void }) {
     const themeClasses = theme === 'red' 
       ? "border-red-500/20 bg-red-500/5 text-red-500" 
       : "border-purple-500/20 bg-purple-500/5 text-purple-500";
 
     return (
         <div className={`border rounded-xl p-6 ${themeClasses}`}>
-            <h3 className="text-2xl font-black uppercase tracking-widest mb-6 text-center">{title}</h3>
+            <div className="text-center mb-6">
+               <h3 className="text-2xl font-black uppercase tracking-widest leading-none">{title}</h3>
+               {date && (
+                  <p className="text-xs font-bold uppercase tracking-widest opacity-70 mt-2">
+                     {new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+               )}
+            </div>
             <BatchCardContent members={members} isEditMode={isEditMode} onOverride={onOverride} />
         </div>
     );
