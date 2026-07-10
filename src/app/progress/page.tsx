@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/page-header";
-import { getProgress, getMembers, getEvents } from "@/lib/actions";
+import { getProgress, getMembers, getEvents, getBibleVerses } from "@/lib/actions";
+import type { BibleVerse } from "@/lib/types";
 import { ProgressCard } from "@/components/progress-card";
 import { auth } from "@/auth";
 
@@ -8,6 +9,7 @@ export const revalidate = 60; // Cache for 60 seconds
 const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
 const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
+const BIBLE_VERSES_SHEET_URL = "https://docs.google.com/spreadsheets/d/1j1witr2nLn-LYm-_8K3C03KMGZhhM_rIqRfBIsfQXC8/edit?gid=952167006#gid=952167006";
 
 export default async function ProgressPage() {
   const session = await auth();
@@ -16,11 +18,13 @@ export default async function ProgressPage() {
   const [
     { data: progressData, error: progressError }, 
     { data: membersData, error: membersError },
-    { data: hlazirEvents }
+    { data: hlazirEvents },
+    { data: bibleVerses }
   ] = await Promise.all([
     getProgress(PROGRESS_SHEET_URL),
     getMembers(MEMBERS_SHEET_URL),
-    getEvents(BCYA_SHEET_URL, true)
+    getEvents(BCYA_SHEET_URL, true),
+    getBibleVerses(BIBLE_VERSES_SHEET_URL)
   ]);
 
   if (progressError) {
@@ -115,6 +119,31 @@ export default async function ProgressPage() {
 
   // Groups
   const heroMember = mergedMembers.find(m => m.email && userEmail && m.email.toLowerCase() === userEmail.toLowerCase());
+  
+  let assignedVerse: BibleVerse | undefined = undefined;
+  if (heroMember && bibleVerses && bibleVerses.length > 0) {
+      const today = new Date();
+      
+      // Calculate day of year (1-365)
+      const start = new Date(today.getFullYear(), 0, 0);
+      const diff = today.getTime() - start.getTime();
+      const oneDay = 1000 * 60 * 60 * 24;
+      const dayOfYear = Math.floor(diff / oneDay);
+      
+      // Create a perfectly unique offset for each of the 24 members
+      // We sort the names alphabetically to guarantee a stable index for everyone
+      const allNames = mergedMembers.map(m => m.name).sort();
+      const memberIndex = allNames.indexOf(heroMember.name);
+      
+      // Spread the 24 members evenly across the 365 verses to maximize variety
+      const spacing = Math.floor(bibleVerses.length / Math.max(mergedMembers.length, 1));
+      const memberOffset = memberIndex * spacing;
+      
+      // Select the verse index
+      const verseIndex = (dayOfYear + memberOffset) % bibleVerses.length;
+      assignedVerse = bibleVerses[verseIndex];
+  }
+
   const queue1Members = mergedMembers.filter(m => m.queue === '1');
   const queue2Members = mergedMembers.filter(m => m.queue === '2');
   const restMembers = mergedMembers.filter(m => m !== heroMember && m.queue !== '1' && m.queue !== '2');
@@ -130,7 +159,7 @@ export default async function ProgressPage() {
         
         {heroMember && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-12">
-             <ProgressCard member={heroMember} isHero={true} />
+             <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} />
           </div>
         )}
 

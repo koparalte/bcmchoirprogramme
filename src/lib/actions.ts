@@ -20,6 +20,14 @@ function extractSheetId(url: string): string | null {
     return null;
 }
 
+function extractGid(url: string): string | null {
+    const match = /[?&]gid=([0-9]+)/.exec(url);
+    if (match) {
+        return match[1];
+    }
+    return null;
+}
+
 interface GvizResponse {
   table: {
     cols: {id: string; label: string; type: string}[];
@@ -54,6 +62,7 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
     try {
         const validatedUrl = sheetUrlSchema.parse(sheetUrl);
         const sheetId = extractSheetId(validatedUrl);
+        const gid = extractGid(validatedUrl);
 
         if (!sheetId) {
             return {
@@ -61,7 +70,10 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
             };
         }
 
-        const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        let gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        if (gid) {
+            gvizUrl += `&gid=${gid}`;
+        }
 
         // Setting revalidate to 60 ensures data is cached for 60 seconds.
         const response = await fetch(gvizUrl, { next: { revalidate: 60 } });
@@ -341,6 +353,45 @@ export async function getProgress(
     console.error('Error processing sheet data for progress:', err);
     return {
       error: 'An unexpected error occurred while processing progress data.',
+    };
+  }
+}
+
+export async function getBibleVerses(
+  sheetUrl: string
+): Promise<{data?: BibleVerse[]; error?: string}> {
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+
+  try {
+    const { rows } = gvizData.table;
+    
+    const verses: BibleVerse[] = rows
+      .map((row) => {
+        const snoCell = row.c[0];
+        const verseCell = row.c[1];
+        const textCell = row.c[2];
+
+        const sno = snoCell ? (snoCell.f ?? snoCell.v) : '';
+        const verse = verseCell ? (verseCell.f ?? verseCell.v) : '';
+        const text = textCell ? (textCell.f ?? textCell.v) : '';
+
+        return {
+          sno: sno,
+          verse: (verse as string) || '',
+          text: (text as string) || ''
+        };
+      })
+      .filter(v => v.verse && v.text && v.verse.trim().toLowerCase() !== 'bible verse');
+
+    return {data: verses};
+  } catch (err) {
+    console.error('Error processing sheet data for Bible verses:', err);
+    return {
+      error: 'An unexpected error occurred while processing Bible verses.',
     };
   }
 }

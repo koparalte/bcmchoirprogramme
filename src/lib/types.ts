@@ -42,3 +42,9 @@ export type ProgressMember = {
   link?: string;
   email?: string;
 };
+
+export type BibleVerse = {
+  sno: string | number;
+  verse: string;
+  text: string;
+};

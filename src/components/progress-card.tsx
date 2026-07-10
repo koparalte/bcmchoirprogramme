@@ -2,8 +2,8 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { ProgressMember } from "@/lib/types";
-import { CheckCircle2, Circle, ExternalLink } from "lucide-react";
+import type { ProgressMember, BibleVerse } from "@/lib/types";
+import { CheckCircle2, Circle, ExternalLink, Quote } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useState, useMemo } from "react";
@@ -26,7 +26,7 @@ const getInitials = (name: string) => {
   return name.substring(0, 2);
 }
 
-export function ProgressCard({ member, isHero = false, theme = 'default' }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple' }) {
+export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse }) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Memoize the derived calculations so they don't re-run on simple state changes (like hovering or opening the dialog)
@@ -145,6 +145,21 @@ export function ProgressCard({ member, isHero = false, theme = 'default' }: { me
                         )}
                      </div>
                   </div>
+
+                  {isHero && bibleVerse && (
+                     <div className="mt-4 md:mt-2 p-4 md:p-6 bg-black/40 backdrop-blur-md rounded-xl border border-primary/20 w-full max-w-2xl relative overflow-hidden z-10 shadow-lg">
+                        <Quote className="absolute top-3 left-3 w-8 h-8 text-primary/10 rotate-180" />
+                        <p className="text-base md:text-lg text-primary/90 font-serif italic leading-relaxed drop-shadow-sm px-4 pt-2">
+                           "{bibleVerse.text}"
+                        </p>
+                        <div className="mt-4 text-right">
+                           <span className="inline-block text-xs font-bold tracking-widest uppercase text-primary/80 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                              {bibleVerse.verse}
+                           </span>
+                        </div>
+                     </div>
+                  )}
+
                   <div className={cn("text-muted-foreground transition-colors z-10", isHero ? "absolute top-6 right-6 opacity-0 group-hover:opacity-100 group-hover:text-primary" : `flex-shrink-0 ${t.iconHover}`)}>
                      <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" />
                   </div>
