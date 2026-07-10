@@ -2,7 +2,6 @@
 'use server';
 
 import {z} from 'zod';
-import { revalidatePath } from 'next/cache';
 import type {Banner, Event, Member, ProgressMember} from './types';
 
 const sheetUrlSchema = z.string().url();
