@@ -29,8 +29,18 @@ export function generateNextBatches(
    const batch2: string[] = [];
    
    for (const [part, partMembers] of byPart.entries()) {
-       // Sort members by times queued ascending, then shuffle the ties
-       const sorted = partMembers
+       // Promote existing Batch 2 to Batch 1
+       const existingBatch2 = partMembers.filter(m => m.queue === '2');
+       existingBatch2.forEach(m => batch1.push(m.name));
+       
+       // If there were NO existing Batch 2 members (e.g. first time ever), we need to generate Batch 1 from scratch
+       let neededForBatch1 = existingBatch2.length === 0 ? 4 : 0;
+       
+       // The remaining members are those NOT promoted to Batch 1
+       const remainingPool = partMembers.filter(m => !batch1.includes(m.name));
+       
+       // Sort remaining members by times queued ascending, then shuffle the ties
+       const sortedPool = remainingPool
           .map(m => ({ 
              name: m.name, 
              times: history.get(m.name) || 0,
@@ -41,19 +51,22 @@ export function generateNextBatches(
              return a.rand - b.rand;
           });
           
-       // To ensure batch 1 and batch 2 consist of DIFFERENT people, we must divide the available pool.
-       // If there are 8+ members, maxPerBatch is 4.
-       // If there are 4 members, maxPerBatch is 2.
-       // If there are 5 members, maxPerBatch is 3 (Batch 1 gets 3, Batch 2 gets 2).
-       const totalAvailable = sorted.length;
-       const maxPerBatch = Math.min(4, Math.ceil(totalAvailable / 2));
+       // If we need to build Batch 1 from scratch (first run)
+       if (neededForBatch1 > 0) {
+           const maxForBatch1 = Math.min(neededForBatch1, Math.ceil(sortedPool.length / 2));
+           const newlySelectedForBatch1 = sortedPool.splice(0, maxForBatch1);
+           newlySelectedForBatch1.forEach(m => batch1.push(m.name));
+       }
        
-       const selectedForBatch1 = sorted.slice(0, maxPerBatch);
-       const selectedForBatch2 = sorted.slice(maxPerBatch, maxPerBatch + 4); // Take up to 4 of the remaining
+       // Now generate a fresh Batch 2 from whatever is left in the sorted pool
+       // We cap the new Batch 2 size to 4, or whatever is appropriate if the pool is small.
+       // Actually, if the pool is very small (like Tenors), they just take the remaining pool (up to 4).
+       const maxForBatch2 = Math.min(4, sortedPool.length);
+       const newlySelectedForBatch2 = sortedPool.slice(0, maxForBatch2);
        
-       selectedForBatch1.forEach(m => batch1.push(m.name));
-       selectedForBatch2.forEach(m => batch2.push(m.name));
+       newlySelectedForBatch2.forEach(m => batch2.push(m.name));
    }
    
    return { batch1, batch2 };
 }
+
