@@ -54,7 +54,8 @@ export default async function ProgressPage() {
      return {
         ...progressMember,
         link: matchingMember?.link,
-        email: matchingMember?.email
+        email: matchingMember?.email,
+        designation: matchingMember?.designation
      };
   });
 
@@ -145,7 +146,7 @@ export default async function ProgressPage() {
       assignedVerse = bibleVerses[verseIndex];
   }
   
-  const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || false;
+  const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || heroMember?.designation?.toUpperCase().includes('CONDUCTOR') || false;
 
   const queue1Members = mergedMembers.filter(m => m.queue === '1');
   const queue2Members = mergedMembers.filter(m => m.queue === '2');

@@ -133,6 +133,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
   const t = themeConfig[theme];
 
   const partUpper = (member.part || 'CONDUCTOR').toUpperCase();
+  const designationUpper = (member.designation || '').toUpperCase();
   
   // Default to slate/gray if no part matched
   let heroTheme = {
@@ -153,8 +154,8 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
       dialogBg: "bg-slate-500/5"
   };
 
-  if (partUpper.includes('ASST') || partUpper.includes('ASSISTANT')) {
-      // Asst. Conductor gets Blue
+  if (partUpper.includes('CONDUCTOR') || designationUpper.includes('CONDUCTOR')) {
+      // All Conductors (Main and Asst) get Blue
       heroTheme = {
           cardBorder: "border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.2)]",
           bgGradient: "from-blue-500/20 via-blue-500/5",
@@ -285,11 +286,11 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center p-2 opacity-[0.03] pointer-events-none flex justify-center overflow-hidden">
                         <span className={cn(
                            "leading-none font-black italic tracking-tighter whitespace-nowrap",
-                           partUpper.length > 8 
+                           (designationUpper || partUpper).length > 8 
                              ? "text-[3.5rem] sm:text-[5rem] md:text-[7rem] lg:text-[8rem]" 
                              : "text-[5rem] sm:text-[6rem] md:text-[9rem] lg:text-[10rem]"
                         )}>
-                           {partUpper}
+                           {designationUpper || partUpper}
                         </span>
                      </div>
                   )}
@@ -326,7 +327,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                      </h3>
                      <div className={cn("flex items-center gap-2 mt-2", isHero ? "justify-center mt-4" : "")}>
                         <Badge variant="secondary" className={cn("font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm border", isHero ? `${heroTheme.badgeBg} ${heroTheme.textPrimary}` : t.badgeBg)}>
-                           {member.part}
+                           {member.designation || member.part}
                         </Badge>
                         {totalSongs > 0 ? (
                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">

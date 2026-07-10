@@ -65,7 +65,7 @@ export async function HomeHero() {
       assignedVerse = bibleVerses[verseIndex];
   }
   
-  const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || false;
+  const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || heroMember?.designation?.toUpperCase().includes('CONDUCTOR') || false;
 
   return (
     <div className="w-full max-w-5xl mb-12">

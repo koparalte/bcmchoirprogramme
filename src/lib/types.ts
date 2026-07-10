@@ -1,4 +1,3 @@
-
 export type Event = {
   id: string;
   title: string;
@@ -41,6 +40,7 @@ export type ProgressMember = {
   queue?: string;
   link?: string;
   email?: string;
+  designation?: string;
 };
 
 export type BibleVerse = {
