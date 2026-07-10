@@ -99,21 +99,21 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
 
   if (partUpper.includes('SOPRANO')) {
       heroTheme = {
-          cardBorder: "border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.2)]",
-          bgGradient: "from-amber-500/20 via-amber-500/5",
-          borderB: "border-amber-500/20",
-          avatarBg: "bg-amber-500/10",
-          avatarBorder: "border-amber-500/30",
-          avatarShadow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]",
-          textPrimary: "text-amber-500",
-          textPrimaryHover: "group-hover:text-amber-500",
-          badgeBg: "bg-amber-500/10 border-amber-500/20",
-          dropShadow: "drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]",
-          bibleBorder: "border-amber-500/20",
-          bibleQuote: "text-amber-500/20",
-          bibleText: "text-amber-500/90",
-          bibleBadgeText: "text-amber-500/80",
-          dialogBg: "bg-amber-500/5"
+          cardBorder: "border-rose-400/50 shadow-[0_0_30px_rgba(251,113,133,0.2)]",
+          bgGradient: "from-rose-400/20 via-rose-400/5",
+          borderB: "border-rose-400/20",
+          avatarBg: "bg-rose-400/10",
+          avatarBorder: "border-rose-400/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(251,113,133,0.3)]",
+          textPrimary: "text-rose-400",
+          textPrimaryHover: "group-hover:text-rose-400",
+          badgeBg: "bg-rose-400/10 border-rose-400/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(251,113,133,0.4)]",
+          bibleBorder: "border-rose-400/20",
+          bibleQuote: "text-rose-400/20",
+          bibleText: "text-rose-400/90",
+          bibleBadgeText: "text-rose-400/80",
+          dialogBg: "bg-rose-400/5"
       };
   } else if (partUpper.includes('CONTRALTO')) {
       heroTheme = {
