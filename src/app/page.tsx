@@ -1,5 +1,6 @@
 import { EventSchedule } from "@/components/event-schedule";
 import { PageHeader } from "@/components/page-header";
+import { HomeHero } from "@/components/home-hero";
 import { MemberSchedule } from "@/components/member-schedule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgrammeTab } from "@/components/programme-tab";
@@ -11,6 +12,7 @@ export default function Home() {
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
+      <HomeHero />
       <div className="w-full max-w-5xl">
         <Tabs defaultValue="bcm" className="w-full">
           <TabsList className="flex justify-center w-full max-w-[500px] mx-auto bg-transparent mb-10 h-12 gap-2 md:gap-8 border-b border-white/10 rounded-none p-0">
