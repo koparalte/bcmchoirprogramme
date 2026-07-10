@@ -145,8 +145,12 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
   const partUpper = (member.part || 'CONDUCTOR').toUpperCase();
   const designationUpper = (member.designation || '').toUpperCase();
   
-  const shouldShowDesignation = designationUpper.includes('CONDUCTOR') || (isHero && (designationUpper.includes('SECRETARY') || designationUpper.includes('TREASURER')));
-  const displayPart = shouldShowDesignation && member.designation ? member.designation : (member.part || 'CONDUCTOR');
+  const hasUniqueDesignation = member.designation && designationUpper !== partUpper;
+  const badgeText = isHero && hasUniqueDesignation
+     ? `${member.part} • ${member.designation}`.toUpperCase()
+     : partUpper;
+     
+  const bgText = isHero && hasUniqueDesignation ? designationUpper : partUpper;
   
   // Default to slate/gray if no part matched
   let heroTheme = {
@@ -299,11 +303,11 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center p-2 opacity-[0.03] pointer-events-none flex justify-center overflow-hidden">
                         <span className={cn(
                            "leading-none font-black italic tracking-tighter whitespace-nowrap",
-                           displayPart.length > 8 
+                           bgText.length > 8 
                              ? "text-[3.5rem] sm:text-[5rem] md:text-[7rem] lg:text-[8rem]" 
                              : "text-[5rem] sm:text-[6rem] md:text-[9rem] lg:text-[10rem]"
                         )}>
-                           {displayPart}
+                           {bgText}
                         </span>
                      </div>
                   )}
@@ -340,7 +344,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                      </h3>
                      <div className={cn("flex items-center gap-2 mt-2", isHero ? "justify-center mt-4" : "")}>
                         <Badge variant="secondary" className={cn("font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm border", isHero ? `${heroTheme.badgeBg} ${heroTheme.textPrimary}` : t.badgeBg)}>
-                           {member.designation || member.part}
+                           {isHero ? badgeText : member.part}
                         </Badge>
                         {totalSongs > 0 ? (
                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
@@ -391,8 +395,8 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                   )}
               </div>
                   <div className="flex flex-col flex-grow items-start md:items-center">
-                     <Badge className={cn("px-3 py-1 font-semibold tracking-wide uppercase transition-colors text-xs", isHero ? heroTheme.badgeBg : "bg-primary/10 text-primary border-primary/20")}>
-                        {displayPart}
+                     <Badge className={cn("px-3 py-1 font-semibold tracking-wide uppercase transition-colors text-xs", isHero ? heroTheme.badgeBg : t.badgeBg)}>
+                        {isHero ? badgeText : member.part}
                      </Badge>
                      <h3 className={cn("text-xl md:text-2xl font-black uppercase tracking-wider leading-tight mt-2 line-clamp-2 md:line-clamp-1 transition-colors", isHero ? heroTheme.textPrimary : "text-foreground")}>
                         {member.name}
