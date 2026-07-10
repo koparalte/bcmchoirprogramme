@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { getProgress, getMembers, getEvents, getBibleVerses } from "@/lib/actions";
 import type { BibleVerse } from "@/lib/types";
 import { ProgressCard } from "@/components/progress-card";
@@ -131,13 +132,13 @@ export default async function ProgressPage() {
       const dayOfYear = Math.floor(diff / oneDay);
       
       // Create a perfectly unique offset for each of the 24 members
-      // We sort the names alphabetically to guarantee a stable index for everyone
-      const allNames = mergedMembers.map(m => m.name).sort();
+      // We sort the names alphabetically from the base membersData to guarantee a stable index across all pages
+      const allNames = (membersData || []).filter(m => m.name).map(m => m.name).sort();
       const memberIndex = allNames.indexOf(heroMember.name);
       
-      // Spread the 24 members evenly across the 365 verses to maximize variety
-      const spacing = Math.floor(bibleVerses.length / Math.max(mergedMembers.length, 1));
-      const memberOffset = memberIndex * spacing;
+      // Spread the members evenly across the 365 verses to maximize variety
+      const spacing = Math.floor(bibleVerses.length / Math.max(allNames.length, 1));
+      const memberOffset = memberIndex > -1 ? memberIndex * spacing : 0;
       
       // Select the verse index
       const verseIndex = (dayOfYear + memberOffset) % bibleVerses.length;

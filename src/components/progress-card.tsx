@@ -78,25 +78,125 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
 
   const t = themeConfig[theme];
 
+  const partUpper = (member.part || 'CONDUCTOR').toUpperCase();
+  let heroTheme = {
+      cardBorder: "border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.2)]",
+      bgGradient: "from-blue-500/20 via-blue-500/5",
+      borderB: "border-blue-500/20",
+      avatarBg: "bg-blue-500/10",
+      avatarBorder: "border-blue-500/30",
+      avatarShadow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+      textPrimary: "text-blue-500",
+      textPrimaryHover: "group-hover:text-blue-500",
+      badgeBg: "bg-blue-500/10 border-blue-500/20",
+      dropShadow: "drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]",
+      bibleBorder: "border-blue-500/20",
+      bibleQuote: "text-blue-500/20",
+      bibleText: "text-blue-500/90",
+      bibleBadgeText: "text-blue-500/80",
+      dialogBg: "bg-blue-500/5"
+  };
+
+  if (partUpper.includes('SOPRANO')) {
+      heroTheme = {
+          cardBorder: "border-orange-500/50 shadow-[0_0_30px_rgba(249,115,22,0.2)]",
+          bgGradient: "from-orange-500/20 via-orange-500/5",
+          borderB: "border-orange-500/20",
+          avatarBg: "bg-orange-500/10",
+          avatarBorder: "border-orange-500/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(249,115,22,0.3)]",
+          textPrimary: "text-orange-500",
+          textPrimaryHover: "group-hover:text-orange-500",
+          badgeBg: "bg-orange-500/10 border-orange-500/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]",
+          bibleBorder: "border-orange-500/20",
+          bibleQuote: "text-orange-500/20",
+          bibleText: "text-orange-500/90",
+          bibleBadgeText: "text-orange-500/80",
+          dialogBg: "bg-orange-500/5"
+      };
+  } else if (partUpper.includes('CONTRALTO')) {
+      heroTheme = {
+          cardBorder: "border-purple-400/50 shadow-[0_0_30px_rgba(192,132,252,0.2)]",
+          bgGradient: "from-purple-400/20 via-purple-400/5",
+          borderB: "border-purple-400/20",
+          avatarBg: "bg-purple-400/10",
+          avatarBorder: "border-purple-400/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(192,132,252,0.3)]",
+          textPrimary: "text-purple-400",
+          textPrimaryHover: "group-hover:text-purple-400",
+          badgeBg: "bg-purple-400/10 border-purple-400/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(192,132,252,0.4)]",
+          bibleBorder: "border-purple-400/20",
+          bibleQuote: "text-purple-400/20",
+          bibleText: "text-purple-400/90",
+          bibleBadgeText: "text-purple-400/80",
+          dialogBg: "bg-purple-400/5"
+      };
+  } else if (partUpper.includes('TENOR')) {
+      heroTheme = {
+          cardBorder: "border-slate-300/50 shadow-[0_0_30px_rgba(203,213,225,0.2)]",
+          bgGradient: "from-slate-300/20 via-slate-300/5",
+          borderB: "border-slate-300/20",
+          avatarBg: "bg-slate-300/10",
+          avatarBorder: "border-slate-300/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(203,213,225,0.3)]",
+          textPrimary: "text-slate-300",
+          textPrimaryHover: "group-hover:text-slate-300",
+          badgeBg: "bg-slate-300/10 border-slate-300/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(203,213,225,0.4)]",
+          bibleBorder: "border-slate-300/20",
+          bibleQuote: "text-slate-300/20",
+          bibleText: "text-slate-300/90",
+          bibleBadgeText: "text-slate-300/80",
+          dialogBg: "bg-slate-300/5"
+      };
+  } else if (partUpper.includes('BASS')) {
+      heroTheme = {
+          cardBorder: "border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]",
+          bgGradient: "from-emerald-500/20 via-emerald-500/5",
+          borderB: "border-emerald-500/20",
+          avatarBg: "bg-emerald-500/10",
+          avatarBorder: "border-emerald-500/30",
+          avatarShadow: "shadow-[0_0_20px_rgba(16,185,129,0.3)]",
+          textPrimary: "text-emerald-500",
+          textPrimaryHover: "group-hover:text-emerald-500",
+          badgeBg: "bg-emerald-500/10 border-emerald-500/20",
+          dropShadow: "drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]",
+          bibleBorder: "border-emerald-500/20",
+          bibleQuote: "text-emerald-500/20",
+          bibleText: "text-emerald-500/90",
+          bibleBadgeText: "text-emerald-500/80",
+          dialogBg: "bg-emerald-500/5"
+      };
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Card className={cn(
            "bg-card border transition-all duration-500 rounded-2xl overflow-hidden group h-full flex flex-col cursor-pointer",
            isHero 
-             ? "border-primary/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] md:col-span-2 xl:col-span-3 scale-[1.02] z-10 my-4" 
+             ? `${heroTheme.cardBorder} md:col-span-2 xl:col-span-3 scale-[1.02] z-10 my-4` 
              : t.cardBorder
         )}>
            <CardContent className="p-0 flex flex-col h-full">
                <div className={cn(
                   "flex relative overflow-hidden flex-shrink-0 h-full",
                   isHero 
-                    ? "flex-col items-center justify-center text-center p-8 md:p-10 pb-6 md:pb-8 gap-4 md:gap-6 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border-b border-primary/20" 
+                    ? `flex-col items-center justify-center text-center p-8 md:p-10 pb-6 md:pb-8 gap-4 md:gap-6 bg-gradient-to-br ${heroTheme.bgGradient} to-transparent border-b ${heroTheme.borderB}` 
                     : `flex-row items-center p-6 pb-4 gap-4 border-b ${t.bgGradient} ${t.borderB}`
                )}>
                   {isHero && (
-                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 opacity-[0.03] pointer-events-none w-full text-center">
-                        <span className="text-[8rem] md:text-[12rem] leading-none font-black italic tracking-tighter">YOU</span>
+                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center p-2 opacity-[0.03] pointer-events-none flex justify-center overflow-hidden">
+                        <span className={cn(
+                           "leading-none font-black italic tracking-tighter whitespace-nowrap",
+                           partUpper.length > 8 
+                             ? "text-[3.5rem] sm:text-[5rem] md:text-[7rem] lg:text-[8rem]" 
+                             : "text-[5rem] sm:text-[6rem] md:text-[9rem] lg:text-[10rem]"
+                        )}>
+                           {partUpper}
+                        </span>
                      </div>
                   )}
                   {/* Progress Bar background hint */}
@@ -107,7 +207,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                   
                   <div className={cn(
                       "relative rounded-full overflow-hidden flex-shrink-0 border flex items-center justify-center z-10",
-                      isHero ? "bg-primary/10 border-primary/20 w-24 h-24 md:w-32 md:h-32 border-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]" : `w-16 h-16 ${t.avatarBg} ${t.avatarBorder}`
+                      isHero ? `${heroTheme.avatarBg} ${heroTheme.avatarBorder} w-24 h-24 md:w-32 md:h-32 border-2 ${heroTheme.avatarShadow}` : `w-16 h-16 ${t.avatarBg} ${t.avatarBorder}`
                    )}>
                      {member.link ? (
                        <Image 
@@ -117,12 +217,12 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                          objectFit="cover" 
                        />
                      ) : (
-                       <span className={cn("font-bold", isHero ? "text-primary/70 text-4xl md:text-5xl" : `text-xl ${t.initialsText}`)}>{getInitials(member.name)}</span>
+                       <span className={cn("font-bold", isHero ? `${heroTheme.textPrimary} opacity-70 text-4xl md:text-5xl` : `text-xl ${t.initialsText}`)}>{getInitials(member.name)}</span>
                      )}
                   </div>
                   
                   <div className={cn("z-10", isHero ? "flex flex-col items-center" : "flex-grow")}>
-                     <h3 className={cn("font-semibold tracking-wider uppercase text-foreground", isHero ? "text-2xl md:text-4xl text-primary drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]" : "text-lg")}>
+                     <h3 className={cn("font-semibold tracking-wider uppercase text-foreground", isHero ? `text-2xl md:text-4xl ${heroTheme.textPrimary} ${heroTheme.dropShadow}` : "text-lg")}>
                         {isHero ? (
                            <div className="flex flex-col items-center gap-1">
                               <span className="text-sm md:text-base text-muted-foreground/80 lowercase tracking-widest font-medium">Welcome,</span>
@@ -131,7 +231,7 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                         ) : member.name}
                      </h3>
                      <div className={cn("flex items-center gap-2 mt-2", isHero ? "justify-center mt-4" : "")}>
-                        <Badge variant="secondary" className={cn("font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm border", isHero ? "bg-primary/10 text-primary border-primary/20" : t.badgeBg)}>
+                        <Badge variant="secondary" className={cn("font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm border", isHero ? `${heroTheme.badgeBg} ${heroTheme.textPrimary}` : t.badgeBg)}>
                            {member.part}
                         </Badge>
                         {totalSongs > 0 ? (
@@ -147,20 +247,20 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                   </div>
 
                   {isHero && bibleVerse && (
-                     <div className="mt-4 md:mt-2 p-4 md:p-6 bg-black/40 backdrop-blur-md rounded-xl border border-primary/20 w-full max-w-2xl relative overflow-hidden z-10 shadow-lg">
-                        <Quote className="absolute top-3 left-3 w-8 h-8 text-primary/10 rotate-180" />
-                        <p className="text-base md:text-lg text-primary/90 font-serif italic leading-relaxed drop-shadow-sm px-4 pt-2">
+                     <div className={cn("mt-4 md:mt-2 p-4 md:p-6 bg-black/40 backdrop-blur-md rounded-xl border w-full max-w-2xl relative overflow-hidden z-10 shadow-lg", heroTheme.bibleBorder)}>
+                        <Quote className={cn("absolute top-3 left-3 w-8 h-8 rotate-180", heroTheme.bibleQuote)} />
+                        <p className={cn("text-base md:text-lg font-serif italic leading-relaxed drop-shadow-sm px-4 pt-2", heroTheme.bibleText)}>
                            "{bibleVerse.text}"
                         </p>
                         <div className="mt-4 text-right">
-                           <span className="inline-block text-xs font-bold tracking-widest uppercase text-primary/80 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                           <span className={cn("inline-block text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border", heroTheme.bibleBadgeText, heroTheme.badgeBg)}>
                               {bibleVerse.verse}
                            </span>
                         </div>
                      </div>
                   )}
 
-                  <div className={cn("text-muted-foreground transition-colors z-10", isHero ? "absolute top-6 right-6 opacity-0 group-hover:opacity-100 group-hover:text-primary" : `flex-shrink-0 ${t.iconHover}`)}>
+                  <div className={cn("text-muted-foreground transition-colors z-10", isHero ? `absolute top-6 right-6 opacity-0 group-hover:opacity-100 ${heroTheme.textPrimaryHover}` : `flex-shrink-0 ${t.iconHover}`)}>
                      <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" />
                   </div>
                </div>
@@ -171,20 +271,20 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
       <DialogContent className="max-w-md bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90dvh]">
         <div className={cn(
            "p-4 md:p-8 pb-4 border-b border-white/5 flex-shrink-0",
-           isHero ? "bg-primary/5" : "bg-white/5"
+           isHero ? heroTheme.dialogBg : "bg-white/5"
         )}>
           <DialogHeader>
             <DialogTitle className="flex flex-col items-center gap-2 md:gap-4">
-              <div className="relative w-32 h-32 md:w-64 md:h-64 rounded-full overflow-hidden bg-primary/10 border-4 border-primary/40 shadow-[0_0_30px_rgba(59,130,246,0.3)] flex items-center justify-center">
+              <div className={cn("relative w-32 h-32 md:w-64 md:h-64 rounded-full overflow-hidden border-4 flex items-center justify-center", isHero ? `${heroTheme.avatarBg} ${heroTheme.avatarBorder} ${heroTheme.avatarShadow}` : "bg-primary/10 border-primary/40 shadow-[0_0_30px_rgba(59,130,246,0.3)]")}>
                   {member.link ? (
                      <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" />
                   ) : (
-                     <span className="text-6xl md:text-8xl font-bold text-primary/70">{getInitials(member.name)}</span>
+                     <span className={cn("text-6xl md:text-8xl font-bold opacity-70", isHero ? heroTheme.textPrimary : "text-primary")}>{getInitials(member.name)}</span>
                   )}
               </div>
               <div className="flex flex-col items-center text-center mt-2">
                 <span className="text-xl md:text-2xl font-black tracking-wider uppercase drop-shadow-md">{member.name}</span>
-                <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-1 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">{member.part}</span>
+                <span className={cn("text-[10px] font-bold uppercase tracking-widest mt-1 px-3 py-1 rounded-full border", isHero ? `${heroTheme.badgeBg} ${heroTheme.textPrimary}` : "bg-primary/10 text-primary border-primary/20")}>{member.part}</span>
               </div>
             </DialogTitle>
           </DialogHeader>
