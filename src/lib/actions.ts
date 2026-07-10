@@ -2,6 +2,7 @@
 'use server';
 
 import {z} from 'zod';
+import { revalidatePath } from 'next/cache';
 import type {Banner, Event, Member, ProgressMember} from './types';
 
 const sheetUrlSchema = z.string().url();
@@ -458,3 +459,101 @@ export async function updateMemberProgress(sheetUrl: string, memberName: string,
   }
 }
 
+export async function getQueueHistory(
+  sheetUrl: string
+): Promise<{ history?: Map<string, number>, error?: string }> {
+  try {
+    const serviceAccountAuth = new JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(extractSheetId(sheetUrl)!, serviceAccountAuth);
+    await doc.loadInfo();
+    
+    // Check if QueueHistory sheet exists
+    let historySheet = doc.sheetsByTitle['QueueHistory'];
+    const historyMap = new Map<string, number>();
+    
+    if (historySheet) {
+        const rows = await historySheet.getRows();
+        rows.forEach(row => {
+           const name = row.get('Name');
+           const times = parseInt(row.get('Times Queued') || '0', 10);
+           if (name && !isNaN(times)) {
+               historyMap.set(name.trim(), times);
+           }
+        });
+    }
+    
+    return { history: historyMap };
+  } catch (err: any) {
+    console.error('Error fetching QueueHistory:', err);
+    return { error: err.message };
+  }
+}
+
+export async function generateQueueSchedule(
+  sheetUrl: string,
+  batch1: string[],
+  batch2: string[]
+) {
+  try {
+    const serviceAccountAuth = new JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(extractSheetId(sheetUrl)!, serviceAccountAuth);
+    await doc.loadInfo();
+    
+    const progressSheet = doc.sheetsByIndex[0];
+    const rows = await progressSheet.getRows();
+    
+    // Write 1s and 2s to the progress sheet
+    for (const row of rows) {
+       const name = row.get('Name')?.trim();
+       if (!name) continue;
+       
+       if (batch1.includes(name)) {
+           row.set('queue', '1');
+       } else if (batch2.includes(name)) {
+           row.set('queue', '2');
+       } else {
+           row.set('queue', '');
+       }
+       await row.save();
+    }
+    
+    // Update QueueHistory
+    let historySheet = doc.sheetsByTitle['QueueHistory'];
+    if (!historySheet) {
+        historySheet = await doc.addSheet({ title: 'QueueHistory', headerValues: ['Name', 'Times Queued'] });
+    }
+    
+    const historyRows = await historySheet.getRows();
+    const historyMap = new Map(historyRows.map(r => [r.get('Name'), r]));
+    
+    const allSelected = [...batch1, ...batch2];
+    for (const name of allSelected) {
+        const existingRow = historyMap.get(name);
+        if (existingRow) {
+            const currentTimes = parseInt(existingRow.get('Times Queued') || '0', 10);
+            existingRow.set('Times Queued', (currentTimes + 1).toString());
+            await existingRow.save();
+        } else {
+            await historySheet.addRow({ 'Name': name, 'Times Queued': '1' });
+        }
+    }
+    
+    revalidatePath('/progress');
+    revalidatePath('/');
+    
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error saving queue schedule:', err);
+    return { error: err.message };
+  }
+}

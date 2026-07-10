@@ -70,8 +70,13 @@ export async function HomeHero() {
   const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || heroMember?.designation?.toUpperCase().includes('CONDUCTOR') || false;
 
   return (
-    <div className="w-full max-w-5xl mb-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+    <div className="w-full max-w-5xl mb-12 flex flex-col items-center">
+      {isConductor && (
+         <a href="/admin/schedule" className="mb-6 px-6 py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-blue-600/30 transition-colors">
+            Conductor Tools: Queue Management
+         </a>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 w-full">
          <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} />
       </div>
     </div>
