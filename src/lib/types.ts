@@ -38,6 +38,7 @@ export type ProgressMember = {
   name: string;
   part: string;
   songs: SongProgress[];
+  queue?: string;
   link?: string;
   email?: string;
 };

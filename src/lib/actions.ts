@@ -290,27 +290,32 @@ export async function getProgress(
   try {
     const {cols, rows} = gvizData.table;
     
-    if (cols.length < 2) {
+    if (cols.length < 3) {
         return { error: "The Google Sheet appears to be missing required columns." };
     }
 
-    // First two columns are Name and Part. 
-    // The rest of the columns are songs.
-    const songHeaders = cols.slice(2).map(col => col.label);
+    // Columns: 0: Name, 1: queue, 2: Part, 3+: Songs
+    const songHeaders = cols.slice(3).map(col => col.label);
 
     const members: ProgressMember[] = rows
       .map((row, index) => {
         const nameCell = row.c[0];
         const name = nameCell ? (nameCell.f ?? nameCell.v) : null;
         
-        let part: string = '';
+        let queue: string = '';
         if (row.c.length > 1) {
-          const partCell = row.c[1];
+          const queueCell = row.c[1];
+          queue = queueCell ? (queueCell.f ?? queueCell.v)?.toString() : '';
+        }
+        
+        let part: string = '';
+        if (row.c.length > 2) {
+          const partCell = row.c[2];
           part = partCell ? (partCell.f ?? partCell.v) : '';
         }
 
         const songs = songHeaders.map((songName, songIndex) => {
-           const cell = row.c[songIndex + 2];
+           const cell = row.c[songIndex + 3];
            let completed = false;
            if (cell) {
               completed = cell.v === true || cell.v === 'TRUE' || cell.v === 'true' || cell.v === 1;
@@ -325,6 +330,7 @@ export async function getProgress(
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: (name as string) || '',
           part: (part as string) || '',
+          queue,
           songs
         };
       })

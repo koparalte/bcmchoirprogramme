@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/page-header";
-import { getProgress, getMembers } from "@/lib/actions";
+import { getProgress, getMembers, getEvents } from "@/lib/actions";
 import { ProgressCard } from "@/components/progress-card";
 import { auth } from "@/auth";
 
@@ -7,14 +7,20 @@ export const revalidate = 60; // Cache for 60 seconds
 
 const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
+const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
 
 export default async function ProgressPage() {
   const session = await auth();
   const userEmail = session?.user?.email;
 
-  const [{ data: progressData, error: progressError }, { data: membersData, error: membersError }] = await Promise.all([
+  const [
+    { data: progressData, error: progressError }, 
+    { data: membersData, error: membersError },
+    { data: hlazirEvents }
+  ] = await Promise.all([
     getProgress(PROGRESS_SHEET_URL),
-    getMembers(MEMBERS_SHEET_URL)
+    getMembers(MEMBERS_SHEET_URL),
+    getEvents(BCYA_SHEET_URL, true)
   ]);
 
   if (progressError) {
@@ -29,7 +35,7 @@ export default async function ProgressPage() {
     );
   }
 
-  // Create a fast lookup map for members (O(N) time complexity instead of O(N^2))
+  // Create a fast lookup map for members
   const membersMap = new Map();
   (membersData || []).forEach(m => {
      if (m.name) {
@@ -40,7 +46,6 @@ export default async function ProgressPage() {
   // Merge the image links and emails from the Members sheet into the Progress data
   const mergedMembers = (progressData || []).map(progressMember => {
      const matchingMember = membersMap.get(progressMember.name.trim().toLowerCase());
-     
      return {
         ...progressMember,
         link: matchingMember?.link,
@@ -48,7 +53,6 @@ export default async function ProgressPage() {
      };
   });
 
-  // If the logged in user is in Members but NOT in Progress (like a Conductor), add them manually!
   const loggedInMember = (membersData || []).find(m => m.email && userEmail && m.email.toLowerCase() === userEmail.toLowerCase());
   
   // AUTHORIZATION CHECK: Block non-members
@@ -74,26 +78,46 @@ export default async function ProgressPage() {
      );
   }
 
-  // They are a member! Check if they need to be added to the progress list manually (like conductors)
   const existsInProgress = mergedMembers.some(m => m.email?.toLowerCase() === userEmail?.toLowerCase());
   if (!existsInProgress) {
-      // Add the conductor/missing member manually to the array
       mergedMembers.push({
           id: `conductor-${loggedInMember.id}`,
           name: loggedInMember.name,
           part: loggedInMember.part || loggedInMember.designation || 'Conductor',
-          songs: [], // No songs to track for conductors
+          songs: [],
+          queue: '',
           link: loggedInMember.link,
           email: loggedInMember.email
       });
   }
 
-  // Sort so the logged-in user is exactly at the top
-  const sortedMembers = [...mergedMembers].sort((a, b) => {
-      if (a.email && userEmail && a.email.toLowerCase() === userEmail.toLowerCase()) return -1;
-      if (b.email && userEmail && b.email.toLowerCase() === userEmail.toLowerCase()) return 1;
-      return 0;
-  });
+  let date1Str = "UPCOMING";
+  let date2Str = "UPCOMING";
+  if (hlazirEvents && hlazirEvents.length > 0) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    // Filter and sort upcoming events to be safe
+    const sortedUpcoming = hlazirEvents
+       .filter(e => e.startdate && new Date(e.startdate) >= today)
+       .sort((a, b) => new Date(a.startdate!).getTime() - new Date(b.startdate!).getTime());
+
+    const nextEvent = sortedUpcoming[0];
+    if (nextEvent && nextEvent.startdate) {
+      date1Str = `ON ${new Date(nextEvent.startdate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}`;
+    }
+    
+    const followingEvent = sortedUpcoming[1];
+    if (followingEvent && followingEvent.startdate) {
+      date2Str = `ON ${new Date(followingEvent.startdate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}`;
+    }
+  }
+
+  // Groups
+  const heroMember = mergedMembers.find(m => m.email && userEmail && m.email.toLowerCase() === userEmail.toLowerCase());
+  const queue1Members = mergedMembers.filter(m => m.queue === '1');
+  const queue2Members = mergedMembers.filter(m => m.queue === '2');
+  const restMembers = mergedMembers.filter(m => m !== heroMember && m.queue !== '1' && m.queue !== '2');
 
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
@@ -104,16 +128,51 @@ export default async function ProgressPage() {
            <h2 className="text-3xl md:text-4xl font-headline font-black uppercase tracking-widest text-primary drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">Member Progress</h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-           {sortedMembers.map((member, idx) => {
-              const isHero = !!(userEmail && member.email && member.email.toLowerCase() === userEmail.toLowerCase() && idx === 0);
-              return (
-                 <ProgressCard key={member.id} member={member} isHero={isHero} />
-              )
-           })}
-        </div>
-        
-        {sortedMembers.length === 0 && (
+        {heroMember && (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-12">
+             <ProgressCard member={heroMember} isHero={true} />
+          </div>
+        )}
+
+        {queue1Members.length > 0 && (
+          <div className="mb-12">
+            <div className="flex flex-col items-center mb-6">
+               <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.3)]">ZAI TURTE</h3>
+               <p className="text-muted-foreground font-semibold uppercase tracking-widest text-xs md:text-sm mt-1">{date1Str}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+               {queue1Members.map(member => (
+                  <ProgressCard key={member.id} member={member} theme="red" />
+               ))}
+            </div>
+          </div>
+        )}
+
+        {queue2Members.length > 0 && (
+          <div className="mb-12">
+            <div className="flex flex-col items-center mb-6">
+               <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest text-purple-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">ZAI TURTE</h3>
+               <p className="text-muted-foreground font-semibold uppercase tracking-widest text-xs md:text-sm mt-1">{date2Str}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+               {queue2Members.map(member => (
+                  <ProgressCard key={member.id} member={member} theme="purple" />
+               ))}
+            </div>
+          </div>
+        )}
+
+        {restMembers.length > 0 && (
+          <div className="mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+               {restMembers.map(member => (
+                  <ProgressCard key={member.id} member={member} theme="default" />
+               ))}
+            </div>
+          </div>
+        )}
+
+        {mergedMembers.length === 0 && (
            <div className="text-center py-16 border border-white/5 bg-black/20 rounded-2xl shadow-inner">
               <h3 className="text-xl font-headline font-bold text-muted-foreground uppercase tracking-widest">No members found</h3>
            </div>

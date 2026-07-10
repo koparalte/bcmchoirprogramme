@@ -26,7 +26,7 @@ const getInitials = (name: string) => {
   return name.substring(0, 2);
 }
 
-export function ProgressCard({ member, isHero = false }: { member: ProgressMember, isHero?: boolean }) {
+export function ProgressCard({ member, isHero = false, theme = 'default' }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple' }) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Memoize the derived calculations so they don't re-run on simple state changes (like hovering or opening the dialog)
@@ -43,6 +43,41 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
     };
   }, [member.songs]);
 
+  const themeConfig = {
+     default: {
+        cardBorder: "border-white/5 hover:border-primary/20",
+        bgGradient: "bg-gradient-to-br from-primary/5 to-transparent",
+        borderB: "border-white/5",
+        avatarBg: "bg-primary/10",
+        avatarBorder: "border-primary/20",
+        initialsText: "text-primary/70",
+        badgeBg: "bg-primary/10 text-primary border-primary/20",
+        iconHover: "group-hover:text-primary",
+     },
+     red: {
+        cardBorder: "border-red-500/30 hover:border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]",
+        bgGradient: "bg-gradient-to-br from-red-500/20 via-red-500/5 to-transparent",
+        borderB: "border-red-500/20",
+        avatarBg: "bg-red-500/10",
+        avatarBorder: "border-red-500/30",
+        initialsText: "text-red-500/70",
+        badgeBg: "bg-red-500/10 text-red-500 border-red-500/30",
+        iconHover: "group-hover:text-red-500",
+     },
+     purple: {
+        cardBorder: "border-purple-500/30 hover:border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.15)]",
+        bgGradient: "bg-gradient-to-br from-purple-500/20 via-purple-500/5 to-transparent",
+        borderB: "border-purple-500/20",
+        avatarBg: "bg-purple-500/10",
+        avatarBorder: "border-purple-500/30",
+        initialsText: "text-purple-500/70",
+        badgeBg: "bg-purple-500/10 text-purple-500 border-purple-500/30",
+        iconHover: "group-hover:text-purple-500",
+     }
+  };
+
+  const t = themeConfig[theme];
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -50,14 +85,14 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
            "bg-card border transition-all duration-500 rounded-2xl overflow-hidden group h-full flex flex-col cursor-pointer",
            isHero 
              ? "border-primary/50 shadow-[0_0_30px_rgba(59,130,246,0.2)] md:col-span-2 xl:col-span-3 scale-[1.02] z-10 my-4" 
-             : "border-white/5 hover:border-primary/20"
+             : t.cardBorder
         )}>
            <CardContent className="p-0 flex flex-col h-full">
                <div className={cn(
                   "flex relative overflow-hidden flex-shrink-0 h-full",
                   isHero 
                     ? "flex-col items-center justify-center text-center p-8 md:p-10 pb-6 md:pb-8 gap-4 md:gap-6 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border-b border-primary/20" 
-                    : "flex-row items-center p-6 pb-4 gap-4 bg-gradient-to-br from-primary/5 to-transparent border-b border-white/5"
+                    : `flex-row items-center p-6 pb-4 gap-4 border-b ${t.bgGradient} ${t.borderB}`
                )}>
                   {isHero && (
                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 opacity-[0.03] pointer-events-none w-full text-center">
@@ -71,8 +106,8 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                   />
                   
                   <div className={cn(
-                      "relative rounded-full overflow-hidden bg-primary/10 flex-shrink-0 border border-primary/20 flex items-center justify-center z-10",
-                      isHero ? "w-24 h-24 md:w-32 md:h-32 border-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]" : "w-16 h-16"
+                      "relative rounded-full overflow-hidden flex-shrink-0 border flex items-center justify-center z-10",
+                      isHero ? "bg-primary/10 border-primary/20 w-24 h-24 md:w-32 md:h-32 border-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]" : `w-16 h-16 ${t.avatarBg} ${t.avatarBorder}`
                    )}>
                      {member.link ? (
                        <Image 
@@ -82,7 +117,7 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                          objectFit="cover" 
                        />
                      ) : (
-                       <span className={cn("font-bold text-primary/70", isHero ? "text-4xl md:text-5xl" : "text-xl")}>{getInitials(member.name)}</span>
+                       <span className={cn("font-bold", isHero ? "text-primary/70 text-4xl md:text-5xl" : `text-xl ${t.initialsText}`)}>{getInitials(member.name)}</span>
                      )}
                   </div>
                   
@@ -96,7 +131,7 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                         ) : member.name}
                      </h3>
                      <div className={cn("flex items-center gap-2 mt-2", isHero ? "justify-center mt-4" : "")}>
-                        <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20 font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm">
+                        <Badge variant="secondary" className={cn("font-bold tracking-widest uppercase text-[10px] px-2 py-0.5 rounded-sm border", isHero ? "bg-primary/10 text-primary border-primary/20" : t.badgeBg)}>
                            {member.part}
                         </Badge>
                         {totalSongs > 0 ? (
@@ -110,7 +145,7 @@ export function ProgressCard({ member, isHero = false }: { member: ProgressMembe
                         )}
                      </div>
                   </div>
-                  <div className={cn("text-muted-foreground group-hover:text-primary transition-colors z-10", isHero ? "absolute top-6 right-6 opacity-0 group-hover:opacity-100" : "flex-shrink-0")}>
+                  <div className={cn("text-muted-foreground transition-colors z-10", isHero ? "absolute top-6 right-6 opacity-0 group-hover:opacity-100 group-hover:text-primary" : `flex-shrink-0 ${t.iconHover}`)}>
                      <ExternalLink className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" />
                   </div>
                </div>
