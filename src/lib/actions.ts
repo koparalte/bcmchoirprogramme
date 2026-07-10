@@ -556,3 +556,45 @@ export async function generateQueueSchedule(
     return { error: err.message };
   }
 }
+
+export async function saveManualOverrides(
+  sheetUrl: string,
+  updates: Record<string, '1' | '2' | ''>
+) {
+  try {
+    const serviceAccountAuth = new JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(extractSheetId(sheetUrl)!, serviceAccountAuth);
+    await doc.loadInfo();
+    
+    const progressSheet = doc.sheetsByIndex[0];
+    const rows = await progressSheet.getRows();
+    
+    let hasChanges = false;
+    for (const row of rows) {
+       const name = row.get('Name')?.trim();
+       if (!name) continue;
+       
+       if (updates[name] !== undefined) {
+           row.set('queue', updates[name]);
+           await row.save();
+           hasChanges = true;
+       }
+    }
+    
+    if (hasChanges) {
+       revalidatePath('/progress');
+       revalidatePath('/');
+       revalidatePath('/admin/schedule');
+    }
+    
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error saving manual overrides:', err);
+    return { error: err.message };
+  }
+}
