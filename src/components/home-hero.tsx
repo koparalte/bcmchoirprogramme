@@ -33,7 +33,8 @@ export async function HomeHero() {
      heroMember = {
         ...heroMember,
         link: loggedInMember.link,
-        email: loggedInMember.email
+        email: loggedInMember.email,
+        designation: loggedInMember.designation
      };
   } else {
       heroMember = {
@@ -43,7 +44,8 @@ export async function HomeHero() {
           songs: [],
           queue: '',
           link: loggedInMember.link,
-          email: loggedInMember.email
+          email: loggedInMember.email,
+          designation: loggedInMember.designation
       };
   }
 
