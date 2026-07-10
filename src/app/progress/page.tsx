@@ -100,12 +100,13 @@ export default async function ProgressPage() {
 
   let date1Str = "UPCOMING";
   let date2Str = "UPCOMING";
+  let sortedUpcoming: any[] = [];
   if (hlazirEvents && hlazirEvents.length > 0) {
     const today = getISTDate();
     today.setHours(0,0,0,0);
     
     // Filter and sort upcoming events to be safe
-    const sortedUpcoming = hlazirEvents
+    sortedUpcoming = hlazirEvents
        .filter(e => e.startdate && new Date(e.startdate) >= today)
        .sort((a, b) => new Date(a.startdate!).getTime() - new Date(b.startdate!).getTime());
 
