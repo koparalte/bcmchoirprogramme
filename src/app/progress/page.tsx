@@ -148,6 +148,13 @@ export default async function ProgressPage() {
   
   const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || heroMember?.designation?.toUpperCase().includes('CONDUCTOR') || false;
 
+  const getMemberTheme = (member: any, queueTheme: string) => {
+     const p = (member.part || '').toUpperCase();
+     const d = (member.designation || '').toUpperCase();
+     if (p.includes('CONDUCTOR') || d.includes('CONDUCTOR')) return 'blue';
+     return queueTheme;
+  };
+
   const queue1Members = mergedMembers.filter(m => m.queue === '1');
   const queue2Members = mergedMembers.filter(m => m.queue === '2');
   const restMembers = mergedMembers.filter(m => m !== heroMember && m.queue !== '1' && m.queue !== '2');
@@ -175,7 +182,7 @@ export default async function ProgressPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                {queue1Members.map(member => (
-                  <ProgressCard key={member.id} member={member} theme="red" isConductor={isConductor} />
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'red') as any} isConductor={isConductor} />
                ))}
             </div>
           </div>
@@ -189,7 +196,7 @@ export default async function ProgressPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                {queue2Members.map(member => (
-                  <ProgressCard key={member.id} member={member} theme="purple" isConductor={isConductor} />
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'purple') as any} isConductor={isConductor} />
                ))}
             </div>
           </div>
@@ -199,7 +206,7 @@ export default async function ProgressPage() {
           <div className="mb-12">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                {restMembers.map(member => (
-                  <ProgressCard key={member.id} member={member} theme="default" isConductor={isConductor} />
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'default') as any} isConductor={isConductor} />
                ))}
             </div>
           </div>
