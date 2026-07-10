@@ -195,7 +195,7 @@ export default async function ProgressPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
                {queue1Members.map(member => (
-                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'red') as any} isConductor={isConductor} isSingingToday={isEventToday} />
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'red') as any} isConductor={isConductor} />
                ))}
             </div>
           </div>
