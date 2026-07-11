@@ -172,6 +172,71 @@ export default async function ProgressPage() {
   const queue2Members = mergedMembers.filter(m => m.queue === '2');
   const restMembers = mergedMembers.filter(m => m !== heroMember && m.queue !== '1' && m.queue !== '2');
 
+  const renderBatchGroup = (members: any[], theme: string) => {
+      if (members.length !== 4) {
+         return (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+               {members.map(member => (
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, theme) as any} isConductor={isConductor} />
+               ))}
+            </div>
+         );
+      }
+
+      const getP = (p: string) => members.find(m => (m.part || '').toUpperCase().includes(p));
+      const s = getP('SOPRANO');
+      const c = getP('CONTRALTO');
+      const t = getP('TENOR');
+      const b = getP('BASS');
+
+      if (!s || !c || !t || !b) {
+         return (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+               {members.map(member => (
+                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, theme) as any} isConductor={isConductor} />
+               ))}
+            </div>
+         );
+      }
+
+      // Hash to determine pairing type consistently for these members
+      const hash = (s.name.length + c.name.length + t.name.length + b.name.length) % 2;
+
+      let pair1, pair2;
+      if (hash === 0) {
+         pair1 = [c, t]; // Contralto & Tenor
+         pair2 = [b, s]; // Bass & Soprano
+      } else {
+         pair1 = [c, b]; // Contralto & Bass
+         pair2 = [s, t]; // Soprano & Tenor
+      }
+
+      const PairContainer = ({ pair }: { pair: any[] }) => (
+         <div className={`flex flex-col items-center gap-4 md:gap-6 p-4 md:p-8 rounded-[2.5rem] relative overflow-hidden group shadow-2xl border ${theme === 'red' ? 'bg-red-950/20 border-red-500/20 shadow-red-500/5' : 'bg-purple-950/20 border-purple-500/20 shadow-purple-500/5'}`}>
+             <div className={`absolute inset-0 opacity-10 bg-gradient-to-br transition-opacity duration-700 group-hover:opacity-20 ${theme === 'red' ? 'from-red-500 to-orange-500' : 'from-purple-500 to-pink-500'}`} />
+             
+             <div className="w-full relative z-10">
+                 <ProgressCard member={pair[0]} theme={getMemberTheme(pair[0], theme) as any} isConductor={isConductor} />
+             </div>
+             
+             <div className="relative z-10 flex items-center justify-center shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-full bg-black/60 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-md transform group-hover:scale-110 transition-transform duration-500">
+                 <span className={`text-2xl md:text-3xl font-black italic ${theme === 'red' ? 'text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'text-purple-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]'}`}>&amp;</span>
+             </div>
+             
+             <div className="w-full relative z-10">
+                 <ProgressCard member={pair[1]} theme={getMemberTheme(pair[1], theme) as any} isConductor={isConductor} />
+             </div>
+         </div>
+      );
+
+      return (
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 w-full">
+             <PairContainer pair={pair1} />
+             <PairContainer pair={pair2} />
+         </div>
+      );
+  };
+
   return (
     <main className="min-h-screen container mx-auto px-4 py-8 md:py-12 flex flex-col items-center">
       <PageHeader />
@@ -193,10 +258,8 @@ export default async function ProgressPage() {
                <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.3)]">ZAI TURTE</h3>
                <p className="text-muted-foreground font-semibold uppercase tracking-widest text-xs md:text-sm mt-1">{date1Str}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-               {queue1Members.map(member => (
-                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'red') as any} isConductor={isConductor} />
-               ))}
+            <div className="w-full">
+               {renderBatchGroup(queue1Members, 'red')}
             </div>
           </div>
         )}
@@ -207,10 +270,8 @@ export default async function ProgressPage() {
                <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest text-purple-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">ZAI TURTE</h3>
                <p className="text-muted-foreground font-semibold uppercase tracking-widest text-xs md:text-sm mt-1">{date2Str}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-               {queue2Members.map(member => (
-                  <ProgressCard key={member.id} member={member} theme={getMemberTheme(member, 'purple') as any} isConductor={isConductor} />
-               ))}
+            <div className="w-full">
+               {renderBatchGroup(queue2Members, 'purple')}
             </div>
           </div>
         )}
