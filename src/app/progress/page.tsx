@@ -158,8 +158,19 @@ export default async function ProgressPage() {
           isEventToday = true;
       }
   }
-  
-  let isSingingToday = isEventToday && heroMember?.queue === '1';
+  let isSingingToday = false;
+  let upcomingSingingDate = "";
+  if (heroMember?.queue === '1' && sortedUpcoming && sortedUpcoming.length > 0) {
+      const today = new Date();
+      const eventD = new Date(sortedUpcoming[0].startdate!);
+      if (today.toDateString() === eventD.toDateString()) {
+          isSingingToday = true;
+      } else {
+          upcomingSingingDate = eventD.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase();
+      }
+  } else if (heroMember?.queue === '2' && sortedUpcoming && sortedUpcoming.length > 1) {
+      upcomingSingingDate = new Date(sortedUpcoming[1].startdate!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase();
+  }
 
   const getMemberTheme = (member: any, queueTheme: string) => {
      const p = (member.part || '').toUpperCase();
@@ -248,7 +259,7 @@ export default async function ProgressPage() {
         
         {heroMember && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-12">
-             <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} />
+             <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} upcomingSingingDate={upcomingSingingDate} />
           </div>
         )}
 

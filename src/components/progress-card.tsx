@@ -27,7 +27,7 @@ const getInitials = (name: string) => {
   return name.substring(0, 2);
 }
 
-export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse, isConductor = false, isSingingToday = false }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse, isConductor?: boolean, isSingingToday?: boolean }) {
+export function ProgressCard({ member, isHero = false, theme = 'default', bibleVerse, isConductor = false, isSingingToday = false, upcomingSingingDate }: { member: ProgressMember, isHero?: boolean, theme?: 'default' | 'red' | 'purple', bibleVerse?: BibleVerse, isConductor?: boolean, isSingingToday?: boolean, upcomingSingingDate?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
@@ -350,6 +350,11 @@ export function ProgressCard({ member, isHero = false, theme = 'default', bibleV
                            <Badge className="px-2 py-0.5 text-[10px] font-black tracking-widest uppercase bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
                               <Flame className="w-3 h-3 text-orange-500" />
                               Zanin Zai Hun
+                           </Badge>
+                        )}
+                        {isHero && !isSingingToday && upcomingSingingDate && (
+                           <Badge className="px-2 py-0.5 text-[10px] font-black tracking-widest uppercase bg-blue-500/20 text-blue-400 border-blue-500/50 shadow-[0_0_10px_rgba(59,130,246,0.3)] flex items-center gap-1">
+                              Zai Hun {upcomingSingingDate}
                            </Badge>
                         )}
                         {totalSongs > 0 ? (

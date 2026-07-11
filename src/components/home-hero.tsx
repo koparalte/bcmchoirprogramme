@@ -8,7 +8,7 @@ const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-y
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
 const BIBLE_VERSES_SHEET_URL = "https://docs.google.com/spreadsheets/d/1j1witr2nLn-LYm-_8K3C03KMGZhhM_rIqRfBIsfQXC8/edit?gid=952167006#gid=952167006";
 
-export async function HomeHero({ nextEventDate }: { nextEventDate?: string }) {
+export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDate?: string, secondEventDate?: string }) {
   const session = await auth();
   const userEmail = session?.user?.email;
   
@@ -70,12 +70,18 @@ export async function HomeHero({ nextEventDate }: { nextEventDate?: string }) {
   const isConductor = heroMember?.part.toUpperCase().includes('CONDUCTOR') || heroMember?.designation?.toUpperCase().includes('CONDUCTOR') || false;
 
   let isSingingToday = false;
-  if (nextEventDate && heroMember?.queue === '1') {
+  let upcomingSingingDate = "";
+  
+  if (heroMember?.queue === '1' && nextEventDate) {
       const today = new Date();
       const eventD = new Date(nextEventDate);
       if (today.toDateString() === eventD.toDateString()) {
           isSingingToday = true;
+      } else {
+          upcomingSingingDate = eventD.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase();
       }
+  } else if (heroMember?.queue === '2' && secondEventDate) {
+      upcomingSingingDate = new Date(secondEventDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase();
   }
 
   return (
@@ -86,7 +92,7 @@ export async function HomeHero({ nextEventDate }: { nextEventDate?: string }) {
          </a>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 w-full">
-         <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} />
+         <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} upcomingSingingDate={upcomingSingingDate} />
       </div>
     </div>
   );

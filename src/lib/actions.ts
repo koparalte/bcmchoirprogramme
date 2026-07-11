@@ -2,7 +2,7 @@
 'use server';
 
 import {z} from 'zod';
-import type {Banner, Event, Member, ProgressMember} from './types';
+import type {Banner, Event, Member, ProgressMember, BibleVerse} from './types';
 
 const sheetUrlSchema = z.string().url();
 
