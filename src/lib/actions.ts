@@ -399,31 +399,7 @@ export async function getBibleVerses(
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 
-export async function logLoginToSheet(name: string | null | undefined, email: string) {
-  try {
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY || !process.env.LOGINS_SHEET_ID) {
-      console.error("Missing Google Sheets credentials for logging.");
-      return;
-    }
 
-    const serviceAccountAuth = new JWT({
-      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const doc = new GoogleSpreadsheet(process.env.LOGINS_SHEET_ID, serviceAccountAuth);
-    await doc.loadInfo(); 
-    
-    const sheet = doc.sheetsByIndex[0];
-    
-    const date = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-
-    await sheet.addRow([date, name || 'Unknown', email]);
-  } catch (error) {
-    console.error('Error logging to Google Sheets:', error);
-  }
-}
 import { revalidatePath } from 'next/cache';
 
 export async function updateMemberProgress(sheetUrl: string, memberName: string, updates: Record<string, boolean>) {

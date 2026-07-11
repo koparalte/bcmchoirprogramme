@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { logLoginToSheet } from "@/lib/actions";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
@@ -8,7 +7,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user }) {
       try {
         if (user.email) {
-          await logLoginToSheet(user.name, user.email);
+           const baseUrl = process.env.NODE_ENV === 'development' 
+               ? 'http://localhost:9002' 
+               : (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://bcmchoirprogramme.vercel.app');
+               
+           await fetch(`${baseUrl}/api/log-login`, {
+             method: 'POST',
+             headers: {
+               'Content-Type': 'application/json'
+             },
+             body: JSON.stringify({ name: user.name, email: user.email })
+           }).catch(e => console.error('Failed to dispatch login log:', e));
         }
       } catch (e) {
         console.error("Failed to log login:", e);
