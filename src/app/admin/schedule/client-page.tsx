@@ -94,18 +94,18 @@ export function AdminScheduleClient({
     const unassigned = activeMembers.filter(m => getEffectiveQueue(m) !== '1' && getEffectiveQueue(m) !== '2');
 
     return (
-        <div className="space-y-8">
-            <div className={`flex flex-col md:flex-row items-center justify-between p-6 border rounded-xl gap-4 transition-colors ${initialCanceled ? 'bg-destructive/10 border-destructive/30' : 'bg-card'}`}>
-               <div>
-                  <h3 className="text-xl font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+        <div className="space-y-6 md:space-y-8">
+            <div className={`flex flex-col md:flex-row items-center justify-between p-4 md:p-6 border rounded-xl gap-4 transition-colors ${initialCanceled ? 'bg-destructive/10 border-destructive/30' : 'bg-card'}`}>
+               <div className="text-center md:text-left">
+                  <h3 className="text-lg md:text-xl font-bold uppercase tracking-widest text-primary flex items-center justify-center md:justify-start gap-2">
                       Next Practice {initialCanceled && <Badge variant="destructive" className="ml-2 uppercase font-black">Canceled</Badge>}
                   </h3>
                   <p className="text-muted-foreground font-semibold mt-1">
                      {nextEventDate ? new Date(nextEventDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : "No upcoming date found"}
                   </p>
                </div>
-               <div className="flex items-center gap-4 bg-black/40 px-6 py-3 rounded-xl border border-white/10">
-                  <div className="text-right">
+               <div className="flex items-center gap-3 md:gap-4 bg-black/40 px-4 py-2 md:px-6 md:py-3 rounded-xl border border-white/10 w-full md:w-auto justify-between md:justify-end">
+                  <div className="text-left md:text-right">
                      <p className="text-sm font-bold uppercase tracking-widest">Cancel Practice</p>
                      <p className="text-xs text-muted-foreground font-semibold">Freeze the queue</p>
                   </div>
@@ -118,8 +118,8 @@ export function AdminScheduleClient({
                </div>
             </div>
 
-            <div className="flex justify-between items-center px-2">
-               <h2 className="text-2xl font-black uppercase tracking-widest text-foreground">Current Assignments</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-center px-2 gap-4">
+               <h2 className="text-xl md:text-2xl font-black uppercase tracking-widest text-foreground">Current Assignments</h2>
                
                {isEditMode ? (
                    <div className="flex gap-2">
@@ -157,8 +157,8 @@ export function AdminScheduleClient({
             </div>
             
             {isEditMode && (
-                <div className="mt-8 border rounded-xl p-6 border-slate-500/20 bg-slate-500/5 text-slate-400">
-                    <h3 className="text-2xl font-black uppercase tracking-widest mb-6 text-center">Unassigned Members</h3>
+                <div className="mt-8 border rounded-xl p-4 md:p-6 border-slate-500/20 bg-slate-500/5 text-slate-400">
+                    <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest mb-4 md:mb-6 text-center">Unassigned Members</h3>
                     <BatchCardContent members={unassigned} isEditMode={true} onOverride={handleOverrideChange} />
                 </div>
             )}
@@ -172,9 +172,9 @@ function BatchCard({ title, date, members, theme, isEditMode, onOverride }: { ti
       : "border-purple-500/20 bg-purple-500/5 text-purple-500";
 
     return (
-        <div className={`border rounded-xl p-6 ${themeClasses}`}>
-            <div className="text-center mb-6">
-               <h3 className="text-2xl font-black uppercase tracking-widest leading-none">{title}</h3>
+        <div className={`border rounded-xl p-4 md:p-6 ${themeClasses} shadow-sm`}>
+            <div className="text-center mb-4 md:mb-6">
+               <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest leading-none">{title}</h3>
                {date && (
                   <p className="text-xs font-bold uppercase tracking-widest opacity-70 mt-2">
                      {new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -210,10 +210,10 @@ function BatchCardContent({ members, isEditMode, onOverride }: { members: Progre
             {parts.map(part => (
                 <div key={part}>
                     <Badge variant="outline" className="mb-3 tracking-widest font-bold opacity-80">{part}</Badge>
-                    <div className="flex flex-col gap-3 pl-2">
+                    <div className="flex flex-col gap-2 md:gap-3 pl-1 md:pl-2">
                         {byPart.get(part)!.map(m => (
-                            <div key={m.id} className="flex items-center justify-between">
-                                <span className="font-semibold">{m.name}</span>
+                            <div key={m.id} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0 last:pb-0 gap-2">
+                                <span className="font-semibold text-sm md:text-base leading-tight">{m.name}</span>
                                 {isEditMode && (
                                     <Select 
                                        defaultValue={m.queue || "none"} 
