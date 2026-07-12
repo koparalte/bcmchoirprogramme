@@ -19,7 +19,7 @@ const getInitials = (name: string) => {
   return name.substring(0, 2);
 };
 
-export function BirthdayCard({ member }: { member: Member }) {
+export function BirthdayCard({ member, isCurrentUser = false }: { member: Member, isCurrentUser?: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
   const { toast } = useToast();
@@ -176,7 +176,7 @@ export function BirthdayCard({ member }: { member: Member }) {
             <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <PartyPopper className="w-6 h-6 text-fuchsia-400 group-hover:scale-125 transition-transform duration-500 group-hover:animate-bounce" />
             <span className="font-black uppercase tracking-widest text-fuchsia-400 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)] z-10 text-sm md:text-base">
-              It's {member.name}'s Birthday!
+              {isCurrentUser ? "It's your Birthday!" : `It's ${member.name}'s Birthday!`}
             </span>
             <PartyPopper className="w-6 h-6 text-pink-400 group-hover:scale-125 transition-transform duration-500 group-hover:animate-bounce" />
           </CardContent>
