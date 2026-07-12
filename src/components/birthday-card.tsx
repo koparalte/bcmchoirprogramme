@@ -214,7 +214,7 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
             </div>
 
             <div className="text-center mt-1 flex flex-col items-center w-full">
-              <h2 className="text-base md:text-lg font-black uppercase tracking-widest text-zinc-100 drop-shadow-md">
+              <h2 className="text-lg md:text-xl font-black uppercase tracking-widest text-zinc-100 drop-shadow-md">
                 {member.name}
               </h2>
               <div className="flex items-center justify-center gap-2 mt-1">
@@ -228,21 +228,16 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
                 )}
               </div>
               {member.kohhran && (
-                <div className="mt-1 flex flex-col items-center gap-0">
-                  <p className="text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                <div className="mt-3 flex flex-col items-center gap-0">
+                  <p className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
                     {member.kohhran}
                   </p>
                 </div>
               )}
               
-              <div className="share-buttons-container flex items-center justify-center gap-6 mt-6 pt-4 border-t border-white/5 w-full relative z-50">
-                 <button disabled={isSharing} onClick={() => handleShare('whatsapp')} className="p-3 rounded-full bg-zinc-900 border border-zinc-800 hover:bg-[#25D366]/20 hover:border-[#25D366]/50 transition-colors group z-50 cursor-pointer pointer-events-auto">
-                    <svg className="w-6 h-6 text-[#25D366] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
-                       <path d="M12.031 21.172a9.13 9.13 0 0 1-4.664-1.272l-5.07.135 1.34-4.945a9.123 9.123 0 0 1-1.233-4.636c0-5.04 4.092-9.132 9.132-9.132 5.04 0 9.132 4.092 9.132 9.132 0 5.04-4.092 9.132-9.132 9.132zm0-16.732a7.6 7.6 0 0 0-7.6 7.6c0 1.631.516 3.167 1.419 4.444l-.841 3.104 3.175-.833a7.587 7.587 0 0 0 3.847 1.042c4.191 0 7.6-3.41 7.6-7.6a7.6 7.6 0 0 0-7.6-7.6zm4.181 10.371c-.228-.114-1.353-.668-1.563-.746-.21-.077-.363-.114-.515.114-.153.228-.592.746-.725.898-.134.153-.267.172-.496.058-.228-.114-.967-.356-1.843-1.137-.682-.609-1.143-1.36-1.276-1.59-.134-.228-.014-.353.1-.466.103-.103.228-.267.343-.4.114-.134.153-.228.228-.381.077-.153.038-.287-.019-.4-.058-.114-.515-1.242-.705-1.7-.186-.445-.375-.386-.515-.393-.134-.007-.287-.007-.44-.007a.846.846 0 0 0-.61.287c-.21.228-.802.784-.802 1.912 0 1.127.822 2.217.936 2.37.114.153 1.616 2.469 3.914 3.46.547.237.974.379 1.306.485.55.176 1.05.151 1.444.092.441-.067 1.353-.553 1.544-1.088.191-.536.191-.994.134-1.088-.057-.094-.21-.151-.439-.265z" />
-                    </svg>
-                 </button>
-                 <button disabled={isSharing} onClick={() => handleShare('native')} className="p-3 rounded-full bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors group z-50 cursor-pointer pointer-events-auto">
-                    {isSharing ? <Loader2 className="w-6 h-6 text-zinc-300 animate-spin" /> : <Share2 className="w-6 h-6 text-zinc-300 group-hover:scale-110 transition-transform" />}
+              <div className="share-buttons-container flex items-center justify-center mt-5 pt-3 border-t border-white/5 w-full relative z-50">
+                 <button disabled={isSharing} onClick={() => handleShare('native')} className="p-2.5 rounded-full bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors group z-50 cursor-pointer pointer-events-auto">
+                    {isSharing ? <Loader2 className="w-5 h-5 text-zinc-300 animate-spin" /> : <Share2 className="w-5 h-5 text-zinc-300 group-hover:scale-110 transition-transform" />}
                  </button>
               </div>
             </div>
