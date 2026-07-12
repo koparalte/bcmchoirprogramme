@@ -247,6 +247,7 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
               </div>
             </div>
           </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
