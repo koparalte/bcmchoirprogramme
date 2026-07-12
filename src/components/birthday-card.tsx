@@ -41,14 +41,10 @@ export function BirthdayCard({ member }: { member: Member }) {
       // We use a filter to exclude the share buttons container
       const dataUrl = await toJpeg(node, {
         quality: 1.0,
-        pixelRatio: 1,
-        canvasWidth: targetWidth,
-        canvasHeight: targetHeight,
+        pixelRatio: scale,
         style: {
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: `${node.offsetWidth}px`,
-          height: `${node.offsetHeight}px`
+          margin: '0',
+          padding: '0',
         },
         filter: (n) => {
           if (n instanceof HTMLElement && n.classList.contains('share-buttons-container')) {
