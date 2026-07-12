@@ -183,11 +183,12 @@ export function BirthdayCard({ member }: { member: Member }) {
         </Card>
       </DialogTrigger>
 
-      <DialogContent className="w-[90vw] max-w-[400px] aspect-[2/3] bg-gradient-to-br from-zinc-950 to-zinc-900 border-zinc-800 shadow-2xl p-0 overflow-hidden flex flex-col rounded-3xl">
-        <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] ${t.gradientFrom} via-transparent to-transparent pointer-events-none`} />
-        
-        <div ref={cardRef} className="relative z-10 flex flex-col items-center justify-center h-full pt-8 pb-6 w-full">
-          <Badge className={`mb-4 ${t.badgeBg} ${t.text} ${t.border} font-semibold tracking-[0.2em] uppercase text-[10px]`}>
+      <DialogContent className="w-[90vw] max-w-[400px] aspect-[2/3] p-0 border-none bg-transparent shadow-none overflow-hidden flex flex-col">
+        <div ref={cardRef} className="relative w-full h-full bg-gradient-to-br from-zinc-950 to-zinc-900 border border-zinc-800 shadow-2xl flex flex-col rounded-3xl overflow-hidden">
+          <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] ${t.gradientFrom} via-transparent to-transparent pointer-events-none`} />
+          
+          <div className="relative z-10 flex flex-col items-center justify-center h-full pt-8 pb-6 w-full">
+            <Badge className={`mb-4 ${t.badgeBg} ${t.text} ${t.border} font-semibold tracking-[0.2em] uppercase text-[10px]`}>
             BCM CHOIR 2025-2029
           </Badge>
 
