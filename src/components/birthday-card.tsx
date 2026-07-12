@@ -235,9 +235,9 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
                 </div>
               )}
               
-              <div className="share-buttons-container flex items-center justify-center mt-5 pt-3 border-t border-white/5 w-full relative z-50">
-                 <button disabled={isSharing} onClick={() => handleShare('native')} className="p-2.5 rounded-full bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors group z-50 cursor-pointer pointer-events-auto">
-                    {isSharing ? <Loader2 className="w-5 h-5 text-zinc-300 animate-spin" /> : <Share2 className="w-5 h-5 text-zinc-300 group-hover:scale-110 transition-transform" />}
+              <div className="share-buttons-container flex items-center justify-center mt-3 pt-2 border-t border-white/5 w-full relative z-50">
+                 <button disabled={isSharing} onClick={() => handleShare('native')} className="p-1.5 rounded-full bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors group z-50 cursor-pointer pointer-events-auto">
+                    {isSharing ? <Loader2 className="w-4 h-4 text-zinc-300 animate-spin" /> : <Share2 className="w-4 h-4 text-zinc-300 group-hover:scale-110 transition-transform" />}
                  </button>
               </div>
             </div>
