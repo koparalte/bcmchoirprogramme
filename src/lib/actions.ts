@@ -70,7 +70,7 @@ async function fetchSheetData(sheetUrl: string): Promise<{data?: GvizResponse, e
             };
         }
 
-        let gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        let gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&headers=1`;
         if (gid) {
             gvizUrl += `&gid=${gid}`;
         }
