@@ -237,7 +237,16 @@ export async function getMembers(
         let birthday: string | null = null;
         if (row.c.length > 7) {
             const birthdayCell = row.c[7];
-            birthday = birthdayCell ? (birthdayCell.f ?? birthdayCell.v) : null;
+            if (birthdayCell) {
+                if (typeof birthdayCell.v === 'string' && birthdayCell.v.startsWith('Date(')) {
+                    const dateParts = birthdayCell.v.replace('Date(', '').replace(')', '').split(',');
+                    const month = parseInt(dateParts[1]) + 1;
+                    const day = parseInt(dateParts[2]);
+                    birthday = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`;
+                } else {
+                    birthday = birthdayCell.f ?? birthdayCell.v;
+                }
+            }
         }
 
         return {
