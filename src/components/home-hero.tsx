@@ -56,7 +56,7 @@ export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDa
       heroMember = {
           id: `conductor-${loggedInMember.id}`,
           name: loggedInMember.name,
-          part: loggedInMember.part || loggedInMember.designation || 'Conductor',
+          part: loggedInMember.part || loggedInMember.designation || 'Member',
           songs: [],
           queue: '',
           link: loggedInMember.link,

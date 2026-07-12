@@ -175,9 +175,14 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
           <CardContent className="p-4 flex items-center justify-center gap-3 relative">
             <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <PartyPopper className="w-6 h-6 text-fuchsia-400 group-hover:scale-125 transition-transform duration-500 group-hover:animate-bounce" />
-            <span className="font-black uppercase tracking-widest text-center text-fuchsia-400 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)] z-10 text-sm md:text-base">
-              {isCurrentUser ? "It's your Birthday!" : `It's ${member.name}'s Birthday!`}
-            </span>
+            <div className="flex flex-col items-center justify-center gap-0.5 z-10">
+              <span className="font-black uppercase tracking-widest text-center text-fuchsia-400 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)] text-sm md:text-base">
+                {isCurrentUser ? "It's your Birthday!" : `It's ${member.name}'s Birthday!`}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest font-bold text-fuchsia-400/80">
+                {isCurrentUser ? "Tap to see" : "Tap to wish"}
+              </span>
+            </div>
             <PartyPopper className="w-6 h-6 text-pink-400 group-hover:scale-125 transition-transform duration-500 group-hover:animate-bounce" />
           </CardContent>
         </Card>
