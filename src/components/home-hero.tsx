@@ -26,7 +26,22 @@ export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDa
   ]);
 
   const loggedInMember = (membersData || []).find(m => m.email && m.email.toLowerCase() === userEmail.toLowerCase());
-  if (!loggedInMember) return null;
+  
+  if (!loggedInMember) {
+    return (
+      <div className="w-full max-w-5xl mb-12 flex flex-col items-center">
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 text-center max-w-md w-full">
+          <h2 className="text-xl font-bold text-zinc-100 mb-2">Account Not Linked</h2>
+          <p className="text-zinc-400 text-sm mb-4">
+            Your Google email (<span className="text-zinc-300 font-mono">{userEmail}</span>) was not found in the Members Google Sheet. 
+          </p>
+          <p className="text-zinc-500 text-xs">
+            Please add this exact email to the "Email" column in your Google Sheet to access your dashboard.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   let heroMember = (progressData || []).find(m => m.name.trim().toLowerCase() === loggedInMember.name.trim().toLowerCase());
   
