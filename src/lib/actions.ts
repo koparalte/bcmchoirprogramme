@@ -234,6 +234,12 @@ export async function getMembers(
             email = emailCell ? (emailCell.f ?? emailCell.v) : null;
         }
 
+        let birthday: string | null = null;
+        if (row.c.length > 7) {
+            const birthdayCell = row.c[7];
+            birthday = birthdayCell ? (birthdayCell.f ?? birthdayCell.v) : null;
+        }
+
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
@@ -243,6 +249,7 @@ export async function getMembers(
           link: link || undefined,
           phone: phone || undefined,
           email: email || undefined,
+          birthday: birthday || undefined,
         };
       })
       .filter(member => member.name && member.name.trim().toLowerCase() !== 'name' && member.name.trim().toLowerCase() !== 'member name'); // Filter out members with no name and the header

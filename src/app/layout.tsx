@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import { Inter, Outfit } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { auth } from "@/auth";
@@ -7,6 +8,11 @@ import { AuthButton } from "@/components/auth-button";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
+const cursiveFont = localFont({
+  src: '../../public/fonts/RusticRoadway.otf',
+  variable: '--font-cursive',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'BCM CHOIR PROGRAMME & HLA ZIR',
@@ -19,7 +25,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${cursiveFont.variable} dark`}>
       <head>
         <link rel="icon" href="/icon.ico" sizes="any" />
       </head>

@@ -20,6 +20,7 @@ export type Member = {
   link?: string;
   phone?: string;
   email?: string;
+  birthday?: string;
 };
 
 export type Banner = {

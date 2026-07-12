@@ -1,5 +1,6 @@
 import { getProgress, getMembers, getBibleVerses } from "@/lib/actions";
 import { ProgressCard } from "@/components/progress-card";
+import { BirthdayCard } from "@/components/birthday-card";
 import { auth } from "@/auth";
 import type { BibleVerse } from "@/lib/types";
 import { getISTDate } from "@/lib/utils";
@@ -84,6 +85,18 @@ export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDa
       upcomingSingingDate = new Date(secondEventDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase();
   }
 
+  const todayISTForBday = getISTDate();
+  const d = todayISTForBday.getDate();
+  const m = todayISTForBday.getMonth() + 1;
+  const bdayMatch1 = `${d}/${m}`;
+  const bdayMatch2 = `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}`;
+
+  const birthdayMember = (membersData || []).find(member => {
+      if (!member.birthday) return false;
+      const b = member.birthday.trim();
+      return b === bdayMatch1 || b === bdayMatch2;
+  });
+
   return (
     <div className="w-full max-w-5xl mb-12 flex flex-col items-center">
       {isConductor && (
@@ -91,6 +104,11 @@ export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDa
             Conductor Tools: Queue Management
          </a>
       )}
+      
+      {birthdayMember && (
+         <BirthdayCard member={birthdayMember} />
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 w-full">
          <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} upcomingSingingDate={upcomingSingingDate} />
       </div>
