@@ -21,7 +21,8 @@ export default async function Home() {
   let secondEventDate = "";
   
   if (eventsData && eventsData.length > 0) {
-      const today = new Date();
+      const { getISTDate } = await import("@/lib/utils");
+      const today = getISTDate();
       today.setHours(0,0,0,0);
       
       const pastEvents = eventsData

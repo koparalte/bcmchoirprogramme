@@ -683,7 +683,8 @@ export async function triggerAutoRotation(
       const { data: events } = await getEvents(bcyaSheetUrl, true);
       if (!events || events.length === 0) return { success: false, reason: 'No events' };
       
-      const today = new Date();
+      const { getISTDate } = await import("./utils");
+      const today = getISTDate();
       today.setHours(0,0,0,0);
       
       // Find the most recent event that is STRICTLY in the past

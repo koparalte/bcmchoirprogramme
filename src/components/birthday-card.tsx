@@ -194,7 +194,7 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
           
           <div className="relative z-10 flex flex-col items-center justify-center h-full pt-8 pb-6 w-full">
             <Badge className={`mb-4 ${t.badgeBg} ${t.text} ${t.border} font-semibold tracking-[0.2em] uppercase text-[10px]`}>
-            BCM CHOIR 2025-2029
+            BCM CHOIR 2025-2028
           </Badge>
 
           <div className="flex flex-col items-center mb-1 leading-tight mt-0 gap-0">

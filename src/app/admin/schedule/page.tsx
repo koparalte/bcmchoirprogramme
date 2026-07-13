@@ -43,7 +43,8 @@ export default async function AdminSchedulePage() {
   let nextEventDate = "";
   let secondEventDate = "";
   if (hlazirEvents && hlazirEvents.length > 0) {
-      const today = new Date();
+      const { getISTDate } = await import("@/lib/utils");
+      const today = getISTDate();
       today.setHours(0,0,0,0);
       const sortedUpcoming = hlazirEvents
          .filter(e => e.startdate && new Date(e.startdate) >= today)
