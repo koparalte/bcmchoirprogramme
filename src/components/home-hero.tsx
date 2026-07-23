@@ -106,7 +106,7 @@ export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDa
   const bdayMatch1 = `${d}/${m}`;
   const bdayMatch2 = `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}`;
 
-  const birthdayMember = (membersData || []).find(member => {
+  const birthdayMembers = (membersData || []).filter(member => {
       if (!member.birthday) return false;
       const b = member.birthday.trim();
       return b === bdayMatch1 || b === bdayMatch2;
@@ -120,9 +120,9 @@ export async function HomeHero({ nextEventDate, secondEventDate }: { nextEventDa
          </a>
       )}
       
-      {birthdayMember && (
-         <BirthdayCard member={birthdayMember} isCurrentUser={loggedInMember.email === birthdayMember.email} />
-      )}
+      {birthdayMembers.map(member => (
+         <BirthdayCard key={member.id} member={member} isCurrentUser={loggedInMember.email === member.email} />
+      ))}
       
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 w-full">
          <ProgressCard member={heroMember} isHero={true} bibleVerse={assignedVerse} isConductor={isConductor} isSingingToday={isSingingToday} upcomingSingingDate={upcomingSingingDate} />
