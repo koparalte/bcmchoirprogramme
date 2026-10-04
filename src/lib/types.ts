@@ -49,3 +49,11 @@ export type BibleVerse = {
   verse: string;
   text: string;
 };
+
+export type SolfaTrack = {
+  id: string;
+  name: string;
+  songlink?: string; // YouTube
+  sheet?: string; // PDF
+  music?: string; // MP3
+};

@@ -2,7 +2,7 @@
 'use server';
 
 import {z} from 'zod';
-import type {Banner, Event, Member, ProgressMember, BibleVerse} from './types';
+import type {Banner, Event, Member, ProgressMember, BibleVerse, SolfaTrack} from './types';
 
 const sheetUrlSchema = z.string().url();
 
@@ -763,4 +763,51 @@ export async function triggerAutoRotation(
       console.error("Error in auto rotation:", e);
       return { error: e.message };
    }
+}
+
+export async function getSolfaTracks(
+  sheetUrl: string
+): Promise<{data?: SolfaTrack[]; error?: string}> {
+  if (!sheetUrl) return { data: [] };
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+
+  try {
+    const { cols, rows } = gvizData.table;
+    const headers = cols.map(col => col.label.toLowerCase().replace(/[^a-z]/g, ''));
+
+    const tracks: SolfaTrack[] = rows
+      .map((row, index) => {
+        const track: Record<string, any> = {};
+        row.c.forEach((cell, i) => {
+          const header = headers[i];
+          if (header) {
+             track[header] = cell ? (cell.f ?? cell.v) : null;
+          }
+        });
+        
+        // Find columns heuristically
+        const nameKey = headers.find(h => h.includes('name') || h.includes('title') || h === 'song') || headers[0];
+        const linkKey = headers.find(h => h.includes('youtube') || h.includes('songlink') || h.includes('link'));
+        const sheetKey = headers.find(h => h.includes('sheet') || h.includes('pdf') || h.includes('solfa'));
+        const musicKey = headers.find(h => h.includes('music') || h.includes('mp3') || h.includes('audio') || h.includes('track'));
+
+        return {
+          id: `${extractSheetId(sheetUrl)}-${index}`,
+          name: (track[nameKey] as string) || 'Unknown Song',
+          songlink: (linkKey ? track[linkKey] as string : undefined) || undefined,
+          sheet: (sheetKey ? track[sheetKey] as string : undefined) || undefined,
+          music: (musicKey ? track[musicKey] as string : undefined) || undefined,
+        };
+      })
+      .filter(t => t.name && t.name.toLowerCase() !== 'name');
+
+    return { data: tracks };
+  } catch (err) {
+    console.error('Error processing sheet data for Solfa & Tracks:', err);
+    return { error: 'An unexpected error occurred while processing Solfa data.' };
+  }
 }

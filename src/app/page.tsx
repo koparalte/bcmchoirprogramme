@@ -5,11 +5,13 @@ import { MemberSchedule } from "@/components/member-schedule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgrammeTab } from "@/components/programme-tab";
 import { HlaZirTab } from "@/components/hla-zir-tab";
+import { SolfaTab } from "@/components/solfa-tab";
 import { AutoQueueTrigger } from "@/components/auto-queue-trigger";
 import { getEvents } from "@/lib/actions";
 const MEMBERS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1VLdfZVk_IrvBV1INNtCTm15onyFKQHeqCmwwCp_a6KQ/edit?gid=0#gid=0";
 const PROGRESS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kMlHvUW0fR-yQDKDxvV1ONErRItvVSTMRzH8IngA-QE/edit?usp=sharing";
 const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
+const SOLFA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1rDQk-t0aKI1OqsiYHUYg6i-KJXhF2QdlnPnjViBvkgU/edit?usp=sharing";
 
 export default async function Home() {
   const [{ data: eventsData }] = await Promise.all([
@@ -56,10 +58,11 @@ export default async function Home() {
       />
       <div className="w-full max-w-5xl">
         <Tabs defaultValue="bcm" className="w-full">
-          <TabsList className="flex justify-center w-full max-w-[500px] mx-auto bg-transparent mb-10 h-12 gap-2 md:gap-8 border-b border-white/10 rounded-none p-0">
-            <TabsTrigger value="bcm" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground">PROGRAMME</TabsTrigger>
-            <TabsTrigger value="bcya" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground">HLA ZIR</TabsTrigger>
-            <TabsTrigger value="members" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground">MEMBERS</TabsTrigger>
+          <TabsList className="flex justify-between sm:justify-center w-full max-w-[650px] mx-auto bg-transparent mb-10 h-12 gap-0 sm:gap-2 md:gap-8 border-b border-white/10 rounded-none p-0 overflow-x-auto hide-scrollbar">
+            <TabsTrigger value="bcm" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-[11px] sm:text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground whitespace-nowrap">PROGRAMME</TabsTrigger>
+            <TabsTrigger value="bcya" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-[11px] sm:text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground whitespace-nowrap">HLA ZIR</TabsTrigger>
+            <TabsTrigger value="solfa" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-[11px] sm:text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground whitespace-nowrap">SOLFA & TRACK</TabsTrigger>
+            <TabsTrigger value="members" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-[11px] sm:text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground whitespace-nowrap">MEMBERS</TabsTrigger>
           </TabsList>
           
           <div className="relative">
@@ -68,6 +71,9 @@ export default async function Home() {
             </TabsContent>
             <TabsContent value="bcya" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               <HlaZirTab />
+            </TabsContent>
+            <TabsContent value="solfa" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <SolfaTab sheetUrl={SOLFA_SHEET_URL} />
             </TabsContent>
             <TabsContent value="members" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               <MemberSchedule sheetUrl={MEMBERS_SHEET_URL} />
