@@ -58,26 +58,7 @@ export async function SolfaTab({ sheetUrl }: { sheetUrl: string }) {
                 </div>
               </div>
 
-              {isDriveAudio ? (
-                <div className="w-full mt-2 rounded-xl overflow-hidden border border-white/5 bg-black/10">
-                  <iframe 
-                    src={`https://drive.google.com/file/d/${driveId}/preview`} 
-                    width="100%" 
-                    height="180" 
-                    allow="autoplay" 
-                    className="w-full border-none"
-                  ></iframe>
-                </div>
-              ) : track.music && (
-                <div className="w-full mt-2 bg-black/30 rounded-xl p-3 border border-white/5">
-                  <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-2 block ml-1">Audio Track</span>
-                  <audio controls className="w-full h-10 rounded-md bg-transparent [&::-webkit-media-controls-panel]:bg-zinc-800" src={track.music}>
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-2 mt-auto pt-2">
+              <div className="flex flex-wrap gap-2 mt-auto pt-4">
                 {track.sheet && (
                   <a href={sheetHref} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-[120px] flex items-center justify-center gap-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-lg py-2.5 px-3 transition-colors text-xs font-bold uppercase tracking-widest">
                     <FileText className="w-4 h-4" />
