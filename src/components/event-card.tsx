@@ -76,19 +76,27 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
 
   const formatDateRange = (start: string, end?: string) => {
     const startDate = new Date(start);
+    const ord = (n: number) => {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+    const w = (date: Date) => date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+    const d = (date: Date) => ord(date.getUTCDate());
+    const m = (date: Date) => date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+    const y = (date: Date) => date.getUTCFullYear();
+
     if (end) {
       const endDate = new Date(end);
-      const startMonth = startDate.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
-      const endMonth = endDate.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
-
-      if (startMonth === endMonth) {
-         return `${startDate.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' })} ${startDate.getUTCDate()} - ${endDate.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' })} ${endDate.getUTCDate()} ${startMonth}, ${startDate.getUTCFullYear()}`;
+      if (m(startDate) === m(endDate) && y(startDate) === y(endDate)) {
+        return `${w(startDate)} ${d(startDate)} – ${w(endDate)} ${d(endDate)} ${m(startDate)} ${y(startDate)}`;
       }
-      return `${startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} - ${endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}`;
+      if (y(startDate) === y(endDate)) {
+        return `${w(startDate)} ${d(startDate)} ${m(startDate)} – ${w(endDate)} ${d(endDate)} ${m(endDate)} ${y(startDate)}`;
+      }
+      return `${w(startDate)} ${d(startDate)} ${m(startDate)} ${y(startDate)} – ${w(endDate)} ${d(endDate)} ${m(endDate)} ${y(endDate)}`;
     }
-    return startDate.toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'
-    });
+    return `${w(startDate)} ${d(startDate)} ${m(startDate)} ${y(startDate)}`;
   }
 
   const zingZanText = event.zingzan?.trim().toLowerCase();
@@ -130,11 +138,9 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
           )}
         </CardHeader>
         <CardFooter className="flex justify-between items-center bg-secondary/10 p-4 mt-auto border-t border-white/5 relative z-10">
-          <div className="flex flex-col items-start gap-1 text-xs font-medium text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{formatDateRange(event.startdate, event.enddate)}</span>
-              </div>
+          <div className="flex items-center gap-3 border-l-2 border-primary pl-3">
+              <Calendar className="w-4 h-4 text-primary shrink-0" />
+              <span className="text-[13px] font-semibold text-foreground/85">{formatDateRange(event.startdate, event.enddate)}</span>
           </div>
           <Button
             variant="ghost"
