@@ -148,7 +148,7 @@ export function EventCard({ event, onSelectEvent, isBcya, isProgramme }: EventCa
             onClick={() => onSelectEvent(event)}
             className="text-primary hover:text-primary h-auto py-1 px-2 text-xs self-end"
           >
-            View Details <ArrowRight className="ml-1.5 w-3.h-3.5" />
+            View Details <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </CardFooter>
       </Card>
