@@ -346,8 +346,16 @@ export async function getAlbumPhotos(sheetUrl: string): Promise<{ data?: AlbumPh
             
             // If no title is given, default to "Group"
             const title = (rawTitle && rawTitle.trim() !== '') ? rawTitle.trim() : 'Group';
-            // Tag: If explicitly set in Column C use it; otherwise automatically group by Title!
-            const tag = (rawTag && rawTag.trim() !== '') ? rawTag.trim() : title;
+            
+            // Check if marked as album heading banner in Column C
+            const isHeading = !!(rawTag && rawTag.toLowerCase().includes('heading'));
+
+            // Clean tag: if Column C only says "heading", fallback to title for album grouping
+            let tag = title;
+            if (rawTag && rawTag.trim() !== '') {
+              const cleaned = rawTag.replace(/heading/gi, '').replace(/[,-_]/g, '').trim();
+              tag = cleaned !== '' ? cleaned : title;
+            }
 
             const driveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
                                rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
@@ -379,7 +387,8 @@ export async function getAlbumPhotos(sheetUrl: string): Promise<{ data?: AlbumPh
               downloadUrl,
               title: title || undefined,
               tag,
-              date: date || undefined
+              date: date || undefined,
+              isHeading
             };
         })
         .filter(photo => photo.url && typeof photo.url === 'string' && photo.url.trim() !== '');

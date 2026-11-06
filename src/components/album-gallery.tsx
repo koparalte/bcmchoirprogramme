@@ -16,26 +16,72 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// Helper to create an organic, artistic scrapbook / album layout
-function getPhotoSpan(index: number): string {
-  const mod = index % 8;
-  switch (mod) {
-    case 0:
-      // Large featured photo
-      return "col-span-2 row-span-2";
-    case 2:
-      // Tall portrait snapshot
-      return "col-span-1 row-span-2";
-    case 4:
-      // Wide panoramic snapshot
-      return "col-span-2 row-span-1";
-    case 6:
-      // Subtle tall snapshot
-      return "col-span-1 row-span-2";
-    default:
-      // Compact snapshot (smaller thumbnail)
-      return "col-span-1 row-span-1";
+// Disperse photos so same parts/groups are never grouped adjacent to each other
+function dispersePhotos(photoList: AlbumPhoto[]): AlbumPhoto[] {
+  if (!photoList || photoList.length <= 2) return photoList;
+
+  const buckets: Record<string, AlbumPhoto[]> = {};
+  photoList.forEach(p => {
+    const key = p.tag || p.title || 'Group';
+    if (!buckets[key]) buckets[key] = [];
+    buckets[key].push(p);
+  });
+
+  // Alternating choir order so adjacent items always differ
+  const alternatingKeys = ['Group', 'Tenors', 'Sopranos', 'Basses', 'Contraltos'];
+  const allKeys = Object.keys(buckets).sort((a, b) => {
+    const idxA = alternatingKeys.indexOf(a);
+    const idxB = alternatingKeys.indexOf(b);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  const result: AlbumPhoto[] = [];
+  let added = true;
+  let round = 0;
+
+  while (added) {
+    added = false;
+    for (let i = 0; i < allKeys.length; i++) {
+      const key = allKeys[(i + round) % allKeys.length];
+      const bucket = buckets[key];
+      if (bucket && bucket.length > 0) {
+        result.push(bucket.shift()!);
+        added = true;
+      }
+    }
+    round++;
   }
+
+  return result;
+}
+
+// Organic, pseudo-randomized thumbnail sizing (some big, some small, some wide, some tall)
+function getPhotoSpan(photo: AlbumPhoto, index: number): string {
+  const str = photo.id || `${index}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  const val = Math.abs(hash + index * 11) % 12;
+
+  if (val === 0 || val === 6) {
+    // Featured large showcase photo
+    return "col-span-2 row-span-2";
+  }
+  if (val === 2 || val === 8) {
+    // Tall portrait snapshot
+    return "col-span-1 row-span-2";
+  }
+  if (val === 4 || val === 10) {
+    // Wide horizontal snapshot
+    return "col-span-2 row-span-1";
+  }
+  // Compact snapshot (smaller thumbnail)
+  return "col-span-1 row-span-1";
 }
 
 export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
@@ -75,11 +121,16 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
     };
   }, [photos]);
 
-  // Filter photos by selected tag
+  // Dispersed photos for "All" so groups and parts are mixed up organically
+  const dispersedAllPhotos = useMemo(() => {
+    return dispersePhotos([...photos]);
+  }, [photos]);
+
+  // Filter photos by selected tag (mixed for All, filtered for specific part)
   const filteredPhotos = useMemo(() => {
-    if (selectedTag === "All" || !hasTags) return photos;
+    if (selectedTag === "All" || !hasTags) return dispersedAllPhotos;
     return photos.filter(p => p.tag?.trim() === selectedTag);
-  }, [photos, selectedTag, hasTags]);
+  }, [photos, dispersedAllPhotos, selectedTag, hasTags]);
 
   // Lightbox navigation
   const openLightbox = (index: number) => {
@@ -182,18 +233,27 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
         <AnimatePresence>
           {filteredPhotos.map((photo, index) => {
             const displayTitle = photo.title || "Group";
-            const spanClass = getPhotoSpan(index);
+            const spanClass = getPhotoSpan(photo, index);
             const isLarge = spanClass.includes("col-span-2 row-span-2");
 
             return (
               <motion.div
                 layout
                 key={photo.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3, delay: Math.min(index * 0.02, 0.25) }}
-                className={`${spanClass} group relative rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 hover:border-primary/60 transition-all duration-500 shadow-md hover:shadow-[0_0_25px_rgba(59,130,246,0.3)] cursor-pointer`}
+                initial={{ opacity: 0, y: 30 + (index % 3) * 15, scale: 0.92 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-20px" }}
+                whileHover={{ y: -5, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ 
+                  duration: 0.5, 
+                  type: "spring", 
+                  stiffness: 110, 
+                  damping: 16,
+                  delay: (index % 4) * 0.04 
+                }}
+                className={`${spanClass} group relative rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 hover:border-primary/60 transition-colors duration-300 shadow-md hover:shadow-[0_12px_35px_-5px_rgba(59,130,246,0.4)] cursor-pointer`}
                 onClick={() => openLightbox(index)}
               >
                 <Image
@@ -201,7 +261,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
                   alt={displayTitle}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                  className="object-cover object-[center_20%] md:object-center transition-transform duration-700 ease-out group-hover:scale-108"
                   loading="lazy"
                   quality={80}
                 />

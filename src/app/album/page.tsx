@@ -19,6 +19,9 @@ const LOGO_URL = "https://lh3.googleusercontent.com/d/1yOgPWEoQhO6nWt2AmwM4lxXgR
 export default async function AlbumPage() {
   const { data: photos, error } = await getAlbumPhotos(BANNER_SHEET_URL);
 
+  // Look for a photo with "heading" in Column C of the sheet
+  const headingPhoto = photos?.find(p => p.isHeading);
+
   return (
     <main className="min-h-screen bg-background text-foreground py-6 md:py-12 px-3 sm:px-4 md:px-8 container mx-auto flex flex-col items-center">
       {/* Top Navigation */}
@@ -33,7 +36,7 @@ export default async function AlbumPage() {
       </div>
 
       {/* Cinematic Header */}
-      <header className="flex flex-col items-center text-center mb-6 md:mb-10 max-w-2xl mx-auto">
+      <header className="flex flex-col items-center text-center mb-6 md:mb-8 max-w-2xl mx-auto">
         <div className="relative p-3 md:p-4 mb-3 md:mb-4 rounded-2xl bg-card border border-white/5 shadow-2xl">
           <Image
             src={LOGO_URL}
@@ -49,7 +52,37 @@ export default async function AlbumPage() {
         <div className="h-0.5 md:h-1 w-16 md:w-20 bg-primary mt-3 md:mt-4 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
       </header>
 
-      {/* Main Content */}
+      {/* Unclickable Heading Banner Cover (Configured via "heading" in Column C of the sheet) */}
+      {headingPhoto && (
+        <div className="w-full max-w-7xl mb-8 md:mb-12 pointer-events-none select-none">
+          <div className="relative h-44 sm:h-64 md:h-80 lg:h-96 w-full rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.6)] bg-zinc-900">
+            <Image
+              src={headingPhoto.fullUrl || headingPhoto.url}
+              alt="Album Heading Banner"
+              fill
+              priority
+              sizes="(max-width: 1280px) 100vw, 1280px"
+              className="object-cover object-[center_20%] md:object-[center_25%]"
+            />
+            {/* Subtle Vignette Gradients */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+
+            {/* Optional Title Badge if distinct title provided */}
+            {headingPhoto.title && headingPhoto.title !== 'Group' && (
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-10">
+                <div className="backdrop-blur-md bg-black/60 border border-white/15 px-4 py-1.5 rounded-full inline-flex items-center shadow-lg">
+                  <p className="text-white font-headline tracking-[0.2em] text-[10px] md:text-xs font-bold uppercase">
+                    {headingPhoto.title}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Main Gallery Content */}
       <div className="w-full max-w-7xl">
         {error && (!photos || photos.length === 0) ? (
           <Card className="max-w-md mx-auto text-center p-8 border-destructive/50 bg-destructive/10 rounded-2xl">

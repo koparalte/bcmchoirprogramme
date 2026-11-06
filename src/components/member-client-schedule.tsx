@@ -145,7 +145,7 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
                           src={banners[currentBannerIndex].url}
                           alt={`Members Banner ${currentBannerIndex + 1}`}
                           fill
-                          className="object-cover"
+                          className="object-cover object-[center_20%] md:object-center"
                           priority={currentBannerIndex === 0}
                           sizes="(max-width: 768px) 100vw, 1200px"
                           quality={85}

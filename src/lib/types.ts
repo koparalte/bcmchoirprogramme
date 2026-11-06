@@ -37,6 +37,7 @@ export type AlbumPhoto = {
   title?: string;
   tag?: string;
   date?: string;
+  isHeading?: boolean;
 };
 
 export type SongProgress = {
