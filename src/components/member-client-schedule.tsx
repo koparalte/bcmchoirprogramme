@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/accordion";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Download } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Images, ExternalLink } from "lucide-react";
 
 const groupMembersByPart = (members: Member[]) => {
   const grouped = members.reduce((acc, member) => {
@@ -104,7 +105,8 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
 
   const downloadImage = () => {
     if (banners) {
-        const imageUrl = banners[currentBannerIndex].url;
+        const current = banners[currentBannerIndex];
+        const imageUrl = current.downloadUrl || current.url;
         // Open in new tab is a reliable fallback for cross-origin images
         window.open(imageUrl, '_blank');
     }
@@ -145,6 +147,8 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
                           fill
                           className="object-cover"
                           priority={currentBannerIndex === 0}
+                          sizes="(max-width: 768px) 100vw, 1200px"
+                          quality={85}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30" />
                     </motion.div>
@@ -199,11 +203,14 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
                 </>
             )}
             
-            {/* Download Button */}
-             <Button onClick={downloadImage} variant="outline" size="sm" className="absolute top-6 right-6 backdrop-blur-md bg-black/20 text-white border-white/10 hover:bg-black/50 hover:border-white/30 transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-full px-4 h-9 z-20">
-                <Download className="mr-2 h-3.5 w-3.5" />
-                <span className="text-xs tracking-wider uppercase font-bold">Download</span>
-            </Button>
+            {/* View Album Button */}
+            <Link href="/album" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" size="sm" className="absolute top-6 right-6 backdrop-blur-md bg-black/40 text-white border-white/20 hover:bg-black/70 hover:border-primary/50 transition-all shadow-[0_0_20px_rgba(0,0,0,0.6)] rounded-full px-4 h-9 z-20 flex items-center gap-2 group/btn">
+                <Images className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs tracking-wider uppercase font-bold">View Album</span>
+                <ExternalLink className="h-3 w-3 text-white/60 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-all" />
+              </Button>
+            </Link>
           </div>
           
           <div className="flex flex-col items-center justify-center mt-8 mb-12 opacity-60">

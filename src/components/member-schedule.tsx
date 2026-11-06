@@ -1,4 +1,3 @@
-
 import { getMembers, getBannerUrls } from "@/lib/actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, PartyPopper } from "lucide-react";
@@ -22,7 +21,7 @@ export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
           <p className="mt-4 text-sm text-muted-foreground">Please check your Google Sheet URL and make sure it's published to the web.</p>
          </CardContent>
        </Card>
-    )
+    );
   }
 
   if (!members || members.length === 0) {
@@ -32,10 +31,13 @@ export async function MemberSchedule({ sheetUrl }: { sheetUrl: string }) {
         <h3 className="mt-4 text-xl font-semibold">No Members Found</h3>
         <p className="mt-1 text-muted-foreground">The sheet is empty or no names are listed.</p>
       </div>
-    )
+    );
   }
 
+  // Only show the first 10 photos in the top banner slideshow to save data
+  const bannerPhotos = banners ? banners.slice(0, 10) : undefined;
+
   return (
-      <MemberClientSchedule members={members} banners={banners} />
+      <MemberClientSchedule members={members} banners={bannerPhotos} />
   );
 }

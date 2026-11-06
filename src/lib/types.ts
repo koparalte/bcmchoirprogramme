@@ -26,6 +26,17 @@ export type Member = {
 export type Banner = {
   url: string;
   name?: string;
+  downloadUrl?: string;
+};
+
+export type AlbumPhoto = {
+  id: string;
+  url: string; // Thumbnail / grid view
+  fullUrl: string; // Fullscreen lightbox
+  downloadUrl: string; // Original download link
+  title?: string;
+  tag?: string;
+  date?: string;
 };
 
 export type SongProgress = {

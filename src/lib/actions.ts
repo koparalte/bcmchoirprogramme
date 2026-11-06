@@ -2,7 +2,7 @@
 'use server';
 
 import {z} from 'zod';
-import type {Banner, Event, Member, ProgressMember, BibleVerse, SolfaTrack} from './types';
+import type {Banner, Event, Member, ProgressMember, BibleVerse, SolfaTrack, AlbumPhoto} from './types';
 
 const sheetUrlSchema = z.string().url();
 
@@ -286,9 +286,30 @@ export async function getBannerUrls(sheetUrl: string): Promise<{ data?: Banner[]
     if (rows.length > 0) {
       const banners: Banner[] = rows
         .map(row => {
-            const url = row.c[0]?.v as string | null;
+            const rawUrl = ((row.c[0]?.v as string | null) || '').trim();
             const name = row.c.length > 1 ? (row.c[1]?.v as string | null) : undefined;
-            return { url: url || '', name: name || undefined };
+            
+            const driveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                               rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+                               rawUrl.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/) ||
+                               (rawUrl.includes('drive.google.com') ? rawUrl.match(/[-\w]{25,}/) : null);
+
+            let url = rawUrl;
+            let downloadUrl = rawUrl;
+
+            if (driveMatch) {
+              const fileId = driveMatch[1] || driveMatch[0];
+              // Compressed banner display size (~200KB at 1200px width)
+              url = `https://lh3.googleusercontent.com/d/${fileId}=w1200`;
+              // Full-resolution original 12MB download
+              downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            } else if (rawUrl.includes('lh3.googleusercontent.com') && rawUrl.includes('=s0')) {
+              // If an existing lh3 link has =s0, compress display to =w1200 for banner
+              url = rawUrl.replace('=s0', '=w1200');
+              downloadUrl = rawUrl;
+            }
+
+            return { url, name: name || undefined, downloadUrl };
         })
         .filter(banner => banner.url && typeof banner.url === 'string' && banner.url.trim() !== '');
 
@@ -302,6 +323,76 @@ export async function getBannerUrls(sheetUrl: string): Promise<{ data?: Banner[]
     return {
       error:
         'An unexpected error occurred while processing banner data. Check the browser console for more details.',
+    };
+  }
+}
+
+export async function getAlbumPhotos(sheetUrl: string): Promise<{ data?: AlbumPhoto[]; error?: string }> {
+  const { data: gvizData, error } = await fetchSheetData(sheetUrl);
+
+  if (error || !gvizData) {
+    return { error };
+  }
+
+  try {
+    const { rows } = gvizData.table;
+    if (rows.length > 0) {
+      const photos: AlbumPhoto[] = rows
+        .map((row, index) => {
+            const rawUrl = ((row.c[0]?.v as string | null) || '').trim();
+            const rawTitle = row.c.length > 1 ? (row.c[1]?.v as string | null) : undefined;
+            const rawTag = row.c.length > 2 ? (row.c[2]?.v as string | null) : undefined;
+            const date = row.c.length > 3 ? (row.c[3]?.v as string | null) : undefined;
+            
+            // If no title is given, default to "Group"
+            const title = (rawTitle && rawTitle.trim() !== '') ? rawTitle.trim() : 'Group';
+            // Tag: If explicitly set in Column C use it; otherwise automatically group by Title!
+            const tag = (rawTag && rawTag.trim() !== '') ? rawTag.trim() : title;
+
+            const driveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                               rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+                               rawUrl.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/) ||
+                               (rawUrl.includes('drive.google.com') ? rawUrl.match(/[-\w]{25,}/) : null);
+
+            let url = rawUrl;
+            let fullUrl = rawUrl;
+            let downloadUrl = rawUrl;
+
+            if (driveMatch) {
+              const fileId = driveMatch[1] || driveMatch[0];
+              // Ultra-lightweight thumbnail (~30KB-50KB at 500px width for fast grid loading)
+              url = `https://lh3.googleusercontent.com/d/${fileId}=w500`;
+              // Crisp high-res preview for the fullscreen lightbox (~250KB at 1600px width)
+              fullUrl = `https://lh3.googleusercontent.com/d/${fileId}=w1600`;
+              // Genuine untouched original 12MB file for direct download
+              downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            } else if (rawUrl.includes('lh3.googleusercontent.com')) {
+              fullUrl = rawUrl.includes('=') ? rawUrl.replace(/=[^&]+/, '=w1600') : `${rawUrl}=w1600`;
+              url = rawUrl.includes('=') ? rawUrl.replace(/=[^&]+/, '=w500') : `${rawUrl}=w500`;
+              downloadUrl = rawUrl.includes('=') ? rawUrl.replace(/=[^&]+/, '=s0') : `${rawUrl}=s0`;
+            }
+
+            return {
+              id: `photo-${index}-${Math.random().toString(36).substring(2, 7)}`,
+              url,
+              fullUrl,
+              downloadUrl,
+              title: title || undefined,
+              tag,
+              date: date || undefined
+            };
+        })
+        .filter(photo => photo.url && typeof photo.url === 'string' && photo.url.trim() !== '');
+
+      if (photos.length > 0) {
+        return { data: photos };
+      }
+    }
+    return { error: 'No photos found in the sheet.' };
+  } catch(err) {
+    console.error('Error processing sheet data for album photos:', err);
+    return {
+      error: 'An unexpected error occurred while processing album photos.',
     };
   }
 }
