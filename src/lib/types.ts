@@ -18,6 +18,8 @@ export type Member = {
   part?: string;
   designation?: string;
   link?: string;
+  link2?: string;
+  link3?: string;
   phone?: string;
   email?: string;
   birthday?: string;

@@ -106,9 +106,9 @@ export function MemberCard({ member, onSelectMember }: MemberCardProps) {
                 <Image 
                   src={member.link} 
                   alt={member.name} 
-                  layout="fill" 
-                  objectFit="cover" 
-                  className={cn("transition-transform duration-700 ease-out", isFocused ? "scale-110" : "group-hover:scale-110")} 
+                  fill 
+                  unoptimized
+                  className={cn("object-cover object-[center_20%] transition-transform duration-700 ease-out", isFocused ? "scale-110" : "group-hover:scale-110")} 
                 />
               ) : (
                 <span className="text-3xl font-bold text-primary/70">{getInitials(member.name)}</span>

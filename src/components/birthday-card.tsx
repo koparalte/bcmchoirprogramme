@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
-import { PartyPopper, Facebook, Instagram, Share2, Loader2 } from "lucide-react";
+import { PartyPopper, Facebook, Instagram, Share2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Member } from "@/lib/types";
 import { useRef, useState } from "react";
 import { toJpeg } from "html-to-image";
@@ -22,7 +22,16 @@ const getInitials = (name: string) => {
 export function BirthdayCard({ member, isCurrentUser = false }: { member: Member, isCurrentUser?: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isSharing, setIsSharing] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const { toast } = useToast();
+
+  const photos = member
+    ? ([member.link, member.link2, member.link3].filter(
+        (url): url is string => typeof url === "string" && url.trim().length > 0
+      ) as string[])
+    : [];
+
+  const currentPhoto = photos[selectedPhotoIndex] || member?.link;
 
   const handleShare = async (platform?: 'whatsapp' | 'instagram' | 'facebook' | 'native') => {
     if (!cardRef.current) return;
@@ -47,7 +56,10 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
           padding: '0',
         },
         filter: (n) => {
-          if (n instanceof HTMLElement && n.classList.contains('share-buttons-container')) {
+          if (n instanceof HTMLElement && (
+            n.classList.contains('share-buttons-container') ||
+            n.classList.contains('photo-nav-controls')
+          )) {
             return false;
           }
           return true;
@@ -208,15 +220,68 @@ export function BirthdayCard({ member, isCurrentUser = false }: { member: Member
           
           <DialogTitle className="sr-only">Happy Birthday</DialogTitle>
           <div className="flex flex-col items-center gap-2 z-20 mt-2">
-            <div className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-2 ${t.borderStrong} ${t.shadow} flex items-center justify-center ${t.avatarBg}`}>
-              {member.link ? (
-                 <Image src={member.link} alt={member.name} layout="fill" objectFit="cover" crossOrigin="anonymous" />
-              ) : (
-                 <span className={`text-4xl font-bold opacity-70 ${t.textOpacity}`}>
-                   {getInitials(member.name)}
-                 </span>
+            <div className="relative group">
+              <div className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-2 ${t.borderStrong} ${t.shadow} flex items-center justify-center ${t.avatarBg}`}>
+                {currentPhoto ? (
+                   <Image src={currentPhoto} alt={member.name} layout="fill" objectFit="cover" crossOrigin="anonymous" />
+                ) : (
+                   <span className={`text-4xl font-bold opacity-70 ${t.textOpacity}`}>
+                     {getInitials(member.name)}
+                   </span>
+                )}
+              </div>
+
+              {/* Navigation arrows to choose photo */}
+              {photos.length > 1 && !isSharing && (
+                <div className="photo-nav-controls pointer-events-none absolute inset-y-0 -left-3 -right-3 flex items-center justify-between z-30">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+                    }}
+                    className="pointer-events-auto w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-all backdrop-blur-sm border border-white/20 shadow-lg active:scale-90 cursor-pointer"
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="w-4 h-4 -ml-0.5" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPhotoIndex((prev) => (prev + 1) % photos.length);
+                    }}
+                    className="pointer-events-auto w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-all backdrop-blur-sm border border-white/20 shadow-lg active:scale-90 cursor-pointer"
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="w-4 h-4 -mr-0.5" />
+                  </button>
+                </div>
               )}
             </div>
+
+            {/* Navigation Dots to choose photo */}
+            {photos.length > 1 && !isSharing && (
+              <div className="photo-nav-controls flex items-center justify-center gap-1.5 mt-0.5">
+                {photos.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPhotoIndex(idx);
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      idx === selectedPhotoIndex
+                        ? "w-4 bg-fuchsia-400"
+                        : "w-1.5 bg-zinc-600 hover:bg-zinc-400"
+                    }`}
+                    aria-label={`Photo ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            )}
 
             <div className="text-center mt-1 flex flex-col items-center w-full">
               <h2 className="text-lg md:text-xl font-black uppercase tracking-widest text-zinc-100 drop-shadow-md">

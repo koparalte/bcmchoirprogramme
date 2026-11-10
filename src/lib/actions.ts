@@ -177,6 +177,27 @@ export async function getEvents(
   }
 }
 
+function normalizePhotoUrl(raw: string | null | undefined): string | undefined {
+  if (!raw || typeof raw !== 'string') return undefined;
+  let trimmed = raw.trim();
+  if (!trimmed) return undefined;
+
+  // Remove authuser param so it never forces Google account switching
+  trimmed = trimmed.replace(/[?&]authuser=\d+/g, '');
+
+  const driveMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                     trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+                     trimmed.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/) ||
+                     (trimmed.includes('drive.google.com') ? trimmed.match(/[-\w]{25,}/) : null);
+
+  if (driveMatch) {
+    const fileId = driveMatch[1] || driveMatch[0];
+    return `https://lh3.googleusercontent.com/d/${fileId}=w1000`;
+  }
+
+  return trimmed;
+}
+
 export async function getMembers(
   sheetUrl: string
 ): Promise<{data?: Member[]; error?: string}> {
@@ -216,10 +237,11 @@ export async function getMembers(
             designation = designationCell ? (designationCell.f ?? designationCell.v) : null;
         }
 
-        let link: string | null = null;
+        let rawLink1: string | undefined = undefined;
         if (row.c.length > 4) {
             const linkCell = row.c[4];
-            link = linkCell ? (linkCell.f ?? linkCell.v) : null;
+            const raw = linkCell ? (linkCell.f ?? linkCell.v) : null;
+            rawLink1 = normalizePhotoUrl(raw);
         }
 
         let phone: string | null = null;
@@ -249,13 +271,47 @@ export async function getMembers(
             }
         }
 
+        let rawLink2: string | undefined = undefined;
+        if (row.c.length > 8) {
+            const link2Cell = row.c[8];
+            const raw2 = link2Cell ? (link2Cell.f ?? link2Cell.v) : null;
+            rawLink2 = normalizePhotoUrl(raw2);
+        }
+
+        let rawLink3: string | undefined = undefined;
+        if (row.c.length > 9) {
+            const link3Cell = row.c[9];
+            const raw3 = link3Cell ? (link3Cell.f ?? link3Cell.v) : null;
+            rawLink3 = normalizePhotoUrl(raw3);
+        }
+
+        // Photo Ordering:
+        // Main image (for cards and 1st in dialog carousel): Column I (link 2)
+        // Second image (2nd in dialog carousel): Column J (link 3)
+        // Third image (3rd in dialog carousel): Column E (link)
+        let link: string | undefined = undefined;
+        let link2: string | undefined = undefined;
+        let link3: string | undefined = undefined;
+
+        if (rawLink2) {
+          link = rawLink2;
+          link2 = rawLink3 || rawLink1;
+          link3 = rawLink3 ? rawLink1 : undefined;
+        } else {
+          link = rawLink1;
+          link2 = rawLink3;
+          link3 = undefined;
+        }
+
         return {
           id: `${extractSheetId(sheetUrl)}-${index}`,
           name: name || '',
           kohhran: kohhran || undefined,
           part: part || undefined,
           designation: designation || undefined,
-          link: link || undefined,
+          link: link,
+          link2: link2,
+          link3: link3,
           phone: phone || undefined,
           email: email || undefined,
           birthday: birthday || undefined,
