@@ -206,6 +206,9 @@ export function MemberClientSchedule({ members, banners }: { members: Member[], 
             {/* View Album Button - opens album view on the same page */}
             <Link 
               href="/?view=album"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+              }}
               className="absolute top-6 right-6 backdrop-blur-md bg-black/40 text-white border border-white/20 hover:bg-black/70 hover:border-primary/50 transition-all shadow-[0_0_20px_rgba(0,0,0,0.6)] rounded-full px-4 h-9 z-20 flex items-center gap-2 group/btn cursor-pointer"
             >
               <Images className="h-3.5 w-3.5 text-primary group-hover/btn:scale-110 transition-transform" />
