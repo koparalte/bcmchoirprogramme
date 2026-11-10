@@ -1,0 +1,101 @@
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowLeft, Images, AlertTriangle } from "lucide-react";
+import { getAlbumPhotos } from "@/lib/actions";
+import { AlbumGallery } from "@/components/album-gallery";
+import { Card, CardContent } from "@/components/ui/card";
+
+const BANNER_SHEET_URL = "https://docs.google.com/spreadsheets/d/1EeZKOlNySd3VG93XPWMAs5moSGfzsPQ0kjl9Bqugu7s/edit?usp=sharing";
+const LOGO_URL = "https://lh3.googleusercontent.com/d/1yOgPWEoQhO6nWt2AmwM4lxXgRsoZs7nM";
+
+export async function AlbumView() {
+  const { data: photos, error } = await getAlbumPhotos(BANNER_SHEET_URL);
+
+  // Look for a photo with "heading" in Column C of the sheet
+  const headingPhoto = photos?.find((p) => p.isHeading);
+
+  return (
+    <div className="w-full max-w-7xl flex flex-col items-center">
+      {/* Top Navigation */}
+      <div className="w-full flex items-center justify-between mb-6 md:mb-8 pt-2">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-xs md:text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/40 px-4 py-2 rounded-full backdrop-blur-md shadow-sm group"
+        >
+          <ArrowLeft className="w-4 h-4 text-primary group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
+      {/* Cinematic Header */}
+      <header className="flex flex-col items-center text-center mb-6 md:mb-10 max-w-2xl mx-auto">
+        <div className="relative p-3 md:p-4 mb-3 md:mb-4 rounded-2xl bg-card border border-white/5 shadow-2xl group transition-all duration-700 hover:border-primary/40 hover:shadow-[0_0_2rem_-0.5rem_rgba(59,130,246,0.3)]">
+          <Image
+            src={LOGO_URL}
+            alt="BCM Choir Logo"
+            width={48}
+            height={48}
+            className="opacity-90 grayscale group-hover:grayscale-0 transition-all duration-500"
+          />
+        </div>
+        <h1 className="font-headline text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground uppercase pb-1">
+          BCM Choir Album
+        </h1>
+        <div className="h-1 w-20 bg-primary mt-3 md:mt-4 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+      </header>
+
+      {/* Unclickable Heading Banner Cover (Configured via "heading" in Column C of the sheet) */}
+      {headingPhoto && (
+        <div className="w-full mb-8 md:mb-12 pointer-events-none select-none">
+          <div className="relative h-44 sm:h-64 md:h-80 lg:h-96 w-full rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.6)] bg-zinc-900">
+            <Image
+              src={headingPhoto.fullUrl || headingPhoto.url}
+              alt="Album Heading Banner"
+              fill
+              priority
+              sizes="(max-width: 1280px) 100vw, 1280px"
+              className="object-cover object-[center_20%] md:object-[center_25%]"
+            />
+            {/* Subtle Vignette Gradients */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+
+            {/* Optional Title Badge if distinct title provided */}
+            {headingPhoto.title && headingPhoto.title !== "Group" && (
+              <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-10">
+                <div className="backdrop-blur-md bg-black/60 border border-white/15 px-4 py-1.5 rounded-full inline-flex items-center shadow-lg">
+                  <p className="text-white font-headline tracking-[0.2em] text-[10px] md:text-xs font-bold uppercase">
+                    {headingPhoto.title}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Main Gallery Content */}
+      <div className="w-full">
+        {error && (!photos || photos.length === 0) ? (
+          <Card className="max-w-md mx-auto text-center p-8 border-destructive/50 bg-destructive/10 rounded-2xl">
+            <CardContent className="pt-6">
+              <AlertTriangle className="mx-auto h-10 w-10 text-destructive mb-3" />
+              <h3 className="text-lg font-bold text-destructive">Failed to Load Photos</h3>
+              <p className="mt-2 text-xs text-destructive/80">{error}</p>
+            </CardContent>
+          </Card>
+        ) : !photos || photos.length === 0 ? (
+          <div className="text-center p-12 border border-dashed border-white/10 rounded-3xl max-w-md mx-auto bg-black/20">
+            <Images className="mx-auto h-12 w-12 text-muted-foreground mb-3 opacity-50" />
+            <h3 className="text-lg font-bold text-foreground">No Photos Found</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Add photo links to your Google Sheet to display them here.
+            </p>
+          </div>
+        ) : (
+          <AlbumGallery photos={photos} />
+        )}
+      </div>
+    </div>
+  );
+}

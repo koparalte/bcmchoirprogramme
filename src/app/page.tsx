@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgrammeTab } from "@/components/programme-tab";
 import { HlaZirTab } from "@/components/hla-zir-tab";
 import { SolfaTab } from "@/components/solfa-tab";
+import { AlbumView } from "@/components/album-view";
 import { CalendarOnly } from "@/components/calendar-only";
 import { AutoQueueTrigger } from "@/components/auto-queue-trigger";
 import { getEvents, getMembers } from "@/lib/actions";
@@ -17,8 +18,28 @@ const BCM_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xeyiLqMDULNfycqE2
 const BCYA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1NZtNfQ9-P9KCVUUj9BYbf7mIdD2t_yO5wT5j8URquKE/edit?gid=0#gid=0";
 const SOLFA_SHEET_URL = "https://docs.google.com/spreadsheets/d/1rDQk-t0aKI1OqsiYHUYg6i-KJXhF2QdlnPnjViBvkgU/edit?usp=sharing";
 
-export default async function Home() {
-  const [{ data: eventsData }, session, { data: membersData }, { data: programmeData }] = await Promise.all([
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ tab?: string; view?: string }>;
+}) {
+  const params = searchParams ? await searchParams : undefined;
+
+  // Render dedicated Album View on the same page when requested via "View Album"
+  if (params?.view === "album") {
+    return (
+      <main className="min-h-screen container mx-auto px-4 py-6 md:py-10 flex flex-col items-center">
+        <AlbumView />
+      </main>
+    );
+  }
+
+  const [
+    { data: eventsData },
+    session,
+    { data: membersData },
+    { data: programmeData },
+  ] = await Promise.all([
     getEvents(BCYA_SHEET_URL, true),
     auth(),
     getMembers(MEMBERS_SHEET_URL),
@@ -63,7 +84,9 @@ export default async function Home() {
     ...(eventsData || []).map(e => ({ ...e, type: 'hlazir' })),
   ];
 
-  const defaultTab = isMember ? "bcm" : "members";
+  const validTabs = ["bcm", "bcya", "members", "solfa"];
+  const requestedTab = params?.tab && validTabs.includes(params.tab) ? params.tab : undefined;
+  const defaultTab = requestedTab || (isMember ? "bcm" : "members");
   const tabTriggerClass = "rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary transition-all font-semibold tracking-widest text-[11px] sm:text-xs md:text-sm h-full px-2 md:px-4 data-[state=active]:shadow-none text-muted-foreground uppercase hover:text-foreground whitespace-nowrap";
 
   return (
@@ -85,7 +108,7 @@ export default async function Home() {
 
       <div className="w-full max-w-5xl">
         <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="flex justify-between sm:justify-center w-full max-w-[650px] mx-auto bg-transparent mb-10 h-12 gap-0 sm:gap-2 md:gap-8 border-b border-white/10 rounded-none p-0 overflow-x-auto hide-scrollbar">
+          <TabsList className="flex justify-between sm:justify-center w-full max-w-[620px] mx-auto bg-transparent mb-10 h-12 gap-0 sm:gap-2 md:gap-6 border-b border-white/10 rounded-none p-0 overflow-x-auto hide-scrollbar">
             {isMember && (
               <>
                 <TabsTrigger value="bcm" className={tabTriggerClass}>PROGRAMME</TabsTrigger>

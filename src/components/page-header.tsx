@@ -11,7 +11,7 @@ export function PageHeader() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="flex flex-col items-center text-center mb-12 md:mb-16 pt-8"
+      className="flex flex-col items-center text-center mb-10 md:mb-14 pt-4 md:pt-6"
     >
       <div className="relative p-5 mb-8 rounded-2xl bg-card border border-white/5 shadow-2xl group transition-all duration-700 hover:border-primary/40 hover:shadow-[0_0_2rem_-0.5rem_rgba(59,130,246,0.3)]">
         <Image src={logoUrl} alt="BCM Choir Programme Logo" width={64} height={64} className="opacity-90 grayscale group-hover:grayscale-0 transition-all duration-700 relative z-10" />
